@@ -6,18 +6,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Threax.DeployConfig;
+using Threax.DockerBuildConfig;
 using Threax.K8sDeploy.Services;
 
 namespace Threax.K8sDeploy.Controller
 {
     class BuildController : IController
     {
-        private DeploymentConfig appConfig;
+        private BuildConfig appConfig;
         private ILogger logger;
         private IProcessRunner processRunner;
 
-        public BuildController(DeploymentConfig appConfig, ILogger<BuildController> logger, IProcessRunner processRunner)
+        public BuildController(BuildConfig appConfig, ILogger<BuildController> logger, IProcessRunner processRunner)
         {
             this.appConfig = appConfig;
             this.logger = logger;
@@ -28,7 +28,7 @@ namespace Threax.K8sDeploy.Controller
         {
             var clonePath = appConfig.ClonePath;
             var dockerFile = Path.GetFullPath(Path.Combine(clonePath, appConfig.Dockerfile ?? throw new InvalidOperationException($"Please provide {nameof(appConfig.Dockerfile)} when using build.")));
-            var image = appConfig.Name;
+            var image = appConfig.ImageName;
             var buildTag = appConfig.GetBuildTag();
             var currentTag = appConfig.GetCurrentTag();
 

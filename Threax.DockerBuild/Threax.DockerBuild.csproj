@@ -12,14 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="KubernetesClient" Version="1.6.12" />
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.2" />
     <PackageReference Include="Threax.Extensions.Configuration.SchemaBinder" Version="1.5.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Threax.DeployConfig\Threax.DeployConfig.csproj" />
+    <ProjectReference Include="..\Threax.DockerBuildConfig\Threax.DockerBuildConfig.csproj" />
   </ItemGroup>
 
   <ItemGroup>

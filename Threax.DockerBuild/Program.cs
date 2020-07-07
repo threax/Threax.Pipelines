@@ -1,14 +1,11 @@
-﻿using System;
-using System.IO;
-using k8s;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Runtime.InteropServices;
+using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
-using Threax.DeployConfig;
 using Threax.K8sDeploy.Controller;
 using Threax.K8sDeploy.Services;
-using System.Runtime.InteropServices;
 
 namespace Threax.K8sDeploy
 {
@@ -23,7 +20,7 @@ namespace Threax.K8sDeploy
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var jsonConfigPath = args[1];
+                    var jsonConfigPath = args.Length > 1 ? args[1] : "unknown.json";
 
                     services.AddHostedService<HostedService>();
 
@@ -46,18 +43,11 @@ namespace Threax.K8sDeploy
                         return new OSHandlerLinux(s.GetRequiredService<IProcessRunner>());
                     });
 
-                    services.AddScoped<IKubernetes>(s =>
-                    {
-                        var config = KubernetesClientConfiguration.BuildDefaultConfig();
-                        IKubernetes client = new Kubernetes(config);
-                        return client;
-                    });
-
-                    services.AddScoped<DeploymentConfig>(s =>
+                    services.AddScoped<BuildConfig>(s =>
                     {
                         var config = s.GetRequiredService<SchemaConfigurationBinder>();
-                        var appConfig = new DeploymentConfig(jsonConfigPath);
-                        config.Bind("Deploy", appConfig);
+                        var appConfig = new BuildConfig(jsonConfigPath);
+                        config.Bind("Build", appConfig);
                         appConfig.Validate();
                         return appConfig;
                     });

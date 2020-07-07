@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Threax.K8sDeploy": {
+    "Threax.DockerBuild": {
       "commandName": "Project"
     },
     "Clone": {
@@ -11,10 +11,6 @@
       "commandName": "Project",
       "commandLineArgs": "build Example/id/appsettings.json"
     },
-    "Deploy": {
-      "commandName": "Project",
-      "commandLineArgs": "deploy Example/id/appsettings.json"
-    },
     "CloneAppDashboard": {
       "commandName": "Project",
       "commandLineArgs": "clone Example/appdashboard/appsettings.json"
@@ -23,10 +19,6 @@
       "commandName": "Project",
       "commandLineArgs": "build Example/appdashboard/appsettings.json"
     },
-    "DeployAppDashboard": {
-      "commandName": "Project",
-      "commandLineArgs": "deploy Example/appdashboard/appsettings.json"
-    },
     "CloneNotes": {
       "commandName": "Project",
       "commandLineArgs": "clone Example/notes/appsettings.json"
@@ -34,10 +26,6 @@
     "BuildNotes": {
       "commandName": "Project",
       "commandLineArgs": "build Example/notes/appsettings.json"
-    },
-    "DeployNotes": {
-      "commandName": "Project",
-      "commandLineArgs": "deploy Example/notes/appsettings.json"
     }
   }
 }
