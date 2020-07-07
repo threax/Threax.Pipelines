@@ -35,7 +35,7 @@ namespace Threax.DockerBuildConfig
         /// <summary>
         /// The base tag of the app. This is used when looking up image builds.
         /// </summary>
-        public String BaseTag { get; set; } = "k8sdeploy";
+        public String BaseTag { get; set; } = "threaxpipe";
 
         /// <summary>
         /// The path to the source file of this app config.

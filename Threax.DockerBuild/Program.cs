@@ -30,6 +30,7 @@ namespace Threax.K8sDeploy
                     });
 
                     services.AddThreaxPipelines();
+                    services.AddThreaxPipelinesDocker();
 
                     services.AddScoped<BuildConfig>(s =>
                     {

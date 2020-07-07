@@ -11,14 +11,14 @@ namespace Threax.K8sDeploy.Controller
 {
     class PushController : IController
     {
-        private readonly BuildConfig appConfig;
+        private readonly BuildConfig buildConfig;
         private readonly ILogger logger;
         private readonly IImageManager imageManager;
         private readonly IProcessRunner processRunner;
 
-        public PushController(BuildConfig appConfig, ILogger<PushController> logger, IImageManager imageManager, IProcessRunner processRunner)
+        public PushController(BuildConfig buildConfig, ILogger<PushController> logger, IImageManager imageManager, IProcessRunner processRunner)
         {
-            this.appConfig = appConfig;
+            this.buildConfig = buildConfig;
             this.logger = logger;
             this.imageManager = imageManager;
             this.processRunner = processRunner;
@@ -26,18 +26,13 @@ namespace Threax.K8sDeploy.Controller
 
         public Task Run()
         {
-            var clonePath = appConfig.ClonePath;
-            var dockerFile = Path.GetFullPath(Path.Combine(clonePath, appConfig.Dockerfile ?? throw new InvalidOperationException($"Please provide {nameof(appConfig.Dockerfile)} when using push.")));
-            var image = appConfig.ImageName;
-            var buildTag = appConfig.GetBuildTag();
-            var currentTag = appConfig.GetCurrentTag();
+            var image = buildConfig.ImageName;
+            var currentTag = buildConfig.GetCurrentTag();
+            var taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
 
-            var args = $"push {image}:{buildTag} -f {dockerFile} -t {image}:{buildTag} -t {image}:{currentTag}";
+            logger.LogInformation($"Pushing '{image}' with tag '{taggedImageName}'.");
 
-            if (appConfig.AlwaysPull)
-            {
-                args += " --pull";
-            }
+            var args = $"push {taggedImageName}";
 
             processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", args));
 

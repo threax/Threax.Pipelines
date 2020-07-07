@@ -44,9 +44,9 @@ namespace Threax.K8sDeploy.Controller
         {
             var image = buildConfig.ImageName;
             var currentTag = buildConfig.GetCurrentTag();
-            var latestDateTag = imageManager.FindLatestImage(buildConfig.ImageName, buildConfig.BaseTag, currentTag);
+            var taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
 
-            logger.LogInformation($"Redeploying '{image}' with tag '{latestDateTag}'.");
+            logger.LogInformation($"Redeploying '{image}' with tag '{taggedImageName}'.");
 
             var volumes = new List<V1Volume>();
             var volumeMounts = new List<V1VolumeMount>();
@@ -58,7 +58,7 @@ namespace Threax.K8sDeploy.Controller
             var userId = deployConfig.User != null ? long.Parse(deployConfig.User) : default(long?);
             var groupId = deployConfig.Group != null ? long.Parse(deployConfig.Group) : default(long?);
 
-            var deployment = CreateDeployment(deployConfig.Name, latestDateTag, userId, groupId, volumes, volumeMounts);
+            var deployment = CreateDeployment(deployConfig.Name, taggedImageName, userId, groupId, volumes, volumeMounts);
             var service = CreateService(deployConfig.Name);
             var ingress = CreateIngress(deployConfig.Name, $"{deployConfig.Name}.{deployConfig.Domain}");
 
