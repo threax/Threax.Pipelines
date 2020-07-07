@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.AzPowershe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.AzPowershell.Tests", "Threax.Provision.AzPowershell.Tests\Threax.Provision.AzPowershell.Tests.csproj", "{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleProvisioner", "SampleProvisioner\SampleProvisioner.csproj", "{56C00B61-F188-4040-933A-5C4C4D5AA822}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.CheapAzure", "Threax.Provision.CheapAzure\Threax.Provision.CheapAzure.csproj", "{BA49EB21-64D0-476B-BFFD-A205B3850004}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,10 +71,10 @@ Global
 		{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56C00B61-F188-4040-933A-5C4C4D5AA822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56C00B61-F188-4040-933A-5C4C4D5AA822}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56C00B61-F188-4040-933A-5C4C4D5AA822}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56C00B61-F188-4040-933A-5C4C4D5AA822}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA49EB21-64D0-476B-BFFD-A205B3850004}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA49EB21-64D0-476B-BFFD-A205B3850004}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA49EB21-64D0-476B-BFFD-A205B3850004}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA49EB21-64D0-476B-BFFD-A205B3850004}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
