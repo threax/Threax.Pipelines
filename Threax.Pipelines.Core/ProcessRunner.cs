@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Threax.K8sDeploy.Services
+namespace Threax.Pipelines.Core
 {
     public class ProcessRunner : IProcessRunner
     {

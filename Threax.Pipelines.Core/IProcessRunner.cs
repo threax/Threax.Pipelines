@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Threax.K8sDeploy.Services
+namespace Threax.Pipelines.Core
 {
     public interface IProcessRunner
     {

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
 using Threax.K8sDeploy.Controller;
-using Threax.K8sDeploy.Services;
+using Threax.Pipelines.Core;
 
 namespace Threax.K8sDeploy
 {
@@ -31,17 +31,7 @@ namespace Threax.K8sDeploy
                         return new SchemaConfigurationBinder(configBuilder.Build());
                     });
 
-                    services.AddScoped<IProcessRunner, ProcessRunner>();
-                    services.AddScoped<IConfigFileProvider, ConfigFileProvider>();
-
-                    services.AddScoped<IOSHandler>(s =>
-                    {
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        {
-                            return new OSHandlerWindows();
-                        }
-                        return new OSHandlerLinux(s.GetRequiredService<IProcessRunner>());
-                    });
+                    services.AddThreaxPipelines();
 
                     services.AddScoped<BuildConfig>(s =>
                     {

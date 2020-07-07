@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Threax.K8sDeploy.Services
+namespace Threax.Pipelines.Core
 {
-    public class OSHandlerLinux : IOSHandler
+    public class OSHandlerUnix : IOSHandler
     {
         private readonly IProcessRunner processRunner;
 
-        public OSHandlerLinux(IProcessRunner processRunner)
+        public OSHandlerUnix(IProcessRunner processRunner)
         {
             this.processRunner = processRunner;
         }

@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Threax.DockerBuildConfig\Threax.DockerBuildConfig.csproj" />
+    <ProjectReference Include="..\Threax.Pipelines.Core\Threax.Pipelines.Core.csproj" />
+    <ProjectReference Include="..\Threax.Pipelines.Docker\Threax.Pipelines.Docker.csproj" />
   </ItemGroup>
 
   <ItemGroup>
