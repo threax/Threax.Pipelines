@@ -3,15 +3,15 @@
     "Threax.K8sDeploy": {
       "commandName": "Project"
     },
-    "DeployId": {
+    "Deploy Id": {
       "commandName": "Project",
       "commandLineArgs": "deploy $(ProjectDir)../ExampleDeployment/id/appsettings.json"
     },
-    "DeployAppDashboard": {
+    "Deploy AppDashboard": {
       "commandName": "Project",
       "commandLineArgs": "deploy $(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json"
     },
-    "DeployNotes": {
+    "Deploy Notes": {
       "commandName": "Project",
       "commandLineArgs": "deploy $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
     }
