@@ -7,15 +7,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DockerBuild", "Threa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DockerBuildConfig", "Threax.DockerBuildConfig\Threax.DockerBuildConfig.csproj", "{A88C78F1-F01E-4DD4-949E-5D9F9704A16C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Threax.Pipelines.Docker", "Threax.Pipelines.Docker\Threax.Pipelines.Docker.csproj", "{631A339B-FEF9-42AF-9E5D-D8812BADA79E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Pipelines.Docker", "Threax.Pipelines.Docker\Threax.Pipelines.Docker.csproj", "{631A339B-FEF9-42AF-9E5D-D8812BADA79E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Threax.Pipelines.Core", "Threax.Pipelines.Core\Threax.Pipelines.Core.csproj", "{168F3CFF-BA1A-4A68-8C8D-DFD38332B7BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Pipelines.Core", "Threax.Pipelines.Core\Threax.Pipelines.Core.csproj", "{168F3CFF-BA1A-4A68-8C8D-DFD38332B7BC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.K8sDeploy", "Threax.K8sDeploy\Threax.K8sDeploy.csproj", "{6A1C700E-88BF-4035-926B-ED9766CDFF8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Threax.K8sDeployConfig", "Threax.K8sDeployConfig\Threax.K8sDeployConfig.csproj", "{622B904A-B2EB-4051-B5D7-F5AFCE76A093}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.K8sDeployConfig", "Threax.K8sDeployConfig\Threax.K8sDeployConfig.csproj", "{622B904A-B2EB-4051-B5D7-F5AFCE76A093}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleDeployment", "ExampleDeployment\ExampleDeployment.csproj", "{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision", "Threax.Provision\Threax.Provision.csproj", "{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.AzPowershell", "Threax.Provision.AzPowershell\Threax.Provision.AzPowershell.csproj", "{4F7BD4C3-DB4B-4292-85D5-B3670DDBD5F8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.AzPowershell.Tests", "Threax.Provision.AzPowershell.Tests\Threax.Provision.AzPowershell.Tests.csproj", "{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleProvisioner", "SampleProvisioner\SampleProvisioner.csproj", "{56C00B61-F188-4040-933A-5C4C4D5AA822}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +59,22 @@ Global
 		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F7BD4C3-DB4B-4292-85D5-B3670DDBD5F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F7BD4C3-DB4B-4292-85D5-B3670DDBD5F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F7BD4C3-DB4B-4292-85D5-B3670DDBD5F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F7BD4C3-DB4B-4292-85D5-B3670DDBD5F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56C00B61-F188-4040-933A-5C4C4D5AA822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56C00B61-F188-4040-933A-5C4C4D5AA822}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56C00B61-F188-4040-933A-5C4C4D5AA822}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56C00B61-F188-4040-933A-5C4C4D5AA822}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
