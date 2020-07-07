@@ -339,3 +339,5 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /ExampleDeployment/**/src
+/ExampleDeployment/**/data
+/ExampleDeployment/**/pod.json

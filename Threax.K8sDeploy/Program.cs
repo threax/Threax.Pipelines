@@ -7,6 +7,7 @@ using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
 using Threax.K8sDeploy.Controller;
 using Threax.K8sDeployConfig;
+using Threax.Pipelines.Core;
 
 namespace Threax.K8sDeploy
 {
@@ -32,7 +33,11 @@ namespace Threax.K8sDeploy
                         return new SchemaConfigurationBinder(configBuilder.Build());
                     });
 
-                    services.AddThreaxPipelines();
+                    services.AddThreaxPipelines(o =>
+                    {
+                        o.SetupConfigFileProvider = s => new ConfigFileProvider(jsonConfigPath);
+                    });
+                    services.AddThreaxPipelinesDocker();
 
                     services.AddScoped<IKubernetes>(s =>
                     {
@@ -44,19 +49,19 @@ namespace Threax.K8sDeploy
                     services.AddScoped<DeploymentConfig>(s =>
                     {
                         var config = s.GetRequiredService<SchemaConfigurationBinder>();
-                        var appConfig = new DeploymentConfig(jsonConfigPath);
-                        config.Bind("Deploy", appConfig);
-                        appConfig.Validate();
-                        return appConfig;
+                        var deployConfig = new DeploymentConfig(jsonConfigPath);
+                        config.Bind("Deploy", deployConfig);
+                        deployConfig.Validate();
+                        return deployConfig;
                     });
 
                     services.AddScoped<BuildConfig>(s =>
                     {
                         var config = s.GetRequiredService<SchemaConfigurationBinder>();
-                        var appConfig = new BuildConfig(jsonConfigPath);
-                        config.Bind("Build", appConfig);
-                        appConfig.Validate();
-                        return appConfig;
+                        var buildConfig = new BuildConfig(jsonConfigPath);
+                        config.Bind("Build", buildConfig);
+                        buildConfig.Validate();
+                        return buildConfig;
                     });
 
                     var controllerType = typeof(HelpController);

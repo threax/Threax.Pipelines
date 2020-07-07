@@ -8,8 +8,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Threax.DockerBuildConfig;
 using Threax.K8sDeployConfig;
 using Threax.Pipelines.Core;
+using Threax.Pipelines.Docker;
 
 namespace Threax.K8sDeploy.Controller
 {
@@ -17,46 +19,32 @@ namespace Threax.K8sDeploy.Controller
     {
         private const String Namespace = "default";
 
-        private DeploymentConfig appConfig;
-        private ILogger logger;
-        private IProcessRunner processRunner;
+        private readonly DeploymentConfig deployConfig;
+        private readonly BuildConfig buildConfig;
+        private readonly ILogger logger;
+        private readonly IProcessRunner processRunner;
         private readonly IKubernetes k8SClient;
         private readonly IConfigFileProvider configFileProvider;
         private readonly IOSHandler osHandler;
+        private readonly IImageManager imageManager;
 
-        public DeployController(DeploymentConfig appConfig, ILogger<DeployController> logger, IProcessRunner processRunner, IKubernetes k8sClient, IConfigFileProvider configFileProvider, IOSHandler iOSHandler)
+        public DeployController(DeploymentConfig deployConfig, BuildConfig buildConfig, ILogger<DeployController> logger, IProcessRunner processRunner, IKubernetes k8sClient, IConfigFileProvider configFileProvider, IOSHandler iOSHandler, IImageManager imageManager)
         {
-            this.appConfig = appConfig;
+            this.deployConfig = deployConfig;
+            this.buildConfig = buildConfig;
             this.logger = logger;
             this.processRunner = processRunner;
             this.k8SClient = k8sClient;
             this.configFileProvider = configFileProvider;
             this.osHandler = iOSHandler;
+            this.imageManager = imageManager;
         }
 
         public Task Run()
         {
-            var image = appConfig.Name;
-            var currentTag = appConfig.GetCurrentTag();
-
-            //Get the tags from docker
-            var args = $"inspect --format=\"{{{{json .RepoTags}}}}\" {image}:{currentTag}";
-            var startInfo = new ProcessStartInfo("docker", args);
-            var json = processRunner.RunProcessWithOutputGetOutput(startInfo);
-            var tags = System.Text.Json.JsonSerializer.Deserialize<List<String>>(json);
-
-            //Remove any tags that weren't set by this software
-            tags.Remove($"{image}:{currentTag}");
-            var tagFilter = $"{image}:{appConfig.BaseTag}";
-            tags = tags.Where(i => i.StartsWith(tagFilter)).ToList();
-            tags.Sort(); //Docker seems to store these in order, but sort them by their names, the tags are date based and the latest will always be last
-
-            var latestDateTag = tags.LastOrDefault();
-
-            if (latestDateTag == null)
-            {
-                throw new InvalidOperationException($"Cannot find a tag in the format '{tagFilter}' on image '{image}'.");
-            }
+            var image = buildConfig.ImageName;
+            var currentTag = buildConfig.GetCurrentTag();
+            var latestDateTag = imageManager.FindLatestImage(buildConfig.ImageName, buildConfig.BaseTag, currentTag);
 
             logger.LogInformation($"Redeploying '{image}' with tag '{latestDateTag}'.");
 
@@ -67,12 +55,12 @@ namespace Threax.K8sDeploy.Controller
             MountAppSettings(volumes, volumeMounts);
             SetupSecrets(volumes, volumeMounts);
 
-            var userId = appConfig.User != null ? long.Parse(appConfig.User) : default(long?);
-            var groupId = appConfig.Group != null ? long.Parse(appConfig.Group) : default(long?);
+            var userId = deployConfig.User != null ? long.Parse(deployConfig.User) : default(long?);
+            var groupId = deployConfig.Group != null ? long.Parse(deployConfig.Group) : default(long?);
 
-            var deployment = CreateDeployment(appConfig.Name, latestDateTag, userId, groupId, volumes, volumeMounts);
-            var service = CreateService(appConfig.Name);
-            var ingress = CreateIngress(appConfig.Name, $"{appConfig.Name}.{appConfig.Domain}");
+            var deployment = CreateDeployment(deployConfig.Name, latestDateTag, userId, groupId, volumes, volumeMounts);
+            var service = CreateService(deployConfig.Name);
+            var ingress = CreateIngress(deployConfig.Name, $"{deployConfig.Name}.{deployConfig.Domain}");
 
             var deployed = k8SClient.CreateOrReplaceNamespacedDeployment(deployment, Namespace);
             k8SClient.CreateOrReplaceNamespacedService(service, Namespace);
@@ -85,12 +73,12 @@ namespace Threax.K8sDeploy.Controller
 
         private void SetupVolumes(List<V1Volume> volumes, List<V1VolumeMount> volumeMounts)
         {
-            if (appConfig.Volumes != null)
+            if (deployConfig.Volumes != null)
             {
                 //Ensure app data path exists (will need to handle permissions here too eventually).
-                foreach (var vol in appConfig.Volumes?.Where(i => i.Value.Type == PathType.Directory))
+                foreach (var vol in deployConfig.Volumes?.Where(i => i.Value.Type == PathType.Directory))
                 {
-                    var path = appConfig.GetAppDataPath(vol.Value.Source);
+                    var path = deployConfig.GetAppDataPath(vol.Value.Source);
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
@@ -98,21 +86,21 @@ namespace Threax.K8sDeploy.Controller
 
                     if (vol.Value.ManagePermissions)
                     {
-                        osHandler.SetPermissions(path, appConfig.User, appConfig.Group);
+                        osHandler.SetPermissions(path, deployConfig.User, deployConfig.Group);
                     }
                 }
 
-                volumes.AddRange(appConfig.Volumes?.Select(i => new V1Volume()
+                volumes.AddRange(deployConfig.Volumes?.Select(i => new V1Volume()
                 {
                     Name = i.Key.ToLowerInvariant(),
                     HostPath = new V1HostPathVolumeSource()
                     {
-                        Path = osHandler.CreateDockerPath(appConfig.GetAppDataPath(i.Value.Source)),
+                        Path = osHandler.CreateDockerPath(deployConfig.GetAppDataPath(i.Value.Source)),
                         Type = i.Value.Type.ToString()
                     }
                 }));
 
-                volumeMounts.AddRange(appConfig.Volumes?.Select(i => new V1VolumeMount()
+                volumeMounts.AddRange(deployConfig.Volumes?.Select(i => new V1VolumeMount()
                 {
                     MountPath = i.Value.Destination,
                     Name = i.Key.ToLowerInvariant()
@@ -122,37 +110,37 @@ namespace Threax.K8sDeploy.Controller
 
         private void MountAppSettings(List<V1Volume> volumes, List<V1VolumeMount> volumeMounts)
         {
-            if (appConfig.AutoMountAppSettings)
+            if (deployConfig.AutoMountAppSettings)
             {
                 volumes.Add(new V1Volume()
                 {
                     Name = "k8sconfig-appsettings-json",
                     ConfigMap = new V1ConfigMapVolumeSource()
                     {
-                        Name = appConfig.Name
+                        Name = deployConfig.Name
                     }
                 });
 
                 volumeMounts.Add(new V1VolumeMount()
                 {
                     Name = "k8sconfig-appsettings-json",
-                    MountPath = appConfig.AppSettingsMountPath,
-                    SubPath = appConfig.AppSettingsSubPath
+                    MountPath = deployConfig.AppSettingsMountPath,
+                    SubPath = deployConfig.AppSettingsSubPath
                 });
 
-                var configMap = CreateConfigMap(appConfig.Name, new Dictionary<string, string>() { { "appsettings.Production.json", configFileProvider.GetConfigText() } });
+                var configMap = CreateConfigMap(deployConfig.Name, new Dictionary<string, string>() { { "appsettings.Production.json", configFileProvider.GetConfigText() } });
                 k8SClient.CreateOrReplaceNamespacedConfigMap(configMap, Namespace);
             }
         }
 
         private void SetupSecrets(List<V1Volume> volumes, List<V1VolumeMount> volumeMounts)
         {
-            if (appConfig.Secrets != null)
+            if (deployConfig.Secrets != null)
             {
                 //Create any secrets that have a source set
-                foreach (var secret in appConfig.Secrets.Where(i => !String.IsNullOrWhiteSpace(i.Value.Source)))
+                foreach (var secret in deployConfig.Secrets.Where(i => !String.IsNullOrWhiteSpace(i.Value.Source)))
                 {
-                    var secretPath = appConfig.GetConfigPath(secret.Value.Source);
+                    var secretPath = deployConfig.GetConfigPath(secret.Value.Source);
                     var data = File.ReadAllText(secretPath);
 
                     var v1Secret = new V1Secret()
@@ -162,7 +150,7 @@ namespace Threax.K8sDeploy.Controller
                         Type = "Opaque",
                         Metadata = new V1ObjectMeta()
                         {
-                            Name = secret.Value.GetSecretName(appConfig.Name, secret.Key),
+                            Name = secret.Value.GetSecretName(deployConfig.Name, secret.Key),
                         },
                         StringData = new Dictionary<String, string>()
                         {
@@ -173,17 +161,17 @@ namespace Threax.K8sDeploy.Controller
                     k8SClient.CreateOrReplaceNamespacedSecret(v1Secret, Namespace);
                 }
 
-                volumes.AddRange(appConfig.Secrets.Select(i =>
+                volumes.AddRange(deployConfig.Secrets.Select(i =>
                     new V1Volume()
                     {
                         Name = $"k8sconfig-secret-{i.Key.ToLowerInvariant()}",
                         Secret = new V1SecretVolumeSource()
                         {
-                            SecretName = i.Value.GetSecretName(appConfig.Name, i.Key)
+                            SecretName = i.Value.GetSecretName(deployConfig.Name, i.Key)
                         }
                     }));
 
-                volumeMounts.AddRange(appConfig.Secrets.Select(i =>
+                volumeMounts.AddRange(deployConfig.Secrets.Select(i =>
                     new V1VolumeMount()
                     {
                         Name = $"k8sconfig-secret-{i.Key.ToLowerInvariant()}",
@@ -202,7 +190,7 @@ namespace Threax.K8sDeploy.Controller
 
                 var latestPod = pods.Items.Where(i => i.Metadata.DeletionTimestamp == null).FirstOrDefault(); //Find not deleted pod
 
-                var podJsonPath = appConfig.GetConfigPath(appConfig.PodJsonFile);
+                var podJsonPath = deployConfig.GetConfigPath(deployConfig.PodJsonFile);
                 logger.LogInformation($"Writing pod info to '{podJsonPath}'.");
                 using (var streamWriter = new StreamWriter(File.Open(podJsonPath, FileMode.Create, FileAccess.ReadWrite, FileShare.None)))
                 {
@@ -240,7 +228,7 @@ namespace Threax.K8sDeploy.Controller
                     Tls = new List<Networkingv1beta1IngressTLS>() {
                         new Networkingv1beta1IngressTLS() {
                             Hosts = new List<string>(){ host },
-                            SecretName = $"{appConfig.Domain}-tls"
+                            SecretName = $"{deployConfig.Domain}-tls"
                         }
                     },
                     Rules = new List<Networkingv1beta1IngressRule>() {
@@ -347,13 +335,13 @@ namespace Threax.K8sDeploy.Controller
                 },
             };
 
-            if (!String.IsNullOrEmpty(appConfig.InitCommand))
+            if (!String.IsNullOrEmpty(deployConfig.InitCommand))
             {
                 deployment.Spec.Template.Spec.InitContainers = new List<V1Container>()
                 {
                     new V1Container() {
                         Name = "app-init",
-                        Command = new List<String>() { "sh", "-c", appConfig.InitCommand },
+                        Command = new List<String>() { "sh", "-c", deployConfig.InitCommand },
                         Image = image,
                         Env = new List<V1EnvVar>() {
                             new V1EnvVar() {

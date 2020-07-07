@@ -15,7 +15,14 @@ namespace Microsoft.Extensions.DependencyInjection
             configure?.Invoke(options);
 
             services.AddScoped<IProcessRunner, ProcessRunner>();
-            services.AddScoped<IConfigFileProvider, ConfigFileProvider>();
+            services.AddScoped<IConfigFileProvider>(s =>
+            {
+                if(options.SetupConfigFileProvider == null)
+                {
+                    throw new InvalidOperationException($"You must provide {nameof(ThreaxPipelineCoreOptions.SetupConfigFileProvider)} to use the IConfigFileProvider.");
+                }
+                return options.SetupConfigFileProvider.Invoke(s);
+            });
 
             services.AddScoped<IOSHandler>(s =>
             {

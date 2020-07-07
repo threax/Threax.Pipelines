@@ -3,11 +3,11 @@
     "Threax.DockerBuild": {
       "commandName": "Project"
     },
-    "Clone": {
+    "CloneId": {
       "commandName": "Project",
       "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/id/appsettings.json"
     },
-    "Build": {
+    "BuildId": {
       "commandName": "Project",
       "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/id/appsettings.json"
     },

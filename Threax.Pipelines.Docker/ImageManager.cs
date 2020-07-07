@@ -18,6 +18,7 @@ namespace Threax.Pipelines.Docker
 
         public string FindLatestImage(string image, string baseTag, string currentTag)
         {
+            //Get the tags from docker
             var args = $"inspect --format=\"{{{{json .RepoTags}}}}\" {image}:{currentTag}";
             var startInfo = new ProcessStartInfo("docker", args);
             var json = processRunner.RunProcessWithOutputGetOutput(startInfo);

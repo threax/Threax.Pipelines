@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Threax.Pipelines.Core
 {
-    class ConfigFileProvider : IConfigFileProvider
+    public class ConfigFileProvider : IConfigFileProvider
     {
         private readonly String path;
 

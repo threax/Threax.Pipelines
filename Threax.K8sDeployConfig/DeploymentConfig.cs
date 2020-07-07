@@ -54,11 +54,6 @@ namespace Threax.K8sDeployConfig
         public String Group { get; set; } = "10000";
 
         /// <summary>
-        /// The base tag of the app. This is used when looking up image builds without a registry.
-        /// </summary>
-        public String BaseTag { get; set; } = "k8sdeploy";
-
-        /// <summary>
         /// If this is set to a string that command will be run inside an InitContainer before the main container is started.
         /// </summary>
         public String InitCommand { get; set; }
@@ -107,11 +102,6 @@ namespace Threax.K8sDeployConfig
             {
                 throw new InvalidOperationException($"{nameof(Name)} cannot be null. Please provide a value.");
             }
-
-            if(BaseTag == null)
-            {
-                throw new InvalidOperationException($"{nameof(BaseTag)} cannot be null. Please provide a value.");
-            }
         }
 
         public String GetAppDataPath(String path)
@@ -122,16 +112,6 @@ namespace Threax.K8sDeployConfig
         public String GetConfigPath(String path)
         {
             return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(SourceFile), path));
-        }
-
-        public String GetBuildTag()
-        {
-            return $"{BaseTag}-{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}";
-        }
-
-        public String GetCurrentTag()
-        {
-            return $"{BaseTag}-current";
         }
     }
 }
