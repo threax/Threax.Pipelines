@@ -9,6 +9,7 @@ using Threax.Provision.AzPowershell;
 using Threax.DockerBuildConfig;
 using Threax.Pipelines.Docker;
 using Microsoft.Extensions.Logging;
+using System.Threading;
 
 namespace Threax.Provision.CheapAzure.Controller.Deploy
 {
@@ -71,7 +72,19 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
 
             //Update app permissions in key vault
             var appId = await webAppManager.GetOrCreateWebAppIdentity(appName, config.ResourceGroup);
-            await keyVaultManager.UnlockSecrets(config.KeyVaultName, appId);
+
+            try
+            {
+                await keyVaultManager.UnlockSecrets(config.KeyVaultName, appId);
+            }
+            catch (Exception ex)
+            {
+                var delay = 3000;
+                logger.LogError(ex, $"An error occured setting the key vault permissions. Trying again after {delay}ms...");
+                Thread.Sleep(delay);
+                logger.LogInformation("Sleep complete. Trying permissions again.");
+                await keyVaultManager.UnlockSecrets(config.KeyVaultName, appId);
+            }
         }
     }
 }
