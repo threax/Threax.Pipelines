@@ -341,3 +341,4 @@ healthchecksdb
 /ExampleDeployment/**/src
 /ExampleDeployment/**/data
 /ExampleDeployment/**/pod.json
+**/*/coreconfig.json
