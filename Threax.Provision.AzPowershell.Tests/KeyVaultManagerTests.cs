@@ -1,4 +1,4 @@
-//#define ENABLE_KEY_VAULT_TESTS
+#define ENABLE_KEY_VAULT_TESTS
 
 using System;
 using Xunit;
@@ -111,6 +111,30 @@ namespace Threax.Provision.AzPowershell.Tests
 
             await keyVaultAccess.Unlock(TestVault, TestGuid);
             await keyVaultAccess.Unlock(TestVault, TestGuid);
+        }
+
+        [Fact
+#if !ENABLE_KEY_VAULT_TESTS
+         (Skip = "Key Vault Tests Disabled")
+#endif
+        ]
+        public async Task Exists()
+        {
+            var manager = new KeyVaultManager(mockup.Get<ILogger<KeyVaultManager>>());
+            var result = await manager.Exists(TestVault);
+            Assert.True(result);
+        }
+
+        [Fact
+#if !ENABLE_KEY_VAULT_TESTS
+         (Skip = "Key Vault Tests Disabled")
+#endif
+        ]
+        public async Task ExistsNot()
+        {
+            var manager = new KeyVaultManager(mockup.Get<ILogger<KeyVaultManager>>());
+            var result = await manager.Exists(TestVault + "doesnotexist");
+            Assert.False(result);
         }
     }
 }

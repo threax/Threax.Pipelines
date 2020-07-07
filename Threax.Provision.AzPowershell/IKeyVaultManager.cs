@@ -11,5 +11,6 @@ namespace Threax.Provision.AzPowershell
         Task RemoveVault(string keyVaultName, string location);
         Task SetSecret(string keyVaultName, string name, string value);
         Task UnlockSecrets(string keyVaultName, Guid userId);
+        Task<bool> Exists(String VaultName);
     }
 }

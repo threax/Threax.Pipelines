@@ -139,5 +139,26 @@ namespace Threax.Provision.AzPowershell
                 return info?.SecretValueText;
             }
         }
+
+        public async Task<bool> Exists(String VaultName)
+        {
+            using (var pwsh = PowerShell.Create())
+            {
+                pwsh.PrintInformationStream(logger);
+                pwsh.PrintErrorStream(logger);
+
+                pwsh.SetUnrestrictedExecution();
+                pwsh.AddScript("Import-Module Az.KeyVault");
+                var parm = new { VaultName };
+                pwsh.AddParamLine(parm);
+                pwsh.AddCommandWithParams("Get-AzKeyVault", parm);
+
+                var outputCollection = await pwsh.RunAsync();
+
+                pwsh.ThrowOnErrors($"Error loading '{VaultName}' from Key Vault '{VaultName}'.");
+                var info = outputCollection.FirstOrDefault() as dynamic;
+                return info != null;
+            }
+        }
     }
 }

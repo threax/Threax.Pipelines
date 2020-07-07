@@ -14,17 +14,22 @@ namespace Threax.Provision.CheapAzure.Controller.Create
     {
         private readonly IArmTemplateManager armTemplateManager;
         private readonly Config config;
+        private readonly IKeyVaultManager keyVaultManager;
 
-        public CreateKeyVault(IArmTemplateManager armTemplateManager, Config config)
+        public CreateKeyVault(IArmTemplateManager armTemplateManager, Config config, IKeyVaultManager keyVaultManager)
         {
             this.armTemplateManager = armTemplateManager;
             this.config = config;
+            this.keyVaultManager = keyVaultManager;
         }
 
         public async Task Execute(KeyVault resource)
         {
-            var keyVaultArm = new ArmKeyVault(config.KeyVaultName, config.Location, config.TenantId.ToString());
-            await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, keyVaultArm);
+            if (!await keyVaultManager.Exists(config.KeyVaultName))
+            {
+                var keyVaultArm = new ArmKeyVault(config.KeyVaultName, config.Location, config.TenantId.ToString());
+                await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, keyVaultArm);
+            }
         }
     }
 }
