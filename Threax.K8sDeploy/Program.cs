@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Runtime.InteropServices;
+using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
 using Threax.K8sDeploy.Controller;
 using Threax.K8sDeployConfig;
@@ -45,6 +46,15 @@ namespace Threax.K8sDeploy
                         var config = s.GetRequiredService<SchemaConfigurationBinder>();
                         var appConfig = new DeploymentConfig(jsonConfigPath);
                         config.Bind("Deploy", appConfig);
+                        appConfig.Validate();
+                        return appConfig;
+                    });
+
+                    services.AddScoped<BuildConfig>(s =>
+                    {
+                        var config = s.GetRequiredService<SchemaConfigurationBinder>();
+                        var appConfig = new BuildConfig(jsonConfigPath);
+                        config.Bind("Build", appConfig);
                         appConfig.Validate();
                         return appConfig;
                     });

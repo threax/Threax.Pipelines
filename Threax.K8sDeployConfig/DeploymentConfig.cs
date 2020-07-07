@@ -19,7 +19,6 @@ namespace Threax.K8sDeployConfig
         {
             this.SourceFile = sourceFile;
             this.AppDataBasePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(this.SourceFile), "data"));
-            this.ClonePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(this.SourceFile), "src"));
         }
 
         /// <summary>
@@ -27,12 +26,6 @@ namespace Threax.K8sDeployConfig
         /// </summary>
         [JsonIgnore]
         public String SourceFile { get; private set; }
-
-        /// <summary>
-        /// The path to clone files to.
-        /// </summary>
-        [JsonIgnore]
-        public String ClonePath { get; private set; }
 
         /// <summary>
         /// The path that provides the root volume for relative volume mounts.
@@ -51,11 +44,6 @@ namespace Threax.K8sDeployConfig
         public String Domain { get; set; } = "dev.threax.com";
 
         /// <summary>
-        /// The url of the repository with the app's code.
-        /// </summary>
-        public String RepoUrl { get; set; }
-
-        /// <summary>
         /// The user id to run the app as. Default: 10000.
         /// </summary>
         public String User { get; set; } = "10000";
@@ -66,24 +54,9 @@ namespace Threax.K8sDeployConfig
         public String Group { get; set; } = "10000";
 
         /// <summary>
-        /// The branch of the repo to use. Default: master.
-        /// </summary>
-        public String Branch { get; set; } = "master";
-
-        /// <summary>
-        /// The path to the dockerfile. This must be specified to use Build.
-        /// </summary>
-        public String Dockerfile { get; set; }
-
-        /// <summary>
         /// The base tag of the app. This is used when looking up image builds without a registry.
         /// </summary>
         public String BaseTag { get; set; } = "k8sdeploy";
-
-        /// <summary>
-        /// Set this to true to always pull base images when building. Default: True.
-        /// </summary>
-        public bool AlwaysPull { get; set; } = true;
 
         /// <summary>
         /// If this is set to a string that command will be run inside an InitContainer before the main container is started.

@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Threax.DockerBuildConfig\Threax.DockerBuildConfig.csproj" />
     <ProjectReference Include="..\Threax.K8sDeployConfig\Threax.K8sDeployConfig.csproj" />
     <ProjectReference Include="..\Threax.Pipelines.Core\Threax.Pipelines.Core.csproj" />
   </ItemGroup>
