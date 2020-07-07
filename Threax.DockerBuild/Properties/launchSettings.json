@@ -5,27 +5,27 @@
     },
     "Clone": {
       "commandName": "Project",
-      "commandLineArgs": "clone Example/id/appsettings.json"
+      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/id/appsettings.json"
     },
     "Build": {
       "commandName": "Project",
-      "commandLineArgs": "build Example/id/appsettings.json"
+      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/id/appsettings.json"
     },
     "CloneAppDashboard": {
       "commandName": "Project",
-      "commandLineArgs": "clone Example/appdashboard/appsettings.json"
+      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json"
     },
     "BuildAppDashboard": {
       "commandName": "Project",
-      "commandLineArgs": "build Example/appdashboard/appsettings.json"
+      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json"
     },
     "CloneNotes": {
       "commandName": "Project",
-      "commandLineArgs": "clone Example/notes/appsettings.json"
+      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
     },
     "BuildNotes": {
       "commandName": "Project",
-      "commandLineArgs": "build Example/notes/appsettings.json"
+      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
     }
   }
 }

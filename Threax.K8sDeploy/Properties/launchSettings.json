@@ -3,41 +3,17 @@
     "Threax.K8sDeploy": {
       "commandName": "Project"
     },
-    "Clone": {
-      "commandName": "Project",
-      "commandLineArgs": "clone Example/id/appsettings.json"
-    },
-    "Build": {
-      "commandName": "Project",
-      "commandLineArgs": "build Example/id/appsettings.json"
-    },
     "Deploy": {
       "commandName": "Project",
-      "commandLineArgs": "deploy Example/id/appsettings.json"
-    },
-    "CloneAppDashboard": {
-      "commandName": "Project",
-      "commandLineArgs": "clone Example/appdashboard/appsettings.json"
-    },
-    "BuildAppDashboard": {
-      "commandName": "Project",
-      "commandLineArgs": "build Example/appdashboard/appsettings.json"
+      "commandLineArgs": "deploy $(ProjectDir)../ExampleDeployment/id/appsettings.json"
     },
     "DeployAppDashboard": {
       "commandName": "Project",
-      "commandLineArgs": "deploy Example/appdashboard/appsettings.json"
-    },
-    "CloneNotes": {
-      "commandName": "Project",
-      "commandLineArgs": "clone Example/notes/appsettings.json"
-    },
-    "BuildNotes": {
-      "commandName": "Project",
-      "commandLineArgs": "build Example/notes/appsettings.json"
+      "commandLineArgs": "deploy $(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json"
     },
     "DeployNotes": {
       "commandName": "Project",
-      "commandLineArgs": "deploy Example/notes/appsettings.json"
+      "commandLineArgs": "deploy $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
     }
   }
 }
