@@ -1,0 +1,27 @@
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Threax.Provision;
+using Threax.Provision.AzPowershell;
+
+namespace Microsoft.Extensions.DependencyInjection
+{
+    public static class DiExtensions
+    {
+        public static void AddThreaxProvisionAzPowershell(this IServiceCollection services, Action<AzPowershellOptions> configure = null)
+        {
+            var options = new AzPowershellOptions();
+            configure?.Invoke(options);
+
+            services.TryAddScoped<IKeyVaultManager, KeyVaultManager>();
+            services.TryAddScoped<IKeyVaultAccessManager, KeyVaultAccessManager>();
+            services.TryAddScoped<IArmTemplateManager, ArmTemplateManager>();
+            services.TryAddScoped<ISqlServerFirewallRuleManager, SqlServerFirewallRuleManager>();
+            services.TryAddScoped<ISqlServerManager, SqlServerManager>();
+            services.TryAddScoped<IAcrManager, AcrManager>();
+            services.TryAddScoped<IWebAppManager, WebAppManager>();
+            services.TryAddScoped<IWebAppIdentityManager, WebAppIdentityManager>();
+        }
+    }
+}

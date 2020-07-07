@@ -1,0 +1,13 @@
+{
+  "Resources": [
+    {
+      "$type": "SqlDatabase",
+      "Name": "threax-test",
+      "ConnectionStringName": "threax-test--AppConfig--ConnectionString"
+    },
+    {
+      "$type": "Compute",
+      "Name": "threax-appdashboard"
+    }
+  ]
+}
