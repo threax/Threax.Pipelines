@@ -12,9 +12,12 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.5" />
+    <PackageReference Include="Threax.Extensions.Configuration.SchemaBinder" Version="1.5.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Threax.DockerBuildConfig\Threax.DockerBuildConfig.csproj" />
+    <ProjectReference Include="..\Threax.Pipelines.Docker\Threax.Pipelines.Docker.csproj" />
     <ProjectReference Include="..\Threax.Provision.AzPowershell\Threax.Provision.AzPowershell.csproj" />
     <ProjectReference Include="..\Threax.Provision\Threax.Provision.csproj" />
   </ItemGroup>
@@ -26,15 +29,6 @@
     <Content Include="ArmTemplates\**\template.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="coreconfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="test.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

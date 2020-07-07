@@ -6,29 +6,44 @@ using System.Security;
 using System.Threading.Tasks;
 using Threax.Provision;
 using Threax.Provision.AzPowershell;
+using Threax.DockerBuildConfig;
+using Threax.Pipelines.Docker;
+using Microsoft.Extensions.Logging;
 
 namespace Threax.Provision.CheapAzure.Controller.Deploy
 {
     class DeployCompute : IResourceProcessor<Compute>
     {
         private readonly Config config;
+        private readonly BuildConfig buildConfig;
+        private readonly ILogger<DeployCompute> logger;
         private readonly IAcrManager acrManager;
         private readonly IArmTemplateManager armTemplateManager;
         private readonly IWebAppIdentityManager webAppManager;
         private readonly IKeyVaultManager keyVaultManager;
+        private readonly IImageManager imageManager;
 
-        public DeployCompute(Config config, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppManager, IKeyVaultManager keyVaultManager)
+        public DeployCompute(Config config, BuildConfig buildConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppManager, IKeyVaultManager keyVaultManager, IImageManager imageManager)
         {
             this.config = config;
+            this.buildConfig = buildConfig;
+            this.logger = logger;
             this.acrManager = acrManager;
             this.armTemplateManager = armTemplateManager;
             this.webAppManager = webAppManager;
             this.keyVaultManager = keyVaultManager;
+            this.imageManager = imageManager;
         }
 
         public async Task Execute(Compute resource)
         {
             var appName = resource.Name ?? throw new InvalidOperationException($"You must provide a '{nameof(Compute.Name)}' property on your '{nameof(Compute)}' resource.");
+
+            var image = buildConfig.ImageName;
+            var currentTag = buildConfig.GetCurrentTag();
+            var taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
+
+            logger.LogInformation($"Deploying '{image}' with tag '{taggedImageName}'.");
 
             var acrCreds = await acrManager.GetAcrCredential(config.AcrName, config.ResourceGroup);
 
@@ -51,10 +66,10 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                  serverFarmResourceGroup = config.ResourceGroup,
                  location = config.Location,
                  subscriptionId = config.SubscriptionId,
-                 linuxFxVersion = $"DOCKER|{config.AcrName}.azurecr.io/appdashboard:threaxpipe-20200707144622" //Right string mostly, but this is hardcoded. Just take image name from build config.
-                //DOCKER|threaxtestacr.azurecr.io/hello-world:latest
+                 linuxFxVersion = $"DOCKER|{taggedImageName}"
             });
 
+            //Update app permissions in key vault
             var appId = await webAppManager.GetOrCreateWebAppIdentity(appName, config.ResourceGroup);
             await keyVaultManager.UnlockSecrets(config.KeyVaultName, appId);
         }

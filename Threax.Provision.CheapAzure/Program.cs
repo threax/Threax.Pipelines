@@ -13,6 +13,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Threax.Provision;
 using Threax.Provision.Processing;
+using Threax.DockerBuildConfig;
+using Threax.Extensions.Configuration.SchemaBinder;
+using Microsoft.Extensions.Configuration;
 
 namespace Threax.Provision.CheapAzure
 {
@@ -20,9 +23,9 @@ namespace Threax.Provision.CheapAzure
     {
         static async Task Main(string[] args)
         {
-            var command = "Deploy";
-            var file = Path.GetFullPath("test.json");
-            var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText("coreconfig.json"));
+            var command = args[0];
+            var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(args[1]));
+            var jsonConfigPath = Path.GetFullPath(args[2]);
 
             var services = new ServiceCollection();
             services.AddSingleton<Config>(config);
@@ -47,6 +50,22 @@ namespace Threax.Provision.CheapAzure
                 };
             });
 
+            services.AddScoped<SchemaConfigurationBinder>(s =>
+            {
+                var configBuilder = new ConfigurationBuilder();
+                configBuilder.AddJsonFile(jsonConfigPath);
+                return new SchemaConfigurationBinder(configBuilder.Build());
+            });
+
+            services.AddScoped<BuildConfig>(s =>
+            {
+                var config = s.GetRequiredService<SchemaConfigurationBinder>();
+                var buildConfig = new BuildConfig(jsonConfigPath);
+                config.Bind("Build", buildConfig);
+                buildConfig.Validate();
+                return buildConfig;
+            });
+
             services.AddThreaxProvisionAzPowershell();
 
             services.AddHttpClient();
@@ -57,12 +76,14 @@ namespace Threax.Provision.CheapAzure
 
             services.AddScoped<IStringGenerator, StringGenerator>();
             services.AddScoped<ICredentialLookup, CredentialLookup>();
+            services.AddThreaxPipelines();
+            services.AddThreaxPipelinesDocker();
 
             using var serviceProvider = services.BuildServiceProvider();
             using var scope = serviceProvider.CreateScope();
 
             var loader = scope.ServiceProvider.GetRequiredService<IResourceDefinitionLoader>();
-            var definition = loader.LoadFromFile(file);
+            var definition = loader.LoadFromFile(jsonConfigPath);
             definition.Resources.Add(new ResourceGroup(config.ResourceGroup));
             definition.Resources.Add(new KeyVault());
             definition.SortResources();
