@@ -42,6 +42,8 @@ namespace Threax.K8sDeploy.Controller
 
         public Task Run()
         {
+            var nameTest = deployConfig.Name ?? throw new InvalidOperationException($"You must provide a '{nameof(DeploymentConfig.Name)}' property on your 'Deploy' property.");
+
             var image = buildConfig.ImageName;
             var currentTag = buildConfig.GetCurrentTag();
             var taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
