@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Threax.DockerBuildConfig;
-using Threax.K8sDeployConfig;
+using Threax.DeployConfig;
 using Threax.Pipelines.Core;
 using Threax.Pipelines.Docker;
 

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
 using Threax.K8sDeploy.Controller;
-using Threax.K8sDeployConfig;
+using Threax.DeployConfig;
 using Threax.Pipelines.Core;
 
 namespace Threax.K8sDeploy

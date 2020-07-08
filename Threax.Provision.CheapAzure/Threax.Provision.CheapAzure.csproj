@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Threax.DeployConfig\Threax.DeployConfig.csproj" />
     <ProjectReference Include="..\Threax.DockerBuildConfig\Threax.DockerBuildConfig.csproj" />
     <ProjectReference Include="..\Threax.Pipelines.Docker\Threax.Pipelines.Docker.csproj" />
     <ProjectReference Include="..\Threax.Provision.AzPowershell\Threax.Provision.AzPowershell.csproj" />

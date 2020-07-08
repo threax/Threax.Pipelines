@@ -17,6 +17,7 @@ using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
+using Threax.DeployConfig;
 
 namespace Threax.Provision.CheapAzure
 {
@@ -68,6 +69,15 @@ namespace Threax.Provision.CheapAzure
                 config.Bind("Build", buildConfig);
                 buildConfig.Validate();
                 return buildConfig;
+            });
+
+            services.AddScoped<DeploymentConfig>(s =>
+            {
+                var config = s.GetRequiredService<SchemaConfigurationBinder>();
+                var deployConfig = new DeploymentConfig(jsonConfigPath);
+                config.Bind("Deploy", deployConfig);
+                deployConfig.Validate();
+                return deployConfig;
             });
 
             services.AddThreaxProvisionAzPowershell();

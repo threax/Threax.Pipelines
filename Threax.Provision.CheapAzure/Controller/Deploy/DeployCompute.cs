@@ -16,6 +16,7 @@ using Threax.Provision.CheapAzure.Services;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
+using Threax.DeployConfig;
 
 namespace Threax.Provision.CheapAzure.Controller.Deploy
 {
@@ -23,6 +24,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
     {
         private readonly Config config;
         private readonly BuildConfig buildConfig;
+        private readonly DeploymentConfig deployConfig;
         private readonly ILogger<DeployCompute> logger;
         private readonly IAcrManager acrManager;
         private readonly IArmTemplateManager armTemplateManager;
@@ -34,10 +36,11 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         private readonly ISqlServerManager sqlServerManager;
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
 
-        public DeployCompute(Config config, BuildConfig buildConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppManager, IKeyVaultManager keyVaultManager, IImageManager imageManager, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager, ISqlServerManager sqlServerManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager)
+        public DeployCompute(Config config, BuildConfig buildConfig, DeploymentConfig deployConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppManager, IKeyVaultManager keyVaultManager, IImageManager imageManager, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager, ISqlServerManager sqlServerManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager)
         {
             this.config = config;
             this.buildConfig = buildConfig;
+            this.deployConfig = deployConfig;
             this.logger = logger;
             this.acrManager = acrManager;
             this.armTemplateManager = armTemplateManager;
@@ -61,25 +64,26 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             var taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
 
             //Run Init Command if present
-            if (resource.InitCommand != null)
+            if (deployConfig.InitCommand != null)
             {
                 logger.LogInformation($"Running Init Command for '{image}' with tag '{taggedImageName}'.");
 
                 await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
-                var envs = resource.InitEnv.Select(i => new KeyValuePair<string, string>(i.Key.Replace(".", "__"), i.Value)).ToList();
+                var secrets = deployConfig.InitSecrets?.Select(i => new KeyValuePair<string, string>(i.Key.Replace(".", "__"), i.Value))?.ToList() 
+                    ?? Enumerable.Empty<KeyValuePair<String, String>>();
 
                 var sb = new StringBuilder("run "); //Trailing space is important
-                foreach (var env in envs)
+                foreach (var secret in secrets)
                 {
-                    sb.Append($"--env {env.Key} "); //Trailing space is important
+                    sb.Append($"--env {secret.Key} "); //Trailing space is important
                 }
-                sb.Append($"{taggedImageName} {resource.InitCommand}");
+                sb.Append($"{taggedImageName} {deployConfig.InitCommand}");
                 var psi = new ProcessStartInfo("docker", sb.ToString());
 
-                foreach (var env in envs)
+                foreach (var secret in secrets)
                 {
-                    var secret = await keyVaultManager.GetSecret(config.KeyVaultName, env.Value);
-                    psi.EnvironmentVariables.Add(env.Key, secret);
+                    var secretValue = await keyVaultManager.GetSecret(config.KeyVaultName, secret.Value);
+                    psi.EnvironmentVariables.Add(secret.Key, secretValue);
                 }
 
                 processRunner.RunProcessWithOutput(psi);

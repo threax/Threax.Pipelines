@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Pipelines.Core", "Th
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.K8sDeploy", "Threax.K8sDeploy\Threax.K8sDeploy.csproj", "{6A1C700E-88BF-4035-926B-ED9766CDFF8D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.K8sDeployConfig", "Threax.K8sDeployConfig\Threax.K8sDeployConfig.csproj", "{622B904A-B2EB-4051-B5D7-F5AFCE76A093}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleDeployment", "ExampleDeployment\ExampleDeployment.csproj", "{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision", "Threax.Provision\Threax.Provision.csproj", "{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}"
@@ -24,6 +22,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.AzPowershell.Tests", "Threax.Provision.AzPowershell.Tests\Threax.Provision.AzPowershell.Tests.csproj", "{79378E40-9E6B-4E6A-80D5-9B8B5E16C346}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.CheapAzure", "Threax.Provision.CheapAzure\Threax.Provision.CheapAzure.csproj", "{BA49EB21-64D0-476B-BFFD-A205B3850004}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DeployConfig", "Threax.DeployConfig\Threax.DeployConfig.csproj", "{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,10 +51,6 @@ Global
 		{6A1C700E-88BF-4035-926B-ED9766CDFF8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A1C700E-88BF-4035-926B-ED9766CDFF8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A1C700E-88BF-4035-926B-ED9766CDFF8D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{622B904A-B2EB-4051-B5D7-F5AFCE76A093}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{622B904A-B2EB-4051-B5D7-F5AFCE76A093}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{622B904A-B2EB-4051-B5D7-F5AFCE76A093}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{622B904A-B2EB-4051-B5D7-F5AFCE76A093}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -75,6 +71,10 @@ Global
 		{BA49EB21-64D0-476B-BFFD-A205B3850004}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA49EB21-64D0-476B-BFFD-A205B3850004}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA49EB21-64D0-476B-BFFD-A205B3850004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

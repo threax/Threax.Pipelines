@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Threax.K8sDeployConfig
+namespace Threax.DeployConfig
 {
     public enum PathType
     {

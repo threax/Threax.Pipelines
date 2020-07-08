@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Threax.K8sDeployConfig
+namespace Threax.DeployConfig
 {
     /// <summary>
     /// Configuration for k8s deployment.
@@ -59,6 +59,13 @@ namespace Threax.K8sDeployConfig
         public String InitCommand { get; set; }
 
         /// <summary>
+        /// Key vault pairs of secrets to load for the init environment.
+        /// The key should be in in dot format and the value the name of the secret.
+        /// e.g. "AppConfig.ConnectionString": "secret-name"
+        /// </summary>
+        public Dictionary<String, String> InitSecrets { get; set; }
+
+        /// <summary>
         /// A map of volume mounts.
         /// </summary>
         public Dictionary<String, Volume> Volumes { get; set; }
@@ -98,10 +105,7 @@ namespace Threax.K8sDeployConfig
         /// </summary>
         public void Validate()
         {
-            if(Name == null)
-            {
-                throw new InvalidOperationException($"{nameof(Name)} cannot be null. Please provide a value.");
-            }
+            //Does nothing right now
         }
 
         public String GetAppDataPath(String path)
