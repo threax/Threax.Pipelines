@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Threax.DockerBuildConfig
 {
@@ -8,8 +9,8 @@ namespace Threax.DockerBuildConfig
     {
         public BuildConfig(String sourceFile)
         {
-            this.SourceFile = sourceFile;
-            this.ClonePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(this.SourceFile), "src"));
+            this.SourceFile = Path.GetFullPath(sourceFile);
+            this.ClonePath = Path.Combine(Path.GetDirectoryName(sourceFile), "src");
         }
 
         /// <summary>
@@ -44,7 +45,7 @@ namespace Threax.DockerBuildConfig
         public String SourceFile { get; private set; }
 
         /// <summary>
-        /// The path to clone files to.
+        /// The path to clone files to. This will be used as the context if RepoUrl is set.
         /// </summary>
         [JsonIgnore]
         public String ClonePath { get; private set; }
@@ -53,6 +54,35 @@ namespace Threax.DockerBuildConfig
         /// Set this to true to always pull base images when building. Default: True.
         /// </summary>
         public bool AlwaysPull { get; set; } = true;
+
+        private string _context;
+        /// <summary>
+        /// If RepoUrl is not set this will be the path to the build context. This will auto
+        /// discover a .sln file in the same directory as the config file or higher. Otherwise
+        /// it can be manually set. If set to a relative path it will be relative to this file.
+        /// </summary>
+        public string Context { get
+            {
+                if (this._context == null)
+                {
+                    var currentPath = Path.GetDirectoryName(SourceFile);
+                    while (currentPath != null)
+                    {
+                        if (Directory.EnumerateFiles(currentPath, "*.sln", SearchOption.TopDirectoryOnly).Any())
+                        {
+                            this._context = currentPath;
+                            break;
+                        }
+                        currentPath = Path.GetDirectoryName(currentPath);
+                    }
+                }
+                return this._context;
+            }
+            set
+            {
+                this._context = value;
+            }
+        }
 
         public void Validate()
         {
@@ -80,6 +110,17 @@ namespace Threax.DockerBuildConfig
         public String GetCurrentTag()
         {
             return $"{BaseTag}-current";
+        }
+
+        /// <summary>
+        /// Get the computed context value. This will resolve any relative paths, which the property does not do.
+        /// </summary>
+        /// <returns></returns>
+        public String GetContext()
+        {
+            var context = this.Context;
+            var basePath = Path.GetDirectoryName(SourceFile);
+            return Path.Combine(basePath, context);
         }
     }
 }

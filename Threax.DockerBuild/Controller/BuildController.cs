@@ -26,13 +26,17 @@ namespace Threax.K8sDeploy.Controller
 
         public Task Run()
         {
-            var clonePath = appConfig.ClonePath;
-            var dockerFile = Path.GetFullPath(Path.Combine(clonePath, appConfig.Dockerfile ?? throw new InvalidOperationException($"Please provide {nameof(appConfig.Dockerfile)} when using build.")));
+            var context = appConfig.ClonePath;
+            if(appConfig.RepoUrl == null)
+            {
+                context = appConfig.GetContext();
+            }
+            var dockerFile = Path.GetFullPath(Path.Combine(context, appConfig.Dockerfile ?? throw new InvalidOperationException($"Please provide {nameof(appConfig.Dockerfile)} when using build.")));
             var image = appConfig.ImageName;
             var buildTag = appConfig.GetBuildTag();
             var currentTag = appConfig.GetCurrentTag();
 
-            var args = $"build {clonePath} -f {dockerFile} -t {image}:{buildTag} -t {image}:{currentTag}";
+            var args = $"build {context} -f {dockerFile} -t {image}:{buildTag} -t {image}:{currentTag}";
 
             if (appConfig.AlwaysPull)
             {
