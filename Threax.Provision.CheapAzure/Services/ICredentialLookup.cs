@@ -11,6 +11,8 @@ namespace Threax.Provision.CheapAzure.Services
         /// <param name="keyVaultName">The name of the key vault to lookup values from.</param>
         /// <param name="credBaseName">The base name of the user/password pair to lookup.</param>
         /// <returns></returns>
-        Task<Credential> GetCredentials(string keyVaultName, string credBaseName, Func<String, String> fixPass = null, Func<String, String> fixUser = null);
+        Task<Credential> GetOrCreateCredentials(string keyVaultName, string credBaseName, Func<String, String> fixPass = null, Func<String, String> fixUser = null);
+
+        Task<Credential> GetCredentials(string keyVaultName, string credBaseName);
     }
 }

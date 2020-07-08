@@ -47,9 +47,9 @@ namespace Threax.Provision.CheapAzure
         public string MachineIp { get; set; }
 
         /// <summary>
-        /// The name of the sa connection string to save.
+        /// The name of the sa connection string to save. Default: "sqlsrv-sa-connectionstring"
         /// </summary>
-        public string SaConnectionStringSecretName { get; set; }
+        public string SaConnectionStringSecretName { get; set; } = "sqlsrv-sa-connectionstring";
 
         /// <summary>
         /// The name of the acr to create.
@@ -65,5 +65,10 @@ namespace Threax.Provision.CheapAzure
         /// The current subscription id.
         /// </summary>
         public string SubscriptionId { get; set; }
+
+        /// <summary>
+        /// The base name of the sa secret in the key vault. Default: "sqlsrv-sa"
+        /// </summary>
+        public string SqlSaBaseKey { get; set; } = "sqlsrv-sa";
     }
 }

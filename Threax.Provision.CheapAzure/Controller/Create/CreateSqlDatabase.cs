@@ -45,15 +45,15 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             //You would want to have separate dbs in a larger setup.
             await keyVaultAccessManager.Unlock(config.KeyVaultName, config.UserId);
 
-            var saCreds = await credentialLookup.GetCredentials(config.KeyVaultName, "sqlsrv-sa", FixPass, FixUser);
+            var saCreds = await credentialLookup.GetOrCreateCredentials(config.KeyVaultName, config.SqlSaBaseKey, FixPass, FixUser);
 
             //Setup logical server
             logger.LogInformation($"Setting up SQL Logical Server '{config.SqlServerName}' in Resource Group '{config.ResourceGroup}'.");
-            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlServer(config.SqlServerName, saCreds.Username, saCreds.Password));
+            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlServer(config.SqlServerName, saCreds.User, saCreds.Pass));
             var saConnectionString = await keyVaultManager.GetSecret(config.KeyVaultName, config.SaConnectionStringSecretName);
             if (saConnectionString == null || saCreds.Created)
             {
-                saConnectionString = sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, saCreds.Username, saCreds.Password);
+                saConnectionString = sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, saCreds.User, saCreds.Pass);
                 await keyVaultManager.SetSecret(config.KeyVaultName, config.SaConnectionStringSecretName, saConnectionString);
             }
 
@@ -65,24 +65,24 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             logger.LogInformation($"Setting up user for {credKeyBase} in Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");
             await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
             var dbContext = new ProvisionDbContext(saConnectionString);
-            var appCreds = await credentialLookup.GetCredentials(config.KeyVaultName, credKeyBase, FixPass, FixUser);
+            var appCreds = await credentialLookup.GetOrCreateCredentials(config.KeyVaultName, credKeyBase, FixPass, FixUser);
             int result;
             try
             {
-                result = await dbContext.Database.ExecuteSqlRawAsync($"CREATE USER {appCreds.Username} WITH PASSWORD = '{appCreds.Password}';");
+                result = await dbContext.Database.ExecuteSqlRawAsync($"CREATE USER {appCreds.User} WITH PASSWORD = '{appCreds.Pass}';");
             }
             catch (SqlException)
             {
                 //This isn't great, but just ignore this exception for now.
                 //If the user isn't created the lines below will fail.
             }
-            result = await dbContext.Database.ExecuteSqlRawAsync($"ALTER USER {appCreds.Username} WITH PASSWORD = '{appCreds.Password}';");
-            result = await dbContext.Database.ExecuteSqlRawAsync($"ALTER ROLE db_owner ADD MEMBER {appCreds.Username}");
+            result = await dbContext.Database.ExecuteSqlRawAsync($"ALTER USER {appCreds.User} WITH PASSWORD = '{appCreds.Pass}';");
+            result = await dbContext.Database.ExecuteSqlRawAsync($"ALTER ROLE db_owner ADD MEMBER {appCreds.User}");
 
             var appConnectionString = await keyVaultManager.GetSecret(config.KeyVaultName, resource.ConnectionStringName);
             if (appConnectionString == null || appCreds.Created)
             {
-                appConnectionString = sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, appCreds.Username, appCreds.Password);
+                appConnectionString = sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, appCreds.User, appCreds.Pass);
                 await keyVaultManager.SetSecret(config.KeyVaultName, resource.ConnectionStringName, appConnectionString);
             }
         }
