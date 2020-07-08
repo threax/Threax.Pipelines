@@ -5,27 +5,27 @@
     },
     "Create Id": {
       "commandName": "Project",
-      "commandLineArgs": "Create \"$(ProjectDir)/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/id/appsettings.json\""
+      "commandLineArgs": "Create \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/id/appsettings.json\""
     },
     "Create AppDashboard": {
       "commandName": "Project",
-      "commandLineArgs": "Create \"$(ProjectDir)/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json\""
+      "commandLineArgs": "Create \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json\""
     },
     "Create Notes": {
       "commandName": "Project",
-      "commandLineArgs": "Create \"$(ProjectDir)/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/notes/appsettings.json\""
+      "commandLineArgs": "Create \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/notes/appsettings.json\""
     },
     "Deploy Id": {
       "commandName": "Project",
-      "commandLineArgs": "Deploy \"$(ProjectDir)/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/id/appsettings.json\""
+      "commandLineArgs": "Deploy \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/id/appsettings.json\""
     },
     "Deploy AppDashboard": {
       "commandName": "Project",
-      "commandLineArgs": "Deploy \"$(ProjectDir)/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json\""
+      "commandLineArgs": "Deploy \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json\""
     },
     "Deploy Notes": {
       "commandName": "Project",
-      "commandLineArgs": "Deploy \"$(ProjectDir)/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/notes/appsettings.json\""
+      "commandLineArgs": "Deploy \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/notes/appsettings.json\""
     }
   }
 }
