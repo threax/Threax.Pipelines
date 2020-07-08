@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Threax.Provision;
 using Threax.Provision.AzPowershell;
+using Microsoft.Extensions.Logging;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -20,8 +21,10 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly IArmTemplateManager armTemplateManager;
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
+        private readonly ILogger<CreateSqlDatabase> logger;
+        private readonly Random rand = new Random();
 
-        public CreateSqlDatabase(ISqlServerManager sqlServerManager, Config config, IKeyVaultManager keyVaultManager, ICredentialLookup credentialLookup, IArmTemplateManager armTemplateManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, IKeyVaultAccessManager keyVaultAccessManager)
+        public CreateSqlDatabase(ISqlServerManager sqlServerManager, Config config, IKeyVaultManager keyVaultManager, ICredentialLookup credentialLookup, IArmTemplateManager armTemplateManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, IKeyVaultAccessManager keyVaultAccessManager, ILogger<CreateSqlDatabase> logger)
         {
             this.sqlServerManager = sqlServerManager;
             this.config = config;
@@ -30,6 +33,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             this.armTemplateManager = armTemplateManager;
             this.sqlServerFirewallRuleManager = sqlServerFirewallRuleManager;
             this.keyVaultAccessManager = keyVaultAccessManager;
+            this.logger = logger;
         }
 
         public async Task Execute(SqlDatabase resource)
@@ -44,6 +48,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             var saCreds = await credentialLookup.GetCredentials(config.KeyVaultName, "sqlsrv-sa", FixPass, FixUser);
 
             //Setup logical server
+            logger.LogInformation($"Setting up SQL Logical Server '{config.SqlServerName}' in Resource Group '{config.ResourceGroup}'.");
             await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlServer(config.SqlServerName, saCreds.Username, saCreds.Password));
             var saConnectionString = await keyVaultManager.GetSecret(config.KeyVaultName, config.SaConnectionStringSecretName);
             if (saConnectionString == null || saCreds.Created)
@@ -53,9 +58,11 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             }
 
             //Setup shared sql db
+            logger.LogInformation($"Setting up Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");
             await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlDb(config.SqlServerName, config.SqlDbName));
 
             //Setup user in new db
+            logger.LogInformation($"Setting up user for {credKeyBase} in Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");
             await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
             var dbContext = new ProvisionDbContext(saConnectionString);
             var appCreds = await credentialLookup.GetCredentials(config.KeyVaultName, credKeyBase, FixPass, FixUser);
@@ -87,7 +94,13 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 
         private String FixUser(String input)
         {
-            return input.Replace('+', 'g').Replace('/', 'e').Replace('=', 'p');
+            var output = input.Replace('+', RandomLetter()).Replace('/', RandomLetter()).Replace('=', RandomLetter());
+            return RandomLetter() + output; //Ensure first character is a letter
+        }
+
+        private char RandomLetter()
+        {
+            return (char)rand.Next(97, 123);
         }
     }
 }
