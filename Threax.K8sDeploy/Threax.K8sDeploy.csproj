@@ -4,9 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>k8sdeploy</ToolCommandName>
+    <ToolCommandName>threax-k8sdeploy</ToolCommandName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-pre08</Version>
+    <Version>1.0.0-pre09</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
   </PropertyGroup>
