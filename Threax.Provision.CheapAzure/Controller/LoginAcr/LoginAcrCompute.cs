@@ -38,7 +38,7 @@ namespace Threax.Provision.CheapAzure.Controller.LoginAcr
                     passwordStream.Write(acrCreds.Password);
                 }
 
-                var startInfo = new ProcessStartInfo("pwsh", $"-c \"cat {passwordPath} | docker login {config.AcrName}.azurecr.io --username {acrCreds.Username} --password-stdin\"");
+                var startInfo = new ProcessStartInfo("pwsh", $"-c \"cat '{Escape(passwordPath)}' | docker login '{Escape(config.AcrName)}.azurecr.io' --username '{Escape(acrCreds.Username)}' --password-stdin\"");
                 processRunner.RunProcessWithOutput(startInfo);
             }
             finally
@@ -49,6 +49,11 @@ namespace Threax.Provision.CheapAzure.Controller.LoginAcr
                     File.Delete(passwordPath);
                 }
             }
+        }
+
+        private string Escape(string s)
+        {
+            return s.Replace("'", "''");
         }
     }
 }

@@ -16,6 +16,7 @@ using Threax.Provision.Processing;
 using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics;
 
 namespace Threax.Provision.CheapAzure
 {
@@ -23,6 +24,9 @@ namespace Threax.Provision.CheapAzure
     {
         static async Task Main(string[] args)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+
             var command = args[0];
             var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(args[1]));
             var jsonConfigPath = Path.GetFullPath(args[2]);
@@ -79,16 +83,20 @@ namespace Threax.Provision.CheapAzure
             services.AddThreaxPipelines();
             services.AddThreaxPipelinesDocker();
 
-            using var serviceProvider = services.BuildServiceProvider();
-            using var scope = serviceProvider.CreateScope();
+            using (var serviceProvider = services.BuildServiceProvider())
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var loader = scope.ServiceProvider.GetRequiredService<IResourceDefinitionLoader>();
+                var definition = loader.LoadFromFile(jsonConfigPath);
+                definition.Resources.Add(new ResourceGroup(config.ResourceGroup));
+                definition.Resources.Add(new KeyVault());
+                definition.SortResources();
+                var provisioner = scope.ServiceProvider.GetRequiredService<IProvisioner>();
+                await provisioner.ProcessResources(definition, scope);
+            }
 
-            var loader = scope.ServiceProvider.GetRequiredService<IResourceDefinitionLoader>();
-            var definition = loader.LoadFromFile(jsonConfigPath);
-            definition.Resources.Add(new ResourceGroup(config.ResourceGroup));
-            definition.Resources.Add(new KeyVault());
-            definition.SortResources();
-            var provisioner = scope.ServiceProvider.GetRequiredService<IProvisioner>();
-            await provisioner.ProcessResources(definition, scope);
+            sw.Stop();
+            Console.WriteLine($"Tasks took {sw.Elapsed}");
         }
     }
 }
