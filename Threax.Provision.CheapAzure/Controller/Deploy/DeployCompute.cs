@@ -107,14 +107,13 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                 dockerRegistryPassword = securePass,
                 dockerRegistryUsername = acrCreds.Username,
                 dockerRegistryUrl = $"{config.AcrName}.azurecr.io",
-                alwaysOn = resource.AlwaysOn,
+                alwaysOn = false,
                 nameFromTemplate = appName,
                 hostingPlanName = config.AppServicePlanName,
                 serverFarmResourceGroup = config.ResourceGroup,
                 location = config.Location,
                 subscriptionId = config.SubscriptionId,
-                linuxFxVersion = $"DOCKER|{taggedImageName}",
-                loadCertificates = resource.LoadCertificates != null ? String.Join(",", resource.LoadCertificates) : null
+                linuxFxVersion = $"DOCKER|{taggedImageName}"
             });
 
             //Update app permissions in key vault

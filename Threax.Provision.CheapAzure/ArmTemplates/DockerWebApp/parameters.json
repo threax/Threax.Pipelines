@@ -37,9 +37,6 @@
     },
     "dockerRegistryStartupCommand": {
       "value": ""
-    },
-    "loadCertificates": {
-      "value": ""
     }
   }
 }

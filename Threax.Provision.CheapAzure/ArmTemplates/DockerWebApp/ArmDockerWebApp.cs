@@ -29,8 +29,6 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.DockerWebApp
 
         public SecureString dockerRegistryPassword { get; set; }
 
-        public String loadCertificates { get; set; }
-
         //public String dockerRegistryStartupCommand { get; set; }
     }
 }

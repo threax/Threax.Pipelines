@@ -37,9 +37,6 @@
     },
     "dockerRegistryStartupCommand": {
       "type": "string"
-    },
-    "loadCertificates": {
-      "type": "string"
     }
   },
   "resources": [
@@ -69,10 +66,6 @@
             {
               "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
               "value": "false"
-            },
-            {
-              "name": "WEBSITE_LOAD_CERTIFICATES",
-              "value": "[parameters('loadCertificates')]"
             }
           ],
           "linuxFxVersion": "[parameters('linuxFxVersion')]",
