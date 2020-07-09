@@ -20,13 +20,7 @@ namespace Threax.Provision.AzPowershell
 
         public async Task Create(String name, String resourceGroupName, String location, String adminUser, String adminPass)
         {
-            using var securePass = new SecureString();
-            foreach (var c in adminPass)
-            {
-                securePass.AppendChar(c);
-            }
-            securePass.MakeReadOnly();
-            var creds = new PSCredential(adminUser, securePass);
+            var creds = new PSCredential(adminUser, adminPass.ToSecureString());
 
             using var pwsh = PowerShell.Create()
                 .PrintInformationStream(logger)

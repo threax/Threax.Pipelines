@@ -94,17 +94,10 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
 
             var acrCreds = await acrManager.GetAcrCredential(config.AcrName, config.ResourceGroup);
 
-            var securePass = new SecureString();
-            foreach(var c in acrCreds.Password)
-            {
-                securePass.AppendChar(c);
-            }
-            securePass.MakeReadOnly();
-
             //Deploy app itself
             await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmDockerWebApp()
             {
-                dockerRegistryPassword = securePass,
+                dockerRegistryPassword = acrCreds.Password.ToSecureString(),
                 dockerRegistryUsername = acrCreds.Username,
                 dockerRegistryUrl = $"{config.AcrName}.azurecr.io",
                 alwaysOn = false,
@@ -121,7 +114,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
 
             try
             {
-                await keyVaultManager.UnlockSecrets(config.KeyVaultName, appId);
+                await keyVaultManager.UnlockSecretsRead(config.KeyVaultName, appId);
             }
             catch (Exception ex)
             {
@@ -129,7 +122,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                 logger.LogError(ex, $"An error occured setting the key vault permissions. Trying again after {delay}ms...");
                 Thread.Sleep(delay);
                 logger.LogInformation("Sleep complete. Trying permissions again.");
-                await keyVaultManager.UnlockSecrets(config.KeyVaultName, appId);
+                await keyVaultManager.UnlockSecretsRead(config.KeyVaultName, appId);
             }
         }
     }

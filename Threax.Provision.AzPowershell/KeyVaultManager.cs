@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Management.Automation;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,6 +19,12 @@ namespace Threax.Provision.AzPowershell
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Unlock get, list, set and delete for secrets and certificates.
+        /// </summary>
+        /// <param name="keyVaultName"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public async Task UnlockSecrets(String keyVaultName, Guid userId)
         {
             using (var pwsh = PowerShell.Create())
@@ -29,7 +37,33 @@ namespace Threax.Provision.AzPowershell
                 pwsh.AddScript("param($userId, $keyVaultName)");
                 pwsh.AddParameter("userId", userId.ToString());
                 pwsh.AddParameter("keyVaultName", keyVaultName);
-                pwsh.AddScript("Set-AzKeyVaultAccessPolicy -ObjectId $userId -VaultName $keyVaultName -PermissionsToSecrets set,delete,get,list");
+                pwsh.AddScript("Set-AzKeyVaultAccessPolicy -ObjectId $userId -VaultName $keyVaultName -PermissionsToSecrets set,delete,get,list -PermissionsToCertificates import,delete,get,list");
+
+                var outputCollection = await pwsh.RunAsync();
+
+                pwsh.ThrowOnErrors($"Error unlocking secrets in Key Vault '{keyVaultName}'.");
+            }
+        }
+
+        /// <summary>
+        /// Unlock get and list for secrets and certificates.
+        /// </summary>
+        /// <param name="keyVaultName"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task UnlockSecretsRead(String keyVaultName, Guid userId)
+        {
+            using (var pwsh = PowerShell.Create())
+            {
+                pwsh.PrintInformationStream(logger);
+                pwsh.PrintErrorStream(logger);
+
+                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+                pwsh.AddScript("Import-Module Az.KeyVault");
+                pwsh.AddScript("param($userId, $keyVaultName)");
+                pwsh.AddParameter("userId", userId.ToString());
+                pwsh.AddParameter("keyVaultName", keyVaultName);
+                pwsh.AddScript("Set-AzKeyVaultAccessPolicy -ObjectId $userId -VaultName $keyVaultName -PermissionsToSecrets get,list -PermissionsToCertificates get,list");
 
                 var outputCollection = await pwsh.RunAsync();
 
@@ -158,6 +192,52 @@ namespace Threax.Provision.AzPowershell
                 pwsh.ThrowOnErrors($"Error loading '{VaultName}' from Key Vault '{VaultName}'.");
                 var info = outputCollection.FirstOrDefault() as dynamic;
                 return info != null;
+            }
+        }
+
+        public async Task<WebAppInfo> ImportCertificate(String VaultName, String Name, String FilePath, SecureString Password)
+        {
+            var pwshArgs = new { VaultName, Name, FilePath, Password };
+
+            using var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger);
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddScript("Import-Module Az.KeyVault");
+            pwsh.AddParamLine(pwshArgs);
+            pwsh.AddCommandWithParams("Import-AzKeyVaultCertificate", pwshArgs);
+
+            var outputCollection = await pwsh.RunAsync();
+            pwsh.ThrowOnErrors($"Error Importing certificate '{Name}' in Key Vault '{VaultName}'.");
+
+            dynamic result = outputCollection.First();
+
+            var principalId = result.Identity?.PrincipalId;
+
+            return new WebAppInfo()
+            {
+                IdentityObjectId = principalId != null ? new Guid(principalId) : default(Guid?)
+            };
+        }
+
+        public async Task ImportCertificate(String VaultName, String Name, byte[] cert, SecureString Password)
+        {
+            var outFile = Path.GetTempFileName();
+            try
+            {
+                using (var stream = File.Open(outFile, FileMode.Create))
+                {
+                    stream.Write(cert);
+                }
+                await ImportCertificate(VaultName, Name, outFile, Password);
+            }
+            finally
+            {
+                if (File.Exists(outFile))
+                {
+                    File.Delete(outFile);
+                }
             }
         }
     }

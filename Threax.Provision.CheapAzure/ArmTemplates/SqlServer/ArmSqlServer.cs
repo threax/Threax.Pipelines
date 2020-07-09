@@ -9,16 +9,11 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.SqlServer
 {
     class ArmSqlServer : ArmTemplate
     {
-        public ArmSqlServer(String serverName, String administratorLogin, String password)
+        public ArmSqlServer(String serverName, String administratorLogin, SecureString password)
         {
             this.serverName = serverName;
             this.administratorLogin = administratorLogin;
-            this.administratorLoginPassword = new SecureString();
-            foreach(var c in password)
-            {
-                this.administratorLoginPassword.AppendChar(c);
-            }
-            this.administratorLoginPassword.MakeReadOnly();
+            this.administratorLoginPassword = password;
         }
 
         public string serverName { get; set; }

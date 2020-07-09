@@ -49,7 +49,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 
             //Setup logical server
             logger.LogInformation($"Setting up SQL Logical Server '{config.SqlServerName}' in Resource Group '{config.ResourceGroup}'.");
-            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlServer(config.SqlServerName, saCreds.User, saCreds.Pass));
+            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlServer(config.SqlServerName, saCreds.User, saCreds.Pass.ToSecureString()));
             var saConnectionString = await keyVaultManager.GetSecret(config.KeyVaultName, config.SaConnectionStringSecretName);
             if (saConnectionString == null || saCreds.Created)
             {
