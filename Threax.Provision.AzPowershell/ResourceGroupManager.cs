@@ -38,11 +38,6 @@ namespace Threax.Provision.AzPowershell
 
                 pwsh.ThrowOnErrors($"Error creating Resource Group '{name}' in '{location}'.");
             }
-
-            //This is less ideal, but won't have the library load errors.
-            //var startInfo = new ProcessStartInfo("pwsh", $"-c \"New-AzResourceGroup -Name '{name}' -Location '{location}' -Force\"");
-            //ProcessHelper.RunProcessWithOutput(startInfo, logger, $"Error creating Resource Group '{name}' in '{location}'");
-            //return Task.CompletedTask;
         }
     }
 }

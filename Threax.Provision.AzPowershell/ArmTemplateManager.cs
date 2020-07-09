@@ -39,17 +39,6 @@ namespace Threax.Provision.AzPowershell
             var outputCollection = await pwsh.RunAsync();
 
             pwsh.ThrowOnErrors($"Error creating Arm Template '{templateFile}' in Resource Group '{resourceGroupName}'.");
-
-            ////Less ideal, but runs command in another process
-            //var command = ProcessHelper.CreateCommandArgs("New-AzResourceGroupDeployment", pwshArgs);
-            //var startInfo = new ProcessStartInfo("pwsh", command);
-            //var error = templateParameterFile != null ?
-            //    $"An error occured deploying the ARM template resource group deployment in '{resourceGroupName}' with file '{templateFile}' and parameters file {templateParameterFile}." :
-            //    $"An error occured deploying the ARM template resource group deployment in '{resourceGroupName}' with file '{templateFile}'.";
-
-            //ProcessHelper.RunProcessWithOutput(startInfo, logger, error);
-
-            //return Task.CompletedTask;
         }
 
         public Task ResourceGroupDeployment(String resourceGroupName, String templateFile, Object args)
@@ -92,17 +81,6 @@ namespace Threax.Provision.AzPowershell
             var outputCollection = await pwsh.RunAsync();
 
             pwsh.ThrowOnErrors($"Error creating Arm Template Deployment '{templateFile}' in Location '{location}'.");
-
-            ////Less ideal, but runs command in another process
-            //var command = ProcessHelper.CreateCommandArgs("New-AzDeployment", pwshArgs);
-            //var startInfo = new ProcessStartInfo("pwsh", command);
-            //var error = templateParameterFile != null ?
-            //    $"An error occured creationg ARM template deployment in {location} with file '{templateFile}' and parameters file {templateParameterFile}." :
-            //    $"An error occured creationg ARM template deployment in {location} with file '{templateFile}'.";
-
-            //ProcessHelper.RunProcessWithOutput(startInfo, logger, error);
-
-            //return Task.CompletedTask;
         }
 
         public Task SubscriptionDeployment(String location, String templateFile, Object args)

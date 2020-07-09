@@ -195,7 +195,7 @@ namespace Threax.Provision.AzPowershell
             }
         }
 
-        public async Task<WebAppInfo> ImportCertificate(String VaultName, String Name, String FilePath, SecureString Password)
+        public async Task ImportCertificate(String VaultName, String Name, String FilePath, SecureString Password)
         {
             var pwshArgs = new { VaultName, Name, FilePath, Password };
 
@@ -209,16 +209,7 @@ namespace Threax.Provision.AzPowershell
             pwsh.AddCommandWithParams("Import-AzKeyVaultCertificate", pwshArgs);
 
             var outputCollection = await pwsh.RunAsync();
-            pwsh.ThrowOnErrors($"Error Importing certificate '{Name}' in Key Vault '{VaultName}'.");
-
-            dynamic result = outputCollection.First();
-
-            var principalId = result.Identity?.PrincipalId;
-
-            return new WebAppInfo()
-            {
-                IdentityObjectId = principalId != null ? new Guid(principalId) : default(Guid?)
-            };
+            pwsh.ThrowOnErrors($"Error Importing Certificate '{Name}' to Key Vault '{VaultName}'.");
         }
 
         public async Task ImportCertificate(String VaultName, String Name, byte[] cert, SecureString Password)
@@ -239,6 +230,32 @@ namespace Threax.Provision.AzPowershell
                     File.Delete(outFile);
                 }
             }
+        }
+
+        public async Task<VaultCertificate> GetCertificate(String VaultName, String Name)
+        {
+            var pwshArgs = new { VaultName, Name };
+
+            using var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger);
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddScript("Import-Module Az.KeyVault");
+            pwsh.AddParamLine(pwshArgs);
+            pwsh.AddCommandWithParams("Get-AzKeyVaultCertificate", pwshArgs);
+
+            var outputCollection = await pwsh.RunAsync();
+            pwsh.ThrowOnErrors($"Error getting certificate '{Name}' from Key Vault '{VaultName}'.");
+
+            var i = outputCollection.FirstOrDefault() as dynamic;
+            return i != null ?
+                new VaultCertificate()
+                {
+                    KeyId = i.KeyId,
+                    SecretId = i.SecretId,
+                    Thumbprint = i.Thumbprint
+                } : null;
         }
     }
 }
