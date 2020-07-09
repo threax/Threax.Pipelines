@@ -104,16 +104,17 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             //Deploy app itself
             await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmDockerWebApp()
             {
-                 dockerRegistryPassword = securePass,
-                 dockerRegistryUsername = acrCreds.Username,
-                 dockerRegistryUrl = $"{config.AcrName}.azurecr.io",
-                 alwaysOn = resource.AlwaysOn,
-                 nameFromTemplate = appName,
-                 hostingPlanName = config.AppServicePlanName,
-                 serverFarmResourceGroup = config.ResourceGroup,
-                 location = config.Location,
-                 subscriptionId = config.SubscriptionId,
-                 linuxFxVersion = $"DOCKER|{taggedImageName}"
+                dockerRegistryPassword = securePass,
+                dockerRegistryUsername = acrCreds.Username,
+                dockerRegistryUrl = $"{config.AcrName}.azurecr.io",
+                alwaysOn = resource.AlwaysOn,
+                nameFromTemplate = appName,
+                hostingPlanName = config.AppServicePlanName,
+                serverFarmResourceGroup = config.ResourceGroup,
+                location = config.Location,
+                subscriptionId = config.SubscriptionId,
+                linuxFxVersion = $"DOCKER|{taggedImageName}",
+                loadCertificates = resource.LoadCertificates != null ? String.Join(",", resource.LoadCertificates) : null
             });
 
             //Update app permissions in key vault
