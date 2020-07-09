@@ -113,19 +113,22 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             });
 
             //Update app permissions in key vault
-            var appId = await webAppManager.GetOrCreateWebAppIdentity(appName, config.ResourceGroup);
+            if (!string.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
+            {
+                var appId = await webAppManager.GetOrCreateWebAppIdentity(appName, config.ResourceGroup);
 
-            try
-            {
-                await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
-            }
-            catch (Exception ex)
-            {
-                var delay = 8000;
-                logger.LogError(ex, $"An error occured setting the key vault permissions. Trying again after {delay}ms...");
-                Thread.Sleep(delay);
-                logger.LogInformation("Sleep complete. Trying permissions again.");
-                await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
+                try
+                {
+                    await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
+                }
+                catch (Exception ex)
+                {
+                    var delay = 8000;
+                    logger.LogError(ex, $"An error occured setting the key vault permissions. Trying again after {delay}ms...");
+                    Thread.Sleep(delay);
+                    logger.LogInformation("Sleep complete. Trying permissions again.");
+                    await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
+                }
             }
         }
     }
