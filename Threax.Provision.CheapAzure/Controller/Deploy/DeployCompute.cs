@@ -60,7 +60,10 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         {
             var appName = resource.Name ?? throw new InvalidOperationException($"You must provide a '{nameof(Compute.Name)}' property on your '{nameof(Compute)}' resource.");
 
-            await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
+            if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
+            {
+                await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
+            }
 
             var image = buildConfig.ImageName;
             var currentTag = buildConfig.GetCurrentTag();
@@ -83,10 +86,17 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                 sb.Append($"{taggedImageName} {deployConfig.InitCommand}");
                 var psi = new ProcessStartInfo("docker", sb.ToString());
 
-                foreach (var secret in secrets)
+                if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
                 {
-                    var secretValue = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, secret.Value);
-                    psi.EnvironmentVariables.Add(secret.Key, secretValue);
+                    foreach (var secret in secrets)
+                    {
+                        var secretValue = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, secret.Value);
+                        psi.EnvironmentVariables.Add(secret.Key, secretValue);
+                    }
+                }
+                else
+                {
+                    logger.LogInformation($"No 'KeyVault.{nameof(ThreaxAzureKeyVaultConfig.VaultName)}' property defined in config. Skipping secret load during deploy.");
                 }
 
                 processRunner.RunProcessWithOutput(psi);
