@@ -9,5 +9,7 @@ namespace Threax.Provision.CheapAzure.Resources
         public String Name { get; set; }
 
         public String ConnectionStringName { get; set; }
+
+        public String OwnerConnectionStringName { get; set; }
     }
 }

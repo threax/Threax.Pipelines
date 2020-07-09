@@ -17,6 +17,7 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using Threax.DeployConfig;
+using Threax.Configuration.AzureKeyVault;
 
 namespace Threax.Provision.CheapAzure.Controller.Deploy
 {
@@ -35,8 +36,9 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly ISqlServerManager sqlServerManager;
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
+        private readonly ThreaxAzureKeyVaultConfig azureKeyVaultConfig;
 
-        public DeployCompute(Config config, BuildConfig buildConfig, DeploymentConfig deployConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppManager, IKeyVaultManager keyVaultManager, IImageManager imageManager, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager, ISqlServerManager sqlServerManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager)
+        public DeployCompute(Config config, BuildConfig buildConfig, DeploymentConfig deployConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppManager, IKeyVaultManager keyVaultManager, IImageManager imageManager, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager, ISqlServerManager sqlServerManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, ThreaxAzureKeyVaultConfig azureKeyVaultConfig)
         {
             this.config = config;
             this.buildConfig = buildConfig;
@@ -51,13 +53,14 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             this.keyVaultAccessManager = keyVaultAccessManager;
             this.sqlServerManager = sqlServerManager;
             this.sqlServerFirewallRuleManager = sqlServerFirewallRuleManager;
+            this.azureKeyVaultConfig = azureKeyVaultConfig;
         }
 
         public async Task Execute(Compute resource)
         {
             var appName = resource.Name ?? throw new InvalidOperationException($"You must provide a '{nameof(Compute.Name)}' property on your '{nameof(Compute)}' resource.");
 
-            await keyVaultAccessManager.Unlock(config.KeyVaultName, config.UserId);
+            await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
 
             var image = buildConfig.ImageName;
             var currentTag = buildConfig.GetCurrentTag();
@@ -82,7 +85,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
 
                 foreach (var secret in secrets)
                 {
-                    var secretValue = await keyVaultManager.GetSecret(config.KeyVaultName, secret.Value);
+                    var secretValue = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, secret.Value);
                     psi.EnvironmentVariables.Add(secret.Key, secretValue);
                 }
 
@@ -114,15 +117,15 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
 
             try
             {
-                await keyVaultManager.UnlockSecretsRead(config.KeyVaultName, appId);
+                await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
             }
             catch (Exception ex)
             {
-                var delay = 3000;
+                var delay = 8000;
                 logger.LogError(ex, $"An error occured setting the key vault permissions. Trying again after {delay}ms...");
                 Thread.Sleep(delay);
                 logger.LogInformation("Sleep complete. Trying permissions again.");
-                await keyVaultManager.UnlockSecretsRead(config.KeyVaultName, appId);
+                await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
             }
         }
     }

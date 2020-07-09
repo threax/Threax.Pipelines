@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Threax.Configuration.AzureKeyVault;
 using Threax.Provision.AzPowershell;
 using Threax.Provision.CheapAzure.Resources;
 using Threax.Provision.CheapAzure.Services;
@@ -17,13 +18,15 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly IKeyVaultManager keyVaultManager;
         private readonly Config config;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
+        private readonly ThreaxAzureKeyVaultConfig azureKeyVaultConfig;
 
-        public CreateCertificate(IStringGenerator stringGenerator, IKeyVaultManager keyVaultManager, Config config, IKeyVaultAccessManager keyVaultAccessManager)
+        public CreateCertificate(IStringGenerator stringGenerator, IKeyVaultManager keyVaultManager, Config config, IKeyVaultAccessManager keyVaultAccessManager, ThreaxAzureKeyVaultConfig azureKeyVaultConfig)
         {
             this.stringGenerator = stringGenerator;
             this.keyVaultManager = keyVaultManager;
             this.config = config;
             this.keyVaultAccessManager = keyVaultAccessManager;
+            this.azureKeyVaultConfig = azureKeyVaultConfig;
         }
 
         public async Task Execute(Certificate resource)
@@ -38,9 +41,9 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 throw new InvalidOperationException($"You must provide a value for '{nameof(Certificate.CN)}' in your '{nameof(Certificate)}' types.");
             }
 
-            await keyVaultAccessManager.Unlock(config.KeyVaultName, config.UserId);
+            await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
 
-            var existingCert = await keyVaultManager.GetCertificate(config.KeyVaultName, resource.Name);
+            var existingCert = await keyVaultManager.GetCertificate(azureKeyVaultConfig.VaultName, resource.Name);
             if (existingCert == null)
             {
                 using (var rsa = RSA.Create()) // generate asymmetric key pair
@@ -59,7 +62,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                     {
                         certBytes = cert.Export(X509ContentType.Pfx, password);
                     }
-                    await keyVaultManager.ImportCertificate(config.KeyVaultName, resource.Name, certBytes, password.ToSecureString());
+                    await keyVaultManager.ImportCertificate(azureKeyVaultConfig.VaultName, resource.Name, certBytes, password.ToSecureString());
                 }
             }
         }

@@ -39,17 +39,12 @@ namespace Threax.Provision.CheapAzure
         /// <summary>
         /// The name of the key vault to create.
         /// </summary>
-        public String KeyVaultName { get; set; }
+        public String InfraKeyVaultName { get; set; }
 
         /// <summary>
         /// The public ip of the current machine to temporarly create a sql server firewall rule for.
         /// </summary>
         public string MachineIp { get; set; }
-
-        /// <summary>
-        /// The name of the sa connection string to save. Default: "sqlsrv-sa-connectionstring"
-        /// </summary>
-        public string SaConnectionStringSecretName { get; set; } = "sqlsrv-sa-connectionstring";
 
         /// <summary>
         /// The name of the acr to create.

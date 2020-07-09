@@ -18,6 +18,7 @@ using Threax.Extensions.Configuration.SchemaBinder;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using Threax.DeployConfig;
+using Threax.Configuration.AzureKeyVault;
 
 namespace Threax.Provision.CheapAzure
 {
@@ -78,6 +79,14 @@ namespace Threax.Provision.CheapAzure
                 config.Bind("Deploy", deployConfig);
                 deployConfig.Validate();
                 return deployConfig;
+            });
+
+            services.AddScoped<ThreaxAzureKeyVaultConfig>(s =>
+            {
+                var config = s.GetRequiredService<SchemaConfigurationBinder>();
+                var parsed = new ThreaxAzureKeyVaultConfig();
+                config.Bind("KeyVault", parsed);
+                return parsed;
             });
 
             services.AddThreaxProvisionAzPowershell();
