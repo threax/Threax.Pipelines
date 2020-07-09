@@ -26,14 +26,6 @@
     "Deploy Notes": {
       "commandName": "Project",
       "commandLineArgs": "Deploy \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/notes/appsettings.json\""
-    },
-    "Deploy smo": {
-      "commandName": "Project",
-      "commandLineArgs": "Deploy \"C:/DevFreight/smoFreight/coreconfig.json\" \"C:/DevFreight/SmoFreight.IdServer/Threax.IdServer/appsettings.Production.json\""
-    },
-    "Create smo": {
-      "commandName": "Project",
-      "commandLineArgs": "Create \"C:/DevFreight/smoFreight/coreconfig.json\" \"C:/DevFreight/SmoFreight.IdServer/Threax.IdServer/appsettings.Production.json\""
     }
   }
 }

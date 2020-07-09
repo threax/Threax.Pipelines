@@ -34,10 +34,13 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, keyVaultArm);
             }
 
-            if (!await keyVaultManager.Exists(azureKeyVaultConfig.VaultName))
+            if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
             {
-                var keyVaultArm = new ArmKeyVault(azureKeyVaultConfig.VaultName, config.Location, config.TenantId.ToString());
-                await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, keyVaultArm);
+                if (!await keyVaultManager.Exists(azureKeyVaultConfig.VaultName))
+                {
+                    var keyVaultArm = new ArmKeyVault(azureKeyVaultConfig.VaultName, config.Location, config.TenantId.ToString());
+                    await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, keyVaultArm);
+                }
             }
         }
     }
