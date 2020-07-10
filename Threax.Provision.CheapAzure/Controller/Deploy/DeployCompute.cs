@@ -29,7 +29,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         private readonly ILogger<DeployCompute> logger;
         private readonly IAcrManager acrManager;
         private readonly IArmTemplateManager armTemplateManager;
-        private readonly IWebAppIdentityManager webAppManager;
+        private readonly IWebAppIdentityManager webAppIdentityManager;
         private readonly IKeyVaultManager keyVaultManager;
         private readonly IImageManager imageManager;
         private readonly IProcessRunner processRunner;
@@ -37,8 +37,9 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         private readonly ISqlServerManager sqlServerManager;
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
         private readonly ThreaxAzureKeyVaultConfig azureKeyVaultConfig;
+        private readonly IWebAppManager webAppManager;
 
-        public DeployCompute(Config config, BuildConfig buildConfig, DeploymentConfig deployConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppManager, IKeyVaultManager keyVaultManager, IImageManager imageManager, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager, ISqlServerManager sqlServerManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, ThreaxAzureKeyVaultConfig azureKeyVaultConfig)
+        public DeployCompute(Config config, BuildConfig buildConfig, DeploymentConfig deployConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppIdentityManager, IKeyVaultManager keyVaultManager, IImageManager imageManager, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager, ISqlServerManager sqlServerManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, ThreaxAzureKeyVaultConfig azureKeyVaultConfig, IWebAppManager webAppManager)
         {
             this.config = config;
             this.buildConfig = buildConfig;
@@ -46,7 +47,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             this.logger = logger;
             this.acrManager = acrManager;
             this.armTemplateManager = armTemplateManager;
-            this.webAppManager = webAppManager;
+            this.webAppIdentityManager = webAppIdentityManager;
             this.keyVaultManager = keyVaultManager;
             this.imageManager = imageManager;
             this.processRunner = processRunner;
@@ -54,6 +55,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             this.sqlServerManager = sqlServerManager;
             this.sqlServerFirewallRuleManager = sqlServerFirewallRuleManager;
             this.azureKeyVaultConfig = azureKeyVaultConfig;
+            this.webAppManager = webAppManager;
         }
 
         public async Task Execute(Compute resource)
@@ -125,7 +127,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             //Update app permissions in key vault
             if (!string.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
             {
-                var appId = await webAppManager.GetOrCreateWebAppIdentity(appName, config.ResourceGroup);
+                var appId = await webAppIdentityManager.GetOrCreateWebAppIdentity(appName, config.ResourceGroup);
 
                 try
                 {
@@ -140,6 +142,11 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                     await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
                 }
             }
+
+            //Setup dns
+            var hostNames = (resource.DnsNames ?? Enumerable.Empty<String>()).Concat(new string[] { $"{resource.Name}.azurewebsites.net" });
+            logger.LogInformation($"Updating Host Names to '[{String.Join(", ", hostNames)}]'");
+            await webAppManager.SetHostnames(resource.Name, config.ResourceGroup, hostNames);
         }
     }
 }

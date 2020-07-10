@@ -68,5 +68,22 @@ namespace Threax.Provision.AzPowershell
                 IdentityObjectId = principalId != null ? new Guid(principalId) : default(Guid?)
             };
         }
+
+        public async Task SetHostnames(String Name, String ResourceGroupName, IEnumerable<String> HostNames)
+        {
+            var pwshArgs = new { Name, ResourceGroupName, HostNames = HostNames.ToArray() };
+
+            using var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger);
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddScript("Import-Module Az.Websites");
+            pwsh.AddParamLine(pwshArgs);
+            pwsh.AddCommandWithParams("Set-AzWebApp", pwshArgs);
+
+            var outputCollection = await pwsh.RunAsync();
+            pwsh.ThrowOnErrors($"Error setting host names {String.Join(", ", HostNames)} for Web App '{Name}' in Resource Group '{ResourceGroupName}'.");
+        }
     }
 }
