@@ -83,7 +83,24 @@ namespace Threax.Provision.AzPowershell
             pwsh.AddCommandWithParams("Set-AzWebApp", pwshArgs);
 
             var outputCollection = await pwsh.RunAsync();
-            pwsh.ThrowOnErrors($"Error setting host names {String.Join(", ", HostNames)} for Web App '{Name}' in Resource Group '{ResourceGroupName}'.");
+            pwsh.ThrowOnErrors($"Error setting host names '[{String.Join(", ", HostNames)}]' for Web App '{Name}' in Resource Group '{ResourceGroupName}'.");
+        }
+
+        public async Task CreateSslBinding(String WebAppName, String ResourceGroupName, String Thumbprint, String Name)
+        {
+            var pwshArgs = new { WebAppName, ResourceGroupName, Thumbprint, Name };
+
+            using var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger);
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddScript("Import-Module Az.Websites");
+            pwsh.AddParamLine(pwshArgs);
+            pwsh.AddCommandWithParams("New-AzWebAppSSLBinding", pwshArgs);
+
+            var outputCollection = await pwsh.RunAsync();
+            pwsh.ThrowOnErrors($"Error creating ssl binding for '{Name}' with thumb '{Thumbprint}' for Web App '{WebAppName}' in Resource Group '{ResourceGroupName}'.");
         }
     }
 }

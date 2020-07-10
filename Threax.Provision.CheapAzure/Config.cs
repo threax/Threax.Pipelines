@@ -65,5 +65,10 @@ namespace Threax.Provision.CheapAzure
         /// The base name of the sa secret in the key vault. Default: "sqlsrv-sa"
         /// </summary>
         public string SqlSaBaseKey { get; set; } = "sqlsrv-sa";
+
+        /// <summary>
+        /// The thumbprint of the ssl certificate to use.
+        /// </summary>
+        public string SslCertThumb { get; set; }
     }
 }

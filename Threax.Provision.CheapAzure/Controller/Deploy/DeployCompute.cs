@@ -147,6 +147,15 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             var hostNames = (resource.DnsNames ?? Enumerable.Empty<String>()).Concat(new string[] { $"{resource.Name}.azurewebsites.net" });
             logger.LogInformation($"Updating Host Names to '[{String.Join(", ", hostNames)}]'");
             await webAppManager.SetHostnames(resource.Name, config.ResourceGroup, hostNames);
+
+            if (!String.IsNullOrEmpty(config.SslCertThumb) && resource.DnsNames.Count > 0)
+            {
+                logger.LogInformation($"Creating SSL Bindings to '[{String.Join(", ", resource.DnsNames)}]' with thumb '{config.SslCertThumb}'.");
+                foreach (var host in resource.DnsNames)
+                {
+                    await webAppManager.CreateSslBinding(resource.Name, config.ResourceGroup, config.SslCertThumb, host);
+                }
+            }
         }
     }
 }
