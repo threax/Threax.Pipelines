@@ -22,6 +22,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddScoped<IAcrManager, AcrManager>();
             services.TryAddScoped<IWebAppManager, WebAppManager>();
             services.TryAddScoped<IWebAppIdentityManager, WebAppIdentityManager>();
+            services.TryAddScoped<IStorageManager, StorageManager>();
         }
     }
 }

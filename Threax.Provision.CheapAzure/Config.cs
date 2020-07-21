@@ -37,7 +37,7 @@ namespace Threax.Provision.CheapAzure
         public String SqlDbName { get; set; }
 
         /// <summary>
-        /// The name of the key vault to create.
+        /// The name of the key vault to create for general infrastructure that doesn't belong to an app.
         /// </summary>
         public String InfraKeyVaultName { get; set; }
 
