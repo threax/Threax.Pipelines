@@ -5,7 +5,7 @@ using System.Security;
 using System.Text;
 using Threax.Provision.AzPowershell;
 
-namespace Threax.Provision.CheapAzure.ArmTemplates.SqlServer
+namespace Threax.Provision.CheapAzure.ArmTemplates.StorageAccount
 {
     class ArmStorageAccount : ArmTemplate
     {

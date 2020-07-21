@@ -26,7 +26,6 @@ namespace Threax.Provision.AzPowershell
                 { new KeyValuePair<string, object>("ResourceGroupName", resourceGroupName) }
                 .Concat(SetupArgs(ref templateFile, ref templateParameterFile, args));
 
-            //This should work, but library load error
             using var pwsh = PowerShell.Create()
                 .PrintInformationStream(logger)
                 .PrintErrorStream(logger);

@@ -35,7 +35,12 @@ namespace Threax.Provision.AzPowershell
 
             dynamic result = outputCollection.First();
 
-            return result.Key1;
+            return result.Value;
+        }
+
+        public String CreateConnectionString(String accountName, String accountKey)
+        {
+            return $"DefaultEndpointsProtocol=https;AccountName={accountName};AccountKey={accountKey};EndpointSuffix=core.windows.net";
         }
     }
 }
