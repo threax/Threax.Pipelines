@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 using Threax.Configuration.AzureKeyVault;
 using Threax.Provision.AzPowershell;
@@ -9,6 +10,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 {
     class CreateStorage : IResourceProcessor<Storage>
     {
+        private readonly ILogger<CreateStorage> logger;
         private readonly Config config;
         private readonly IArmTemplateManager armTemplateManager;
         private readonly IStorageManager storageManager;
@@ -16,8 +18,9 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly ThreaxAzureKeyVaultConfig azureKeyVaultConfig;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
 
-        public CreateStorage(Config config, IArmTemplateManager armTemplateManager, IStorageManager storageManager, IKeyVaultAccessManager keyVaultAccessManager, IKeyVaultManager keyVaultManager, ThreaxAzureKeyVaultConfig azureKeyVaultConfig)
+        public CreateStorage(ILogger<CreateStorage> logger, Config config, IArmTemplateManager armTemplateManager, IStorageManager storageManager, IKeyVaultAccessManager keyVaultAccessManager, IKeyVaultManager keyVaultManager, ThreaxAzureKeyVaultConfig azureKeyVaultConfig)
         {
+            this.logger = logger;
             this.config = config;
             this.armTemplateManager = armTemplateManager;
             this.storageManager = storageManager;
@@ -35,6 +38,8 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 
             if (!String.IsNullOrWhiteSpace(resource.AccessCredsSecretName))
             {
+                logger.LogInformation($"Setting up connection string in Key Vault '{azureKeyVaultConfig.VaultName}'.");
+
                 await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
 
                 var accessKey = await storageManager.GetAccessKey(resource.Name, config.ResourceGroup);
