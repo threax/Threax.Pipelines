@@ -17,7 +17,7 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using Threax.DeployConfig;
-using Threax.Configuration.AzureKeyVault;
+using Threax.Azure.Abstractions;
 
 namespace Threax.Provision.CheapAzure.Controller.Deploy
 {
@@ -36,10 +36,10 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly ISqlServerManager sqlServerManager;
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
-        private readonly ThreaxAzureKeyVaultConfig azureKeyVaultConfig;
+        private readonly AzureKeyVaultConfig azureKeyVaultConfig;
         private readonly IWebAppManager webAppManager;
 
-        public DeployCompute(Config config, BuildConfig buildConfig, DeploymentConfig deployConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppIdentityManager, IKeyVaultManager keyVaultManager, IImageManager imageManager, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager, ISqlServerManager sqlServerManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, ThreaxAzureKeyVaultConfig azureKeyVaultConfig, IWebAppManager webAppManager)
+        public DeployCompute(Config config, BuildConfig buildConfig, DeploymentConfig deployConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppIdentityManager, IKeyVaultManager keyVaultManager, IImageManager imageManager, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager, ISqlServerManager sqlServerManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, AzureKeyVaultConfig azureKeyVaultConfig, IWebAppManager webAppManager)
         {
             this.config = config;
             this.buildConfig = buildConfig;
@@ -98,7 +98,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                 }
                 else
                 {
-                    logger.LogInformation($"No 'KeyVault.{nameof(ThreaxAzureKeyVaultConfig.VaultName)}' property defined in config. Skipping secret load during deploy.");
+                    logger.LogInformation($"No 'KeyVault.{nameof(AzureKeyVaultConfig.VaultName)}' property defined in config. Skipping secret load during deploy.");
                 }
 
                 processRunner.RunProcessWithOutput(psi);

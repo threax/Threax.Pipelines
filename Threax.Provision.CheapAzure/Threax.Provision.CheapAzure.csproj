@@ -17,7 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.5" />
-    <PackageReference Include="Threax.Configuration.AzureKeyVault.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Threax.Azure.Abstractions" Version="1.0.0-pre04" />
     <PackageReference Include="Threax.Extensions.Configuration.SchemaBinder" Version="1.5.1" />
   </ItemGroup>
 

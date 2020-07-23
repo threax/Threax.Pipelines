@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using Threax.Configuration.AzureKeyVault;
+using Threax.Azure.Abstractions;
 using Threax.Provision.AzPowershell;
 using Threax.Provision.CheapAzure.Resources;
 using Threax.Provision.CheapAzure.Services;
@@ -18,9 +18,9 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly IKeyVaultManager keyVaultManager;
         private readonly Config config;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
-        private readonly ThreaxAzureKeyVaultConfig azureKeyVaultConfig;
+        private readonly AzureKeyVaultConfig azureKeyVaultConfig;
 
-        public CreateCertificate(IStringGenerator stringGenerator, IKeyVaultManager keyVaultManager, Config config, IKeyVaultAccessManager keyVaultAccessManager, ThreaxAzureKeyVaultConfig azureKeyVaultConfig)
+        public CreateCertificate(IStringGenerator stringGenerator, IKeyVaultManager keyVaultManager, Config config, IKeyVaultAccessManager keyVaultAccessManager, AzureKeyVaultConfig azureKeyVaultConfig)
         {
             this.stringGenerator = stringGenerator;
             this.keyVaultManager = keyVaultManager;

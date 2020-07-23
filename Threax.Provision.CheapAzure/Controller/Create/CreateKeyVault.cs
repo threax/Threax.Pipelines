@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Threax.Provision;
 using Threax.Provision.AzPowershell;
-using Threax.Configuration.AzureKeyVault;
+using Threax.Azure.Abstractions;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -16,9 +16,9 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly IArmTemplateManager armTemplateManager;
         private readonly Config config;
         private readonly IKeyVaultManager keyVaultManager;
-        private readonly ThreaxAzureKeyVaultConfig azureKeyVaultConfig;
+        private readonly AzureKeyVaultConfig azureKeyVaultConfig;
 
-        public CreateKeyVault(IArmTemplateManager armTemplateManager, Config config, IKeyVaultManager keyVaultManager, ThreaxAzureKeyVaultConfig azureKeyVaultConfig)
+        public CreateKeyVault(IArmTemplateManager armTemplateManager, Config config, IKeyVaultManager keyVaultManager, AzureKeyVaultConfig azureKeyVaultConfig)
         {
             this.armTemplateManager = armTemplateManager;
             this.config = config;

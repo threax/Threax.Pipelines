@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Threax.Provision;
 using Threax.Provision.AzPowershell;
 using Microsoft.Extensions.Logging;
-using Threax.Configuration.AzureKeyVault;
+using Threax.Azure.Abstractions;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -23,10 +23,10 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly ILogger<CreateSqlDatabase> logger;
-        private readonly ThreaxAzureKeyVaultConfig azureKeyVaultConfig;
+        private readonly AzureKeyVaultConfig azureKeyVaultConfig;
         private readonly Random rand = new Random();
 
-        public CreateSqlDatabase(ISqlServerManager sqlServerManager, Config config, IKeyVaultManager keyVaultManager, ICredentialLookup credentialLookup, IArmTemplateManager armTemplateManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, IKeyVaultAccessManager keyVaultAccessManager, ILogger<CreateSqlDatabase> logger, ThreaxAzureKeyVaultConfig azureKeyVaultConfig)
+        public CreateSqlDatabase(ISqlServerManager sqlServerManager, Config config, IKeyVaultManager keyVaultManager, ICredentialLookup credentialLookup, IArmTemplateManager armTemplateManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, IKeyVaultAccessManager keyVaultAccessManager, ILogger<CreateSqlDatabase> logger, AzureKeyVaultConfig azureKeyVaultConfig)
         {
             this.sqlServerManager = sqlServerManager;
             this.config = config;
