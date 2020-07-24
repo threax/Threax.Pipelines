@@ -86,7 +86,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 linuxFxVersion = $"DOCKER|{imageName}"
             });
 
-            //Need to setup continuous deployment
+            //Need to setup continuous deployment and connection to acr
 
             //Update app permissions in key vault
             if (!string.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
