@@ -39,7 +39,22 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         private readonly AzureKeyVaultConfig azureKeyVaultConfig;
         private readonly IWebAppManager webAppManager;
 
-        public DeployCompute(Config config, BuildConfig buildConfig, DeploymentConfig deployConfig, ILogger<DeployCompute> logger, IAcrManager acrManager, IArmTemplateManager armTemplateManager, IWebAppIdentityManager webAppIdentityManager, IKeyVaultManager keyVaultManager, IImageManager imageManager, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager, ISqlServerManager sqlServerManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, AzureKeyVaultConfig azureKeyVaultConfig, IWebAppManager webAppManager)
+        public DeployCompute(
+            Config config, 
+            BuildConfig buildConfig, 
+            DeploymentConfig deployConfig, 
+            ILogger<DeployCompute> logger, 
+            IAcrManager acrManager, 
+            IArmTemplateManager armTemplateManager, 
+            IWebAppIdentityManager webAppIdentityManager, 
+            IKeyVaultManager keyVaultManager, 
+            IImageManager imageManager, 
+            IProcessRunner processRunner, 
+            IKeyVaultAccessManager keyVaultAccessManager, 
+            ISqlServerManager sqlServerManager, 
+            ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, 
+            AzureKeyVaultConfig azureKeyVaultConfig, 
+            IWebAppManager webAppManager)
         {
             this.config = config;
             this.buildConfig = buildConfig;
@@ -60,8 +75,6 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
 
         public async Task Execute(Compute resource)
         {
-            var appName = resource.Name ?? throw new InvalidOperationException($"You must provide a '{nameof(Compute.Name)}' property on your '{nameof(Compute)}' resource.");
-
             if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
             {
                 await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
@@ -70,6 +83,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             var image = buildConfig.ImageName;
             var currentTag = buildConfig.GetCurrentTag();
             var taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
+            var branchTag = $"{image}:{buildConfig.Branch}";
 
             //Run Init Command if present
             if (deployConfig.InitCommand != null)
@@ -105,57 +119,11 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             }
 
             //Deploy
-            logger.LogInformation($"Deploying '{image}' with tag '{taggedImageName}'.");
+            logger.LogInformation($"Deploying '{image}' for branch '{buildConfig.Branch}'.");
 
-            var acrCreds = await acrManager.GetAcrCredential(config.AcrName, config.ResourceGroup);
+            processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"tag {taggedImageName} {branchTag}"));
 
-            //Deploy app itself
-            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmDockerWebApp()
-            {
-                dockerRegistryPassword = acrCreds.Password.ToSecureString(),
-                dockerRegistryUsername = acrCreds.Username,
-                dockerRegistryUrl = $"{config.AcrName}.azurecr.io",
-                alwaysOn = false,
-                nameFromTemplate = appName,
-                hostingPlanName = config.AppServicePlanName,
-                serverFarmResourceGroup = config.ResourceGroup,
-                location = config.Location,
-                subscriptionId = config.SubscriptionId,
-                linuxFxVersion = $"DOCKER|{taggedImageName}"
-            });
-
-            //Update app permissions in key vault
-            if (!string.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
-            {
-                var appId = await webAppIdentityManager.GetOrCreateWebAppIdentity(appName, config.ResourceGroup);
-
-                try
-                {
-                    await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
-                }
-                catch (Exception ex)
-                {
-                    var delay = 8000;
-                    logger.LogError(ex, $"An error occured setting the key vault permissions. Trying again after {delay}ms...");
-                    Thread.Sleep(delay);
-                    logger.LogInformation("Sleep complete. Trying permissions again.");
-                    await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
-                }
-            }
-
-            //Setup dns
-            var hostNames = (resource.DnsNames ?? Enumerable.Empty<String>()).Concat(new string[] { $"{resource.Name}.azurewebsites.net" });
-            logger.LogInformation($"Updating Host Names to '[{String.Join(", ", hostNames)}]'");
-            await webAppManager.SetHostnames(resource.Name, config.ResourceGroup, hostNames);
-
-            if (!String.IsNullOrEmpty(config.SslCertThumb) && resource.DnsNames.Count > 0)
-            {
-                logger.LogInformation($"Creating SSL Bindings to '[{String.Join(", ", resource.DnsNames)}]' with thumb '{config.SslCertThumb}'.");
-                foreach (var host in resource.DnsNames)
-                {
-                    await webAppManager.CreateSslBinding(resource.Name, config.ResourceGroup, config.SslCertThumb, host);
-                }
-            }
+            processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"push {branchTag}"));
         }
     }
 }
