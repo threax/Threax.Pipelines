@@ -102,5 +102,22 @@ namespace Threax.Provision.AzPowershell
             var outputCollection = await pwsh.RunAsync();
             pwsh.ThrowOnErrors($"Error creating ssl binding for '{Name}' with thumb '{Thumbprint}' for Web App '{WebAppName}' in Resource Group '{ResourceGroupName}'.");
         }
+
+        public async Task Restart(String Name, String ResourceGroupName)
+        {
+            var pwshArgs = new { Name, ResourceGroupName };
+
+            using var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger);
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddScript("Import-Module Az.Websites");
+            pwsh.AddParamLine(pwshArgs);
+            pwsh.AddCommandWithParams("Restart-AzWebApp", pwshArgs);
+
+            var outputCollection = await pwsh.RunAsync();
+            pwsh.ThrowOnErrors($"Error restarting '{Name}' in Resource Group '{ResourceGroupName}'.");
+        }
     }
 }

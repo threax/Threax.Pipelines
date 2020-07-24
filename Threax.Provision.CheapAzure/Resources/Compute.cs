@@ -21,5 +21,10 @@ namespace Threax.Provision.CheapAzure.Resources
         /// Set this to true to keep the app running all the time instead of turning off when idle. Default: false
         /// </summary>
         public bool AlwaysOn { get; set; }
+
+        /// <summary>
+        /// Enable continuous deployment for this app. Otherwise the app will be restarted to pull the new image.
+        /// </summary>
+        public bool EnableContinuousDeployment { get; set; } = true;
     }
 }

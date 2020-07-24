@@ -9,5 +9,6 @@ namespace Threax.Provision.AzPowershell
         Task<WebAppInfo> CreateWebAppIdentity(string Name, string ResourceGroupName);
         Task<WebAppInfo> GetWebApp(string Name, string ResourceGroupName);
         Task SetHostnames(string Name, string ResourceGroupName, IEnumerable<string> HostNames);
+        Task Restart(string Name, string ResourceGroupName);
     }
 }

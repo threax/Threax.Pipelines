@@ -27,47 +27,35 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         private readonly BuildConfig buildConfig;
         private readonly DeploymentConfig deployConfig;
         private readonly ILogger<DeployCompute> logger;
-        private readonly IAcrManager acrManager;
-        private readonly IArmTemplateManager armTemplateManager;
-        private readonly IWebAppIdentityManager webAppIdentityManager;
         private readonly IKeyVaultManager keyVaultManager;
         private readonly IImageManager imageManager;
         private readonly IProcessRunner processRunner;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
-        private readonly ISqlServerManager sqlServerManager;
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
         private readonly AzureKeyVaultConfig azureKeyVaultConfig;
         private readonly IWebAppManager webAppManager;
 
         public DeployCompute(
-            Config config, 
-            BuildConfig buildConfig, 
-            DeploymentConfig deployConfig, 
-            ILogger<DeployCompute> logger, 
-            IAcrManager acrManager, 
-            IArmTemplateManager armTemplateManager, 
-            IWebAppIdentityManager webAppIdentityManager, 
-            IKeyVaultManager keyVaultManager, 
-            IImageManager imageManager, 
-            IProcessRunner processRunner, 
-            IKeyVaultAccessManager keyVaultAccessManager, 
-            ISqlServerManager sqlServerManager, 
-            ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, 
-            AzureKeyVaultConfig azureKeyVaultConfig, 
+            Config config,
+            BuildConfig buildConfig,
+            DeploymentConfig deployConfig,
+            ILogger<DeployCompute> logger,
+            IKeyVaultManager keyVaultManager,
+            IImageManager imageManager,
+            IProcessRunner processRunner,
+            IKeyVaultAccessManager keyVaultAccessManager,
+            ISqlServerFirewallRuleManager sqlServerFirewallRuleManager,
+            AzureKeyVaultConfig azureKeyVaultConfig,
             IWebAppManager webAppManager)
         {
             this.config = config;
             this.buildConfig = buildConfig;
             this.deployConfig = deployConfig;
             this.logger = logger;
-            this.acrManager = acrManager;
-            this.armTemplateManager = armTemplateManager;
-            this.webAppIdentityManager = webAppIdentityManager;
             this.keyVaultManager = keyVaultManager;
             this.imageManager = imageManager;
             this.processRunner = processRunner;
             this.keyVaultAccessManager = keyVaultAccessManager;
-            this.sqlServerManager = sqlServerManager;
             this.sqlServerFirewallRuleManager = sqlServerFirewallRuleManager;
             this.azureKeyVaultConfig = azureKeyVaultConfig;
             this.webAppManager = webAppManager;
@@ -91,7 +79,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                 logger.LogInformation($"Running Init Command for '{image}' with tag '{taggedImageName}'.");
 
                 await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
-                var secrets = deployConfig.InitSecrets?.Select(i => new KeyValuePair<string, string>(i.Key.Replace(".", "__"), i.Value))?.ToList() 
+                var secrets = deployConfig.InitSecrets?.Select(i => new KeyValuePair<string, string>(i.Key.Replace(".", "__"), i.Value))?.ToList()
                     ?? Enumerable.Empty<KeyValuePair<String, String>>();
 
                 var sb = new StringBuilder("run "); //Trailing space is important
@@ -124,6 +112,15 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"tag {taggedImageName} {branchTag}"));
 
             processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"push {branchTag}"));
+
+            if (!resource.EnableContinuousDeployment)
+            {
+                logger.LogInformation($"Restarting '{resource.Name}' in '{config.ResourceGroup}'.");
+
+                await webAppManager.Restart(resource.Name, config.ResourceGroup);
+
+                logger.LogInformation($"Restarted '{resource.Name}' in '{config.ResourceGroup}'.");
+            }
         }
     }
 }
