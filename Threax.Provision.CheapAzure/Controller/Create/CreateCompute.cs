@@ -87,6 +87,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             });
 
             //Need to setup continuous deployment and connection to acr
+            logger.LogWarning("Compute does not deploy correctly. Please update the settings manually to use the container registry, image and continuous deployment settings. This needs to be automated, but is not possible at this time.");
 
             //Update app permissions in key vault
             if (!string.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
