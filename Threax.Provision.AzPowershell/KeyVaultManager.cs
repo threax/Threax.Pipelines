@@ -32,7 +32,7 @@ namespace Threax.Provision.AzPowershell
                 pwsh.PrintInformationStream(logger);
                 pwsh.PrintErrorStream(logger);
 
-                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+                pwsh.SetUnrestrictedExecution();
                 pwsh.AddScript("Import-Module Az.KeyVault");
                 pwsh.AddScript("param($userId, $keyVaultName)");
                 pwsh.AddParameter("userId", userId.ToString());
@@ -58,7 +58,7 @@ namespace Threax.Provision.AzPowershell
                 pwsh.PrintInformationStream(logger);
                 pwsh.PrintErrorStream(logger);
 
-                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+                pwsh.SetUnrestrictedExecution();
                 pwsh.AddScript("Import-Module Az.KeyVault");
                 pwsh.AddScript("param($userId, $keyVaultName)");
                 pwsh.AddParameter("userId", userId.ToString());
@@ -78,7 +78,7 @@ namespace Threax.Provision.AzPowershell
                 pwsh.PrintInformationStream(logger);
                 pwsh.PrintErrorStream(logger);
 
-                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+                pwsh.SetUnrestrictedExecution();
                 pwsh.AddScript("Import-Module Az.KeyVault");
                 pwsh.AddScript("param($userId, $keyVaultName)");
                 pwsh.AddParameter("userId", userId.ToString());
@@ -98,7 +98,7 @@ namespace Threax.Provision.AzPowershell
                 pwsh.PrintInformationStream(logger);
                 pwsh.PrintErrorStream(logger);
 
-                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+                pwsh.SetUnrestrictedExecution();
                 pwsh.AddScript("Import-Module Az.KeyVault");
                 pwsh.AddScript("param($keyVaultName, $rgName, $loc) New-AzKeyVault -Name $keyVaultName -ResourceGroupName $rgName -Location $loc -DisableSoftDelete");
                 pwsh.AddParameter("keyVaultName", keyVaultName);
@@ -118,7 +118,7 @@ namespace Threax.Provision.AzPowershell
                 pwsh.PrintInformationStream(logger);
                 pwsh.PrintErrorStream(logger);
 
-                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+                pwsh.SetUnrestrictedExecution();
                 pwsh.AddScript("Import-Module Az.KeyVault");
                 pwsh.AddScript("param($keyVaultName, $rgName, $loc) Remove-AzKeyVault -Name $keyVaultName -Location $loc -Force");
                 pwsh.AddParameter("keyVaultName", keyVaultName);
@@ -137,7 +137,7 @@ namespace Threax.Provision.AzPowershell
                 pwsh.PrintInformationStream(logger);
                 pwsh.PrintErrorStream(logger);
 
-                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+                pwsh.SetUnrestrictedExecution();
                 pwsh.AddScript("Import-Module Az.KeyVault");
                 pwsh.AddScript("param($keyVaultName, $name, $value)");
                 pwsh.AddParameter("keyVaultName", keyVaultName);
@@ -159,7 +159,7 @@ namespace Threax.Provision.AzPowershell
                 pwsh.PrintInformationStream(logger);
                 pwsh.PrintErrorStream(logger);
 
-                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+                pwsh.SetUnrestrictedExecution();
                 pwsh.AddScript("Import-Module Az.KeyVault");
                 pwsh.AddScript("param($keyVaultName, $name)");
                 pwsh.AddParameter("keyVaultName", keyVaultName);

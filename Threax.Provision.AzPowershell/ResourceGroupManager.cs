@@ -27,7 +27,7 @@ namespace Threax.Provision.AzPowershell
                 pwsh.PrintInformationStream(logger);
                 pwsh.PrintErrorStream(logger);
 
-                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+                pwsh.SetUnrestrictedExecution();
                 pwsh.AddScript("Import-Module Az.Resources");
                 pwsh.AddScript("param($name, $loc)");
                 pwsh.AddParameter("name", name);

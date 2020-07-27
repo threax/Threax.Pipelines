@@ -97,7 +97,11 @@ namespace Threax.Provision.AzPowershell
 
         public static void SetUnrestrictedExecution(this PowerShell pwsh)
         {
-            pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                //Only do this on Windows
+                pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+            }
         }
 
         public static void AddParamLine(this PowerShell pwsh, object props)
