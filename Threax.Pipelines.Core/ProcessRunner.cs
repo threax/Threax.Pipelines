@@ -7,7 +7,7 @@ namespace Threax.Pipelines.Core
 {
     public class ProcessRunner : IProcessRunner
     {
-        public void RunProcessWithOutput(ProcessStartInfo startInfo)
+        public int RunProcessWithOutput(ProcessStartInfo startInfo)
         {
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardOutput = true;
@@ -31,6 +31,8 @@ namespace Threax.Pipelines.Core
                 process.BeginOutputReadLine();
 
                 process.WaitForExit();
+
+                return process.ExitCode;
             }
         }
 

@@ -9,7 +9,7 @@ namespace Threax.Pipelines.Core
         /// Run a process with output to the console.
         /// </summary>
         /// <param name="startInfo">The start info.</param>
-        void RunProcessWithOutput(ProcessStartInfo startInfo);
+        int RunProcessWithOutput(ProcessStartInfo startInfo);
 
         /// <summary>
         /// Run a process with output and return all the standard output as a string.
