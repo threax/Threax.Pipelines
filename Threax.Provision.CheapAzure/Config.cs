@@ -57,6 +57,11 @@ namespace Threax.Provision.CheapAzure
         public String AppServicePlanName { get; set; }
 
         /// <summary>
+        /// The name of the shared app insights.
+        /// </summary>
+        public String AppInsightsName { get; set; }
+
+        /// <summary>
         /// The current subscription id.
         /// </summary>
         public string SubscriptionId { get; set; }

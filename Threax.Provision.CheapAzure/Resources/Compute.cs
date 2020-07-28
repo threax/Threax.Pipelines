@@ -26,5 +26,10 @@ namespace Threax.Provision.CheapAzure.Resources
         /// Enable continuous deployment for this app. Otherwise the app will be restarted to pull the new image.
         /// </summary>
         public bool EnableContinuousDeployment { get; set; } = true;
+
+        /// <summary>
+        /// The name of the app insights secret to store the instrumentation key under.
+        /// </summary>
+        public String AppInsightsSecretName { get; set; }
     }
 }

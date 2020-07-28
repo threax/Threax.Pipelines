@@ -10,6 +10,7 @@ using Threax.DockerBuildConfig;
 using System.Linq;
 using System.Threading;
 using Threax.Azure.Abstractions;
+using Threax.Provision.CheapAzure.ArmTemplates.AppInsights;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -20,10 +21,12 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly IAcrManager acrManager;
         private readonly IArmTemplateManager armTemplateManager;
         private readonly IKeyVaultManager keyVaultManager;
+        private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly ILogger<CreateCompute> logger;
         private readonly IWebAppIdentityManager webAppIdentityManager;
         private readonly AzureKeyVaultConfig azureKeyVaultConfig;
         private readonly IWebAppManager webAppManager;
+        private readonly IAppInsightsManager appInsightsManager;
 
         public CreateCompute(
             Config config, 
@@ -31,20 +34,24 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             IAcrManager acrManager, 
             IArmTemplateManager armTemplateManager, 
             IKeyVaultManager keyVaultManager, 
+            IKeyVaultAccessManager keyVaultAccessManager,
             ILogger<CreateCompute> logger,
             IWebAppIdentityManager webAppIdentityManager,
             AzureKeyVaultConfig azureKeyVaultConfig,
-            IWebAppManager webAppManager)
+            IWebAppManager webAppManager,
+            IAppInsightsManager appInsightsManager)
         {
             this.config = config;
             this.buildConfig = buildConfig;
             this.acrManager = acrManager;
             this.armTemplateManager = armTemplateManager;
             this.keyVaultManager = keyVaultManager;
+            this.keyVaultAccessManager = keyVaultAccessManager;
             this.logger = logger;
             this.webAppIdentityManager = webAppIdentityManager;
             this.azureKeyVaultConfig = azureKeyVaultConfig;
             this.webAppManager = webAppManager;
+            this.appInsightsManager = appInsightsManager;
         }
 
         public async Task Execute(Compute resource)
@@ -120,6 +127,19 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 {
                     await this.webAppManager.CreateSslBinding(resource.Name, config.ResourceGroup, config.SslCertThumb, host);
                 }
+            }
+
+            //Setup App Insights
+            if (!String.IsNullOrEmpty(resource.AppInsightsSecretName))
+            {
+                logger.LogInformation($"Creating App Insights '{config.AppInsightsName}' in Resource Group '{config.ResourceGroup}'");
+
+                var armAppInsights = new ArmAppInsights(config.AppInsightsName, config.Location);
+                await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, armAppInsights);
+
+                var instrumentationKey = await appInsightsManager.GetAppInsightsInstrumentationKey(config.AppInsightsName, config.ResourceGroup);
+                await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
+                await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, resource.AppInsightsSecretName, instrumentationKey);
             }
         }
     }
