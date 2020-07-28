@@ -15,7 +15,14 @@ namespace Microsoft.Extensions.DependencyInjection
             configure?.Invoke(options);
 
             services.TryAddScoped<IKeyVaultManager, KeyVaultManager>();
-            services.TryAddScoped<IKeyVaultAccessManager, KeyVaultAccessManager>();
+            if (options.UseDummyKeyVaultAccessManager)
+            {
+                services.TryAddScoped<IKeyVaultAccessManager, DummyKeyVaultAccessManager>();
+            }
+            else
+            {
+                services.TryAddScoped<IKeyVaultAccessManager, KeyVaultAccessManager>();
+            }
             services.TryAddScoped<IArmTemplateManager, ArmTemplateManager>();
             services.TryAddScoped<ISqlServerFirewallRuleManager, SqlServerFirewallRuleManager>();
             services.TryAddScoped<ISqlServerManager, SqlServerManager>();

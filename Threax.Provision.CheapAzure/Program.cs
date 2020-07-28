@@ -97,7 +97,10 @@ namespace Threax.Provision.CheapAzure
                 return parsed;
             });
 
-            services.AddThreaxProvisionAzPowershell();
+            services.AddThreaxProvisionAzPowershell(o =>
+            {
+                o.UseDummyKeyVaultAccessManager = !config.UnlockCurrentUserInKeyVaults;
+            });
 
             services.AddHttpClient();
             services.AddLogging(o =>

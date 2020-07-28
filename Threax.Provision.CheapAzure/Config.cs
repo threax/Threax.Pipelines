@@ -75,5 +75,11 @@ namespace Threax.Provision.CheapAzure
         /// The guid of the Azure Devops user to set permissions for.
         /// </summary>
         public Guid? AzDoUser { get; set; }
+
+        /// <summary>
+        /// Set this to true to allow the current user to unlock key vaults. If this is false no changes 
+        /// will be made and the current user must have permissions set from somewhere else. Default: true
+        /// </summary>
+        public bool UnlockCurrentUserInKeyVaults { get; set; } = true;
     }
 }

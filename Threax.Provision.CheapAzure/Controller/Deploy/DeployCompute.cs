@@ -63,7 +63,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
 
         public async Task Execute(Compute resource)
         {
-            if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName) && config.UserId != config.AzDoUser)
+            if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
             {
                 logger.LogInformation($"Unlocking '{azureKeyVaultConfig.VaultName}' for user id '{config.UserId}'.");
                 await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
