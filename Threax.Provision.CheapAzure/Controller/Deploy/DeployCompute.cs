@@ -73,6 +73,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             var currentTag = buildConfig.GetCurrentTag();
             var taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
             var branchTag = $"{image}:{buildConfig.Branch}";
+            int exitCode;
 
             //Run Init Command if present
             if (deployConfig.InitCommand != null)
@@ -104,15 +105,27 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                     logger.LogInformation($"No 'KeyVault.{nameof(AzureKeyVaultConfig.VaultName)}' property defined in config. Skipping secret load during deploy.");
                 }
 
-                processRunner.RunProcessWithOutput(psi);
+                exitCode = processRunner.RunProcessWithOutput(psi);
+                if (exitCode != 0)
+                {
+                    throw new InvalidOperationException("An error occured during the init command.");
+                }
             }
 
             //Deploy
             logger.LogInformation($"Deploying '{image}' for branch '{buildConfig.Branch}'.");
 
-            processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"tag {taggedImageName} {branchTag}"));
+            exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"tag {taggedImageName} {branchTag}"));
+            if (exitCode != 0)
+            {
+                throw new InvalidOperationException("An error occured during the docker tag.");
+            }
 
-            processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"push {branchTag}"));
+            exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"push {branchTag}"));
+            if (exitCode != 0)
+            {
+                throw new InvalidOperationException("An error occured during the docker push.");
+            }
 
             if (!resource.EnableContinuousDeployment)
             {

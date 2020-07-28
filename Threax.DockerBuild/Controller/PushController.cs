@@ -34,7 +34,11 @@ namespace Threax.K8sDeploy.Controller
 
             var args = $"push {taggedImageName}";
 
-            processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", args));
+            var exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", args));
+            if (exitCode != 0)
+            {
+                throw new InvalidOperationException("An error occured during the docker push.");
+            }
 
             return Task.CompletedTask;
         }

@@ -24,8 +24,17 @@ namespace Threax.Pipelines.Core
             //sudo chmod 700 /data/app/id
 
             //Dunno if this will work
-            this.processRunner.RunProcessWithOutput(new System.Diagnostics.ProcessStartInfo("chown", $"-R {user}:{group} {path}"));
-            this.processRunner.RunProcessWithOutput(new System.Diagnostics.ProcessStartInfo("chmod", $"700 {path}"));
+            int exitCode;
+            exitCode = this.processRunner.RunProcessWithOutput(new System.Diagnostics.ProcessStartInfo("chown", $"-R {user}:{group} {path}"));
+            if (exitCode != 0)
+            {
+                throw new InvalidOperationException("An error occured during the chown.");
+            }
+            exitCode = this.processRunner.RunProcessWithOutput(new System.Diagnostics.ProcessStartInfo("chmod", $"700 {path}"));
+            if (exitCode != 0)
+            {
+                throw new InvalidOperationException("An error occured during the chmod.");
+            }
         }
     }
 }
