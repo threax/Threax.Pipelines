@@ -65,6 +65,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         {
             if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName) && config.UserId != config.AzDoUser)
             {
+                logger.LogInformation($"Unlocking '{azureKeyVaultConfig.VaultName}' for user id '{config.UserId}'.");
                 await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
             }
 
