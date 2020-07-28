@@ -19,102 +19,101 @@ using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using Threax.DeployConfig;
 using Threax.Azure.Abstractions;
+using Threax.ConsoleApp;
 
 namespace Threax.Provision.CheapAzure
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static Task<int> Main(string[] args)
         {
-            var sw = new Stopwatch();
-            sw.Start();
-
             var command = args[0];
             var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(args[1]));
             var jsonConfigPath = Path.GetFullPath(args[2]);
 
-            var services = new ServiceCollection();
-            services.AddSingleton<Config>(config);
-
-            var assembly = Assembly.GetEntryAssembly();
-            var controllerNs = $"{typeof(Program).Namespace}.Controller.{command}";
-            var controllerTypes = assembly.GetTypes().Where(i => i.Namespace == controllerNs && typeof(Threax.Provision.Hidden.IResourceProcessor).IsAssignableFrom(i)).ToList();
-
-            foreach (var type in controllerTypes)
+            return AppHost
+            .Setup(services =>
             {
-                services.AddScoped(type);
-            }
+                services.AddSingleton<Config>(config);
 
-            services.AddThreaxProvision(o =>
-            {
-                var resourceNamespace = $"{typeof(Program).Namespace}.Resources";
-                var resourceTypes = assembly.GetTypes().Where(i => i.Namespace == resourceNamespace).Select(i => new KeyValuePair<string, Type>(i.Name, i));
-                o.TypeMap = new Dictionary<string, Type>(resourceTypes);
-                o.SetupResolver = r =>
+                var assembly = Assembly.GetEntryAssembly();
+                var controllerNs = $"{typeof(Program).Namespace}.Controller.{command}";
+                var controllerTypes = assembly.GetTypes().Where(i => i.Namespace == controllerNs && typeof(Threax.Provision.Hidden.IResourceProcessor).IsAssignableFrom(i)).ToList();
+
+                foreach (var type in controllerTypes)
                 {
-                    r.AddResourceProcessors(controllerTypes);
-                };
-            });
+                    services.AddScoped(type);
+                }
 
-            services.AddScoped<SchemaConfigurationBinder>(s =>
-            {
-                var configBuilder = new ConfigurationBuilder();
-                configBuilder.AddJsonFile(jsonConfigPath);
-                return new SchemaConfigurationBinder(configBuilder.Build());
-            });
+                services.AddThreaxProvision(o =>
+                {
+                    var resourceNamespace = $"{typeof(Program).Namespace}.Resources";
+                    var resourceTypes = assembly.GetTypes().Where(i => i.Namespace == resourceNamespace).Select(i => new KeyValuePair<string, Type>(i.Name, i));
+                    o.TypeMap = new Dictionary<string, Type>(resourceTypes);
+                    o.SetupResolver = r =>
+                    {
+                        r.AddResourceProcessors(controllerTypes);
+                    };
+                });
 
-            services.AddScoped<BuildConfig>(s =>
-            {
-                var config = s.GetRequiredService<SchemaConfigurationBinder>();
-                var buildConfig = new BuildConfig(jsonConfigPath);
-                config.Bind("Build", buildConfig);
-                buildConfig.Validate();
-                return buildConfig;
-            });
+                services.AddScoped<SchemaConfigurationBinder>(s =>
+                {
+                    var configBuilder = new ConfigurationBuilder();
+                    configBuilder.AddJsonFile(jsonConfigPath);
+                    return new SchemaConfigurationBinder(configBuilder.Build());
+                });
 
-            services.AddScoped<DeploymentConfig>(s =>
-            {
-                var config = s.GetRequiredService<SchemaConfigurationBinder>();
-                var deployConfig = new DeploymentConfig(jsonConfigPath);
-                config.Bind("Deploy", deployConfig);
-                deployConfig.Validate();
-                return deployConfig;
-            });
+                services.AddScoped<BuildConfig>(s =>
+                {
+                    var config = s.GetRequiredService<SchemaConfigurationBinder>();
+                    var buildConfig = new BuildConfig(jsonConfigPath);
+                    config.Bind("Build", buildConfig);
+                    buildConfig.Validate();
+                    return buildConfig;
+                });
 
-            services.AddScoped<AzureKeyVaultConfig>(s =>
-            {
-                var config = s.GetRequiredService<SchemaConfigurationBinder>();
-                var parsed = new AzureKeyVaultConfig();
-                config.Bind("KeyVault", parsed);
-                return parsed;
-            });
+                services.AddScoped<DeploymentConfig>(s =>
+                {
+                    var config = s.GetRequiredService<SchemaConfigurationBinder>();
+                    var deployConfig = new DeploymentConfig(jsonConfigPath);
+                    config.Bind("Deploy", deployConfig);
+                    deployConfig.Validate();
+                    return deployConfig;
+                });
 
-            services.AddScoped<AzureStorageConfig>(s =>
-            {
-                var config = s.GetRequiredService<SchemaConfigurationBinder>();
-                var parsed = new AzureStorageConfig();
-                config.Bind("Storage", parsed);
-                return parsed;
-            });
+                services.AddScoped<AzureKeyVaultConfig>(s =>
+                {
+                    var config = s.GetRequiredService<SchemaConfigurationBinder>();
+                    var parsed = new AzureKeyVaultConfig();
+                    config.Bind("KeyVault", parsed);
+                    return parsed;
+                });
 
-            services.AddThreaxProvisionAzPowershell(o =>
-            {
-                o.UseDummyKeyVaultAccessManager = !config.UnlockCurrentUserInKeyVaults;
-            });
+                services.AddScoped<AzureStorageConfig>(s =>
+                {
+                    var config = s.GetRequiredService<SchemaConfigurationBinder>();
+                    var parsed = new AzureStorageConfig();
+                    config.Bind("Storage", parsed);
+                    return parsed;
+                });
 
-            services.AddHttpClient();
-            services.AddLogging(o =>
-            {
-                o.AddConsole();
-            });
+                services.AddThreaxProvisionAzPowershell(o =>
+                {
+                    o.UseDummyKeyVaultAccessManager = !config.UnlockCurrentUserInKeyVaults;
+                });
 
-            services.AddScoped<IStringGenerator, StringGenerator>();
-            services.AddScoped<ICredentialLookup, CredentialLookup>();
-            services.AddThreaxPipelines();
-            services.AddThreaxPipelinesDocker();
+                services.AddHttpClient();
+                services.AddLogging(o =>
+                {
+                    o.AddConsole();
+                });
 
-            using (var serviceProvider = services.BuildServiceProvider())
-            using (var scope = serviceProvider.CreateScope())
+                services.AddScoped<IStringGenerator, StringGenerator>();
+                services.AddScoped<ICredentialLookup, CredentialLookup>();
+                services.AddThreaxPipelines();
+                services.AddThreaxPipelinesDocker();
+            })
+            .Run(async scope =>
             {
                 var loader = scope.ServiceProvider.GetRequiredService<IResourceDefinitionLoader>();
                 var definition = loader.LoadFromFile(jsonConfigPath);
@@ -123,10 +122,7 @@ namespace Threax.Provision.CheapAzure
                 definition.SortResources();
                 var provisioner = scope.ServiceProvider.GetRequiredService<IProvisioner>();
                 await provisioner.ProcessResources(definition, scope);
-            }
-
-            sw.Stop();
-            Console.WriteLine($"Tasks took {sw.Elapsed}");
+            });
         }
     }
 }

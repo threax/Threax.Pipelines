@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.CheapAzure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DeployConfig", "Threax.DeployConfig\Threax.DeployConfig.csproj", "{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Threax.ConsoleApp", "Threax.ConsoleApp\Threax.ConsoleApp.csproj", "{147D0875-D7D2-478C-95EA-041856E4F719}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{147D0875-D7D2-478C-95EA-041856E4F719}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{147D0875-D7D2-478C-95EA-041856E4F719}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{147D0875-D7D2-478C-95EA-041856E4F719}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{147D0875-D7D2-478C-95EA-041856E4F719}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
