@@ -3,9 +3,6 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <PackAsTool>true</PackAsTool>
-    <ToolCommandName>threax-dockerbuild</ToolCommandName>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.0.0-pre12</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 

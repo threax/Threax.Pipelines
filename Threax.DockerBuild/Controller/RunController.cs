@@ -89,7 +89,11 @@ namespace Threax.DockerBuild.Controller
                 foreach (var vol in deploymentConfig.Volumes)
                 {
                     var path = deploymentConfig.GetAppDataPath(vol.Value.Source);
-                    EnsureDirectory(path, vol.Value.Type, vol.Value.ManagePermissions);
+                    EnsureDirectory(path, vol.Value.Type);
+                    if (vol.Value.ManagePermissions)
+                    {
+                        osHandler.SetPermissions(path, deploymentConfig.User, deploymentConfig.Group);
+                    }
                     args.Append($"-v \"{path}:{vol.Value.Destination}\" ");
                 }
             }
@@ -100,12 +104,14 @@ namespace Threax.DockerBuild.Controller
                 {
                     var path = deploymentConfig.GetSecretDataPath(vol.Value.SecretName);
 
-                    EnsureDirectory(path, vol.Value.Type, true);
+                    EnsureDirectory(path, vol.Value.Type);
 
                     if (!String.IsNullOrEmpty(vol.Value.Source))
                     {
                         File.Copy(vol.Value.Source, path, true);
                     }
+
+                    osHandler.SetPermissions(path, deploymentConfig.User, deploymentConfig.Group);
 
                     args.Append($"-v \"{path}:{vol.Value.Destination}\" ");
                 }
@@ -114,9 +120,10 @@ namespace Threax.DockerBuild.Controller
             if (deploymentConfig.AutoMountAppSettings)
             {
                 var path = deploymentConfig.GetSecretDataPath("threax-docker-appsettings-json");
-                EnsureDirectory(path, PathType.File, true);
+                EnsureDirectory(path, PathType.File);
                 var configText = configFileProvider.GetConfigText();
                 File.WriteAllText(path, configText);
+                osHandler.SetPermissions(path, deploymentConfig.User, deploymentConfig.Group);
                 args.Append($"-v \"{path}:{deploymentConfig.AppSettingsMountPath}\" ");
             }
 
@@ -159,7 +166,7 @@ namespace Threax.DockerBuild.Controller
             return Task.CompletedTask;
         }
 
-        private void EnsureDirectory(string path, PathType type, bool managePermissions)
+        private void EnsureDirectory(string path, PathType type)
         {
             switch (type)
             {
@@ -178,11 +185,6 @@ namespace Threax.DockerBuild.Controller
                     break;
                 default:
                     throw new InvalidOperationException($"Unsupported path type '{type}'.");
-            }
-
-            if (managePermissions)
-            {
-                osHandler.SetPermissions(path, deploymentConfig.User, deploymentConfig.Group);
             }
         }
     }
