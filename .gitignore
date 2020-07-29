@@ -340,4 +340,5 @@ ASALocalRun/
 healthchecksdb
 /ExampleDeployment/**/src
 /ExampleDeployment/**/data
+/ExampleDeployment/**/secrets
 /ExampleDeployment/**/pod.json
