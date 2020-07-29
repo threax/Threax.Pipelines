@@ -21,6 +21,8 @@ namespace Threax.DockerBuild
             return AppHost
             .Setup(services =>
             {
+                services.AddSingleton<IArgsProvider>(s => new ArgsProvider(args));
+
                 services.AddScoped<SchemaConfigurationBinder>(s =>
                 {
                     var configBuilder = new ConfigurationBuilder();

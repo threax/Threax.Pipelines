@@ -54,6 +54,14 @@
     "Run Nginx": {
       "commandName": "Project",
       "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/nginx/appsettings.json"
+    },
+    "Set Nginx Public Key": {
+      "commandName": "Project",
+      "commandLineArgs": "setsecret $(ProjectDir)../ExampleDeployment/nginx/appsettings.json public-key C:/Development/K8sCluster/files/cert/fullchain1.pem"
+    },
+    "Set Nginx Private Key": {
+      "commandName": "Project",
+      "commandLineArgs": "setsecret $(ProjectDir)../ExampleDeployment/nginx/appsettings.json private-key C:/Development/K8sCluster/files/cert/privkey1.pem"
     }
   }
 }
