@@ -42,6 +42,18 @@
     "Push Notes": {
       "commandName": "Project",
       "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
+    },
+    "Build Nginx": {
+      "commandName": "Project",
+      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/nginx/appsettings.json"
+    },
+    "Push Nginx": {
+      "commandName": "Project",
+      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/nginx/appsettings.json"
+    },
+    "Run Nginx": {
+      "commandName": "Project",
+      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/nginx/appsettings.json"
     }
   }
 }

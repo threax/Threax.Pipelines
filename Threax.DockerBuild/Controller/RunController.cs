@@ -43,15 +43,23 @@ namespace Threax.K8sDeploy.Controller
 
         public Task Run()
         {
-            var image = buildConfig.ImageName;
-            var currentTag = buildConfig.GetCurrentTag();
-            var taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
+            int exitCode;
+            String taggedImageName;
 
-            var exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"pull {taggedImageName}"));
-            if (exitCode != 0)
+            if (!String.IsNullOrEmpty(deploymentConfig.ImageName))
             {
-                //This is ok
-                //throw new InvalidOperationException("An error occured during the docker pull.");
+                taggedImageName = deploymentConfig.ImageName;
+                exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"pull {taggedImageName}"));
+                if (exitCode != 0)
+                {
+                    throw new InvalidOperationException("An error occured during the docker pull.");
+                }
+            }
+            else
+            {
+                var image = buildConfig.ImageName;
+                var currentTag = buildConfig.GetCurrentTag();
+                taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
             }
 
             exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"rm {deploymentConfig.Name} --force"));
@@ -113,6 +121,14 @@ namespace Threax.K8sDeploy.Controller
                 var configText = configFileProvider.GetConfigText();
                 File.WriteAllText(path, configText);
                 args.Append($"-v \"{path}:{deploymentConfig.AppSettingsMountPath}\" ");
+            }
+
+            if(deploymentConfig.Ports != null)
+            {
+                foreach(var port in deploymentConfig.Ports)
+                {
+                    args.Append($"-p {port} ");
+                }
             }
 
             args.Append(taggedImageName);

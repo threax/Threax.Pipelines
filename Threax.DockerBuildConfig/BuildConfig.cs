@@ -120,7 +120,11 @@ namespace Threax.DockerBuildConfig
         {
             var context = this.Context;
             var basePath = Path.GetDirectoryName(SourceFile);
-            return Path.Combine(basePath, context);
+            if (context != null)
+            {
+                return Path.Combine(basePath, context);
+            }
+            return basePath;
         }
     }
 }

@@ -88,6 +88,11 @@ namespace Threax.DeployConfig
         public Dictionary<String, String> Environment { get; set; }
 
         /// <summary>
+        /// Port mappings in the format host:container
+        /// </summary>
+        public List<String> Ports { get; set; }
+
+        /// <summary>
         /// The name of the pod info json file to generate. Default: pod.json.
         /// </summary>
         public String PodJsonFile { get; set; } = "pod.json";
@@ -106,6 +111,12 @@ namespace Threax.DeployConfig
         /// The sub path for the appsettings file. Default: appsettings.Production.json.
         /// </summary>
         public String AppSettingsSubPath { get; set; } = "appsettings.Production.json";
+
+        /// <summary>
+        /// Set this to the name of an image to force that image to be used instead of a discovered image from the local system.
+        /// This image must be pullable from the target container host or an error will be thrown.
+        /// </summary>
+        public string ImageName { get; set; }
 
         /// <summary>
         /// Validate that this config is correct. Throws an exception if there is an error.
