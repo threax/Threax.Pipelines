@@ -28,7 +28,7 @@ sudo docker network create -d bridge appnet
 ```
 curl -L https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerTools_1.0.0-pre01/Threax.DockerTools > ~/Threax.DockerTools && \
 sudo mv ~/Threax.DockerTools /bin/Threax.DockerTools && \
-sudo chmod 777 /bin/Threax.DockerTools
+sudo chmod 700 /bin/Threax.DockerTools
 ```
 
 ## Setup Nginx
