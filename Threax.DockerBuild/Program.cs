@@ -4,9 +4,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using Threax.ConsoleApp;
+using Threax.DeployConfig;
 using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
 using Threax.K8sDeploy.Controller;
+using Threax.Pipelines.Core;
 
 namespace Threax.K8sDeploy
 {
@@ -26,7 +28,10 @@ namespace Threax.K8sDeploy
                     return new SchemaConfigurationBinder(configBuilder.Build());
                 });
 
-                services.AddThreaxPipelines();
+                services.AddThreaxPipelines(o =>
+                {
+                    o.SetupConfigFileProvider = s => new ConfigFileProvider(jsonConfigPath);
+                });
                 services.AddThreaxPipelinesDocker();
 
                 services.AddScoped<BuildConfig>(s =>
@@ -36,6 +41,15 @@ namespace Threax.K8sDeploy
                     config.Bind("Build", appConfig);
                     appConfig.Validate();
                     return appConfig;
+                });
+
+                services.AddScoped<DeploymentConfig>(s =>
+                {
+                    var config = s.GetRequiredService<SchemaConfigurationBinder>();
+                    var deployConfig = new DeploymentConfig(jsonConfigPath);
+                    config.Bind("Deploy", deployConfig);
+                    deployConfig.Validate();
+                    return deployConfig;
                 });
 
                 var controllerType = typeof(HelpController);

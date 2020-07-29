@@ -19,6 +19,7 @@ namespace Threax.DeployConfig
         {
             this.SourceFile = sourceFile;
             this.AppDataBasePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(this.SourceFile), "data"));
+            this.SecretDataBasePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(this.SourceFile), "secrets"));
         }
 
         /// <summary>
@@ -32,6 +33,12 @@ namespace Threax.DeployConfig
         /// </summary>
         [JsonIgnore]
         public String AppDataBasePath { get; private set; }
+
+        /// <summary>
+        /// The path that provides the root volume for relative secret volume mounts. Not all consumers will use this.
+        /// </summary>
+        [JsonIgnore]
+        public String SecretDataBasePath { get; private set; }
 
         /// <summary>
         /// The name of the app. Is used as a unique key for many settings including urls.
@@ -76,14 +83,14 @@ namespace Threax.DeployConfig
         public Dictionary<String, Secret> Secrets { get; set; }
 
         /// <summary>
+        /// Key value pairs for environment variables.
+        /// </summary>
+        public Dictionary<String, String> Environment { get; set; }
+
+        /// <summary>
         /// The name of the pod info json file to generate. Default: pod.json.
         /// </summary>
         public String PodJsonFile { get; set; } = "pod.json";
-
-        /// <summary>
-        /// The path to the schema file when running in UpdateSchema mode.
-        /// </summary>
-        public String SchemaOutputPath { get; set; } = "schema.json";
 
         /// <summary>
         /// Set this to true to auto mount the app settings config. Default: true.
@@ -111,6 +118,11 @@ namespace Threax.DeployConfig
         public String GetAppDataPath(String path)
         {
             return Path.GetFullPath(Path.Combine(AppDataBasePath, path));
+        }
+
+        public String GetSecretDataPath(String path)
+        {
+            return Path.GetFullPath(Path.Combine(SecretDataBasePath, path));
         }
 
         public String GetConfigPath(String path)

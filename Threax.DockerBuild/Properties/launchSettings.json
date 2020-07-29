@@ -15,6 +15,10 @@
       "commandName": "Project",
       "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/id/appsettings.json"
     },
+    "Run Id": {
+      "commandName": "Project",
+      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/id/appsettings.json"
+    },
     "Clone AppDashboard": {
       "commandName": "Project",
       "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json"
