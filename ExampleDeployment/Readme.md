@@ -1,13 +1,9 @@
 # Setup A New Server
-This document describes how to setup a new Ubuntu VM to run these apps.
 
 ## Setup Firewall
-```
 sudo ufw enable && sudo ufw allow http && sudo ufw allow https && sudo ufw allow 22
-```
 
 ## Install Docker
-```
 sudo apt-get update
 sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -15,28 +11,27 @@ sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-```
 
 ## Create Network
-```
 sudo docker network create -d bridge appnet
-```
 
-## Install Threax.DockerBuild
-Copy this file over, it is self contained.
+## Install Threax.DockerTools
+```
+curl https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerTools_1.0.0-pre01/Threax.DockerTools > /bin/Threax.DockerTools
+```
 
 ## Setup Nginx
 Create appsettings.json in /app/nginx
 
 Add ssl cert to nginx secrets, this needs to be created somewhere else like a self signed or let's encrypt
 ```
-sudo /home/threax/Threax.DockerBuild setsecret /app/nginx/appsettings.json private-key /home/threax/privkey1.pem 
-sudo /home/threax/Threax.DockerBuild setsecret /app/nginx/appsettings.json public-key /home/threax/fullchain1.pem 
+sudo /home/threax/Threax.DockerTools setsecret /app/nginx/appsettings.json private-key /home/threax/privkey1.pem 
+sudo /home/threax/Threax.DockerTools setsecret /app/nginx/appsettings.json public-key /home/threax/fullchain1.pem 
 ```
 
 Run with
 ```
-sudo /home/threax/Threax.DockerBuild run /app/nginx/appsettings.json
+sudo /home/threax/Threax.DockerTools run /app/nginx/appsettings.json
 ```
 
 ## Setup Id server
@@ -44,8 +39,8 @@ Create appsettings.json in /app/id
 
 Clone and build
 ```
-sudo /home/threax/Threax.DockerBuild clone /app/id/appsettings.json
-sudo /home/threax/Threax.DockerBuild build /app/id/appsettings.json
+sudo /home/threax/Threax.DockerTools clone /app/id/appsettings.json
+sudo /home/threax/Threax.DockerTools build /app/id/appsettings.json
 ```
 
 Create a cert by running
@@ -55,7 +50,7 @@ sudo docker run --rm -v /app/id/secrets:/out threaxacr.azurecr.io/id:threaxpipe-
 
 Finally run the id server
 ```
-sudo /home/threax/Threax.DockerBuild run /app/id/appsettings.json
+sudo /home/threax/Threax.DockerTools run /app/id/appsettings.json
 ```
 
 Create an account on the id server and get the user id.
@@ -74,7 +69,7 @@ sudo touch /app/appdashboard/appsettings.json && sudo chmod 666 /app/appdashboar
 
 Clone, build and run
 ```
-sudo /home/threax/Threax.DockerBuild clone /app/appdashboard/appsettings.json
-sudo /home/threax/Threax.DockerBuild build /app/appdashboard/appsettings.json
-sudo /home/threax/Threax.DockerBuild run /app/appdashboard/appsettings.json
+sudo /home/threax/Threax.DockerTools clone /app/appdashboard/appsettings.json
+sudo /home/threax/Threax.DockerTools build /app/appdashboard/appsettings.json
+sudo /home/threax/Threax.DockerTools run /app/appdashboard/appsettings.json
 ```
