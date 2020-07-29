@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Threax.DeployConfig;
@@ -69,7 +70,7 @@ namespace Threax.K8sDeploy.Controller
                 //throw new InvalidOperationException("An error occured during the docker pull.");
             }
 
-            var args = new StringBuilder($"run -d --restart unless-stopped --network appnet --name {deploymentConfig.Name} ");
+            var args = new StringBuilder($"--network appnet --name {deploymentConfig.Name} ");
             if (!String.IsNullOrEmpty(deploymentConfig.User) && !String.IsNullOrEmpty(deploymentConfig.Group))
             {
                 args.Append($"--user {deploymentConfig.User}:{deploymentConfig.Group} ");
@@ -133,7 +134,27 @@ namespace Threax.K8sDeploy.Controller
 
             args.Append(taggedImageName);
 
-            exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", args.ToString()));
+            if (!String.IsNullOrEmpty(deploymentConfig.InitCommand))
+            {
+                var entryPoint = deploymentConfig.InitCommand.Split(null).First();
+                var cmd = "";
+                if(entryPoint.Length < deploymentConfig.InitCommand.Length)
+                {
+                    cmd = deploymentConfig.InitCommand.Substring(entryPoint.Length);
+                }
+
+                var initArgs = $"run -it --rm --entrypoint {entryPoint} {args}{cmd}";
+                logger.LogInformation(initArgs);
+                exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", initArgs));
+                if (exitCode != 0)
+                {
+                    throw new InvalidOperationException("An error occured during docker run.");
+                }
+            }
+
+            var runArgs = $"run -d --restart unless-stopped {args.ToString()}";
+            logger.LogInformation(runArgs);
+            exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", runArgs));
             if (exitCode != 0)
             {
                 throw new InvalidOperationException("An error occured during docker run.");

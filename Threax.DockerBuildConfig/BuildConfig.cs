@@ -55,34 +55,11 @@ namespace Threax.DockerBuildConfig
         /// </summary>
         public bool AlwaysPull { get; set; } = true;
 
-        private string _context;
         /// <summary>
-        /// If RepoUrl is not set this will be the path to the build context. This will auto
-        /// discover a .sln file in the same directory as the config file or higher. Otherwise
-        /// it can be manually set. If set to a relative path it will be relative to this file.
+        /// If RepoUrl is not set this will be the path to the build context. This can be
+        /// set to a relative path from this config file.
         /// </summary>
-        public string Context { get
-            {
-                if (this._context == null)
-                {
-                    var currentPath = Path.GetDirectoryName(SourceFile);
-                    while (currentPath != null)
-                    {
-                        if (Directory.EnumerateFiles(currentPath, "*.sln", SearchOption.TopDirectoryOnly).Any())
-                        {
-                            this._context = currentPath;
-                            break;
-                        }
-                        currentPath = Path.GetDirectoryName(currentPath);
-                    }
-                }
-                return this._context;
-            }
-            set
-            {
-                this._context = value;
-            }
-        }
+        public string Context { get; set; }
 
         public void Validate()
         {
@@ -113,18 +90,25 @@ namespace Threax.DockerBuildConfig
         }
 
         /// <summary>
-        /// Get the computed context value. This will resolve any relative paths, which the property does not do.
+        /// Get the computed context value. This will resolve any relative paths and handle the repo url, which the property does not do.
         /// </summary>
         /// <returns></returns>
         public String GetContext()
         {
-            var context = this.Context;
-            var basePath = Path.GetDirectoryName(SourceFile);
-            if (context != null)
+            if (RepoUrl == null)
             {
-                return Path.Combine(basePath, context);
+                var context = this.Context;
+                var basePath = Path.GetDirectoryName(SourceFile);
+                if (context != null)
+                {
+                    return Path.Combine(basePath, context);
+                }
+                return basePath;
             }
-            return basePath;
+            else
+            {
+                return ClonePath;
+            }
         }
     }
 }
