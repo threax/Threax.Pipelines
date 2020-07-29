@@ -64,11 +64,7 @@ namespace Threax.K8sDeploy.Controller
             }
 
             exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"rm {deploymentConfig.Name} --force"));
-            if (exitCode != 0)
-            {
-                //This is ok
-                //throw new InvalidOperationException("An error occured during the docker pull.");
-            }
+            //It is ok if this fails, probably means it wasn't running
 
             var args = new StringBuilder($"--network appnet --name {deploymentConfig.Name} ");
             if (!String.IsNullOrEmpty(deploymentConfig.User) && !String.IsNullOrEmpty(deploymentConfig.Group))
@@ -77,7 +73,7 @@ namespace Threax.K8sDeploy.Controller
             }
             else
             {
-                logger.LogWarning("No user and group defined. App will run as root.");
+                logger.LogWarning("No user and group defined. Container will run as root.");
             }
 
             if (deploymentConfig.Environment != null)
