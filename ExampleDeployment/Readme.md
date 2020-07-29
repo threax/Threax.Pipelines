@@ -34,13 +34,13 @@ Create appsettings.json in /app/nginx
 
 Add ssl cert to nginx secrets, this needs to be created somewhere else like a self signed or let's encrypt
 ```
-sudo /home/threax/Threax.DockerTools setsecret /app/nginx/appsettings.json private-key /home/threax/privkey1.pem && \
-sudo /home/threax/Threax.DockerTools setsecret /app/nginx/appsettings.json public-key /home/threax/fullchain1.pem 
+sudo Threax.DockerTools setsecret /app/nginx/appsettings.json private-key ~/privkey1.pem && \
+sudo Threax.DockerTools setsecret /app/nginx/appsettings.json public-key ~/fullchain1.pem 
 ```
 
 Run with
 ```
-sudo /home/threax/Threax.DockerTools run /app/nginx/appsettings.json
+sudo Threax.DockerTools run /app/nginx/appsettings.json
 ```
 
 ## Setup Id server
@@ -48,8 +48,8 @@ Create appsettings.json in /app/id
 
 Clone and build
 ```
-sudo /home/threax/Threax.DockerTools clone /app/id/appsettings.json && \
-sudo /home/threax/Threax.DockerTools build /app/id/appsettings.json
+sudo Threax.DockerTools clone /app/id/appsettings.json && \
+sudo Threax.DockerTools build /app/id/appsettings.json
 ```
 
 Create a cert by running
@@ -59,7 +59,7 @@ sudo docker run --rm -v /app/id/secrets:/out threaxacr.azurecr.io/id:threaxpipe-
 
 Finally run the id server
 ```
-sudo /home/threax/Threax.DockerTools run /app/id/appsettings.json
+sudo Threax.DockerTools run /app/id/appsettings.json
 ```
 
 Create an account on the id server and get the user id.
@@ -79,7 +79,7 @@ sudo chmod 666 /app/appdashboard/appsettings.json
 
 Clone, build and run
 ```
-sudo /home/threax/Threax.DockerTools clone /app/appdashboard/appsettings.json && \
-sudo /home/threax/Threax.DockerTools build /app/appdashboard/appsettings.json && \
-sudo /home/threax/Threax.DockerTools run /app/appdashboard/appsettings.json && \
+sudo Threax.DockerTools clone /app/appdashboard/appsettings.json && \
+sudo Threax.DockerTools build /app/appdashboard/appsettings.json && \
+sudo Threax.DockerTools run /app/appdashboard/appsettings.json && \
 ```
