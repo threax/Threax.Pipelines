@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Threax.DockerBuild": {
+    "Threax.DockerTools": {
       "commandName": "Project"
     },
     "Clone Id": {

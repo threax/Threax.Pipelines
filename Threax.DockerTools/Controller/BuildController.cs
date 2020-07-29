@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Threax.DockerBuildConfig;
 using Threax.Pipelines.Core;
 
-namespace Threax.DockerBuild.Controller
+namespace Threax.DockerTools.Controller
 {
     class BuildController : IController
     {

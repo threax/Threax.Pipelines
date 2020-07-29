@@ -1,4 +1,4 @@
-﻿namespace Threax.DockerBuild
+﻿namespace Threax.DockerTools
 {
     public interface IArgsProvider
     {

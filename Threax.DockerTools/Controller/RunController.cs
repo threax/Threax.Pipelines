@@ -1,7 +1,5 @@
-﻿using LibGit2Sharp;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -12,7 +10,7 @@ using Threax.DockerBuildConfig;
 using Threax.Pipelines.Core;
 using Threax.Pipelines.Docker;
 
-namespace Threax.DockerBuild.Controller
+namespace Threax.DockerTools.Controller
 {
     class RunController : IController
     {

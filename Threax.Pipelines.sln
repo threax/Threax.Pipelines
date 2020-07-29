@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DockerBuild", "Threax.DockerBuild\Threax.DockerBuild.csproj", "{0D8E871A-DD8A-42DC-9B7E-63F649231738}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DockerBuildConfig", "Threax.DockerBuildConfig\Threax.DockerBuildConfig.csproj", "{A88C78F1-F01E-4DD4-949E-5D9F9704A16C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Pipelines.Docker", "Threax.Pipelines.Docker\Threax.Pipelines.Docker.csproj", "{631A339B-FEF9-42AF-9E5D-D8812BADA79E}"
@@ -25,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.CheapAzure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DeployConfig", "Threax.DeployConfig\Threax.DeployConfig.csproj", "{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Threax.ConsoleApp", "Threax.ConsoleApp\Threax.ConsoleApp.csproj", "{147D0875-D7D2-478C-95EA-041856E4F719}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.ConsoleApp", "Threax.ConsoleApp\Threax.ConsoleApp.csproj", "{147D0875-D7D2-478C-95EA-041856E4F719}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Threax.DockerTools", "Threax.DockerTools\Threax.DockerTools.csproj", "{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +33,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0D8E871A-DD8A-42DC-9B7E-63F649231738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0D8E871A-DD8A-42DC-9B7E-63F649231738}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0D8E871A-DD8A-42DC-9B7E-63F649231738}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0D8E871A-DD8A-42DC-9B7E-63F649231738}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A88C78F1-F01E-4DD4-949E-5D9F9704A16C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A88C78F1-F01E-4DD4-949E-5D9F9704A16C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A88C78F1-F01E-4DD4-949E-5D9F9704A16C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,6 +77,10 @@ Global
 		{147D0875-D7D2-478C-95EA-041856E4F719}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{147D0875-D7D2-478C-95EA-041856E4F719}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{147D0875-D7D2-478C-95EA-041856E4F719}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

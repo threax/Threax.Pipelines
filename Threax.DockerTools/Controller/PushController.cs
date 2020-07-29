@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
 using Threax.DockerBuildConfig;
 using Threax.Pipelines.Core;
 using Threax.Pipelines.Docker;
 
-namespace Threax.DockerBuild.Controller
+namespace Threax.DockerTools.Controller
 {
     class PushController : IController
     {

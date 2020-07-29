@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Threax.DeployConfig;
 using Threax.Pipelines.Core;
 
-namespace Threax.DockerBuild.Controller
+namespace Threax.DockerTools.Controller
 {
     class SetSecretController : IController
     {

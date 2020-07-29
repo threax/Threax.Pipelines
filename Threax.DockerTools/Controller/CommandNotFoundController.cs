@@ -4,20 +4,20 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Threax.DockerBuild.Controller
+namespace Threax.DockerTools.Controller
 {
-    class HelpController : IController
+    class CommandNotFoundController : IController
     {
         private ILogger logger;
 
-        public HelpController(ILogger<HelpController> logger)
+        public CommandNotFoundController(ILogger<CommandNotFoundController> logger)
         {
             this.logger = logger;
         }
 
         public async Task Run()
         {
-            logger.LogInformation("Help");
+            logger.LogInformation("Command not found.");
         }
     }
 }
