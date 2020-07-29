@@ -26,25 +26,49 @@ sudo docker network create -d bridge appnet
 
 ## Install Threax.DockerTools
 ```
-curl https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerTools_1.0.0-pre01/Threax.DockerTools > /bin/Threax.DockerTools
+curl -L https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerTools_1.0.0-pre01/Threax.DockerTools > ~/Threax.DockerTools && \
+sudo mv ~/Threax.DockerTools /bin/Threax.DockerTools && \
+sudo chmod 777 /bin/Threax.DockerTools
 ```
 
 ## Setup Nginx
 Create appsettings.json in /app/nginx
+```
+sudo mkdir /app/nginx && \
+sudo touch /app/nginx/appsettings.json && \
+sudo chmod 666 /app/nginx/appsettings.json && \
+sudo touch /app/nginx/Dockerfile && \
+sudo chmod 666 /app/nginx/Dockerfile && \
+sudo touch /app/nginx/nginx.conf && \
+sudo chmod 666 /app/nginx/nginx.conf
+```
+Copy the contents from the nginx example directory.
 
-Add ssl cert to nginx secrets, this needs to be created somewhere else like a self signed or let's encrypt
+Add ssl cert to nginx secrets, this needs to be created somewhere else like a self signed or let's encrypt. Copy the certs to `/app/cert/`.
 ```
-sudo Threax.DockerTools setsecret /app/nginx/appsettings.json private-key ~/privkey1.pem && \
-sudo Threax.DockerTools setsecret /app/nginx/appsettings.json public-key ~/fullchain1.pem 
+sudo Threax.DockerTools setsecret /app/nginx/appsettings.json private-key /app/cert/privkey1.pem && \
+sudo Threax.DockerTools setsecret /app/nginx/appsettings.json public-key /app/cert/fullchain1.pem
 ```
 
-Run with
+Remove the cert:
 ```
+sudo rm -r /app/cert
+```
+
+Build and Run with
+```
+sudo Threax.DockerTools build /app/nginx/appsettings.json && \
 sudo Threax.DockerTools run /app/nginx/appsettings.json
 ```
 
 ## Setup Id server
 Create appsettings.json in /app/id
+```
+sudo mkdir /app/id && \
+sudo touch /app/id/appsettings.json && \
+sudo chmod 666 /app/id/appsettings.json
+```
+Copy contents from example folder.
 
 Clone and build
 ```
@@ -76,10 +100,11 @@ sudo mkdir /app/appdashboard && \
 sudo touch /app/appdashboard/appsettings.json && \
 sudo chmod 666 /app/appdashboard/appsettings.json
 ```
+Copy contents from example folder.
 
 Clone, build and run
 ```
 sudo Threax.DockerTools clone /app/appdashboard/appsettings.json && \
 sudo Threax.DockerTools build /app/appdashboard/appsettings.json && \
-sudo Threax.DockerTools run /app/appdashboard/appsettings.json && \
+sudo Threax.DockerTools run /app/appdashboard/appsettings.json
 ```
