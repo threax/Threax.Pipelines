@@ -135,6 +135,11 @@ namespace Threax.DockerBuild.Controller
                 }
             }
 
+            if (!String.IsNullOrEmpty(deploymentConfig.MemoryLimit))
+            {
+                args.Append($"--memory={deploymentConfig.MemoryLimit} ");
+            }
+
             args.Append(taggedImageName);
 
             if (!String.IsNullOrEmpty(deploymentConfig.InitCommand))

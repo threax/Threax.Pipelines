@@ -88,6 +88,11 @@ namespace Threax.DeployConfig
         public Dictionary<String, String> Environment { get; set; }
 
         /// <summary>
+        /// The memory limit to set. Null means unlimited. This should be in the docker memory format, e.g. '400m'. Default: null
+        /// </summary>
+        public String MemoryLimit { get; set; }
+
+        /// <summary>
         /// Port mappings in the format host:container
         /// </summary>
         public List<String> Ports { get; set; }
