@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Threax.DeployConfig;
+using Threax.Pipelines.Core;
 
 namespace Threax.DockerBuild.Controller
 {
@@ -12,12 +13,18 @@ namespace Threax.DockerBuild.Controller
     {
         private readonly DeploymentConfig deploymentConfig;
         private readonly IArgsProvider argsProvider;
+        private readonly IOSHandler osHandler;
         private readonly ILogger<SetSecretController> logger;
 
-        public SetSecretController(DeploymentConfig deploymentConfig, IArgsProvider argsProvider, ILogger<SetSecretController> logger)
+        public SetSecretController(
+            DeploymentConfig deploymentConfig, 
+            IArgsProvider argsProvider,
+            IOSHandler osHandler, 
+            ILogger<SetSecretController> logger)
         {
             this.deploymentConfig = deploymentConfig;
             this.argsProvider = argsProvider;
+            this.osHandler = osHandler;
             this.logger = logger;
         }
 
@@ -44,6 +51,7 @@ namespace Threax.DockerBuild.Controller
             }
 
             File.Copy(source, path, true);
+            osHandler.SetPermissions(path, deploymentConfig.User, deploymentConfig.Group);
 
             logger.LogInformation($"Added secret '{name}' to '{dir}' from '{source}'.");
 

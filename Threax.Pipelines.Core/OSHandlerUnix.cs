@@ -30,7 +30,7 @@ namespace Threax.Pipelines.Core
             {
                 throw new InvalidOperationException("An error occured during the chown.");
             }
-            exitCode = this.processRunner.RunProcessWithOutput(new System.Diagnostics.ProcessStartInfo("chmod", $"700 {path}"));
+            exitCode = this.processRunner.RunProcessWithOutput(new System.Diagnostics.ProcessStartInfo("chmod", $"-R 700 {path}"));
             if (exitCode != 0)
             {
                 throw new InvalidOperationException("An error occured during the chmod.");
