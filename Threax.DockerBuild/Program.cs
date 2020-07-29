@@ -7,10 +7,10 @@ using Threax.ConsoleApp;
 using Threax.DeployConfig;
 using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
-using Threax.K8sDeploy.Controller;
+using Threax.DockerBuild.Controller;
 using Threax.Pipelines.Core;
 
-namespace Threax.K8sDeploy
+namespace Threax.DockerBuild
 {
     class Program
     {

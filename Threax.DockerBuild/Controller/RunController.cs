@@ -12,7 +12,7 @@ using Threax.DockerBuildConfig;
 using Threax.Pipelines.Core;
 using Threax.Pipelines.Docker;
 
-namespace Threax.K8sDeploy.Controller
+namespace Threax.DockerBuild.Controller
 {
     class RunController : IController
     {

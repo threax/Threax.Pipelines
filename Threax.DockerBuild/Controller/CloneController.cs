@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Threax.DockerBuildConfig;
 
-namespace Threax.K8sDeploy.Controller
+namespace Threax.DockerBuild.Controller
 {
     class CloneController : IController
     {

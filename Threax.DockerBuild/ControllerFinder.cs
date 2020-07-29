@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using Threax.K8sDeploy.Controller;
+using Threax.DockerBuild;
+using Threax.DockerBuild.Controller;
 
-namespace Threax.K8sDeploy
+namespace Threax.DockerBuild
 {
     static class ControllerFinder
     {

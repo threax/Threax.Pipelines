@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Threax.K8sDeploy.Controller
+namespace Threax.DockerBuild.Controller
 {
     class HelpController : IController
     {
