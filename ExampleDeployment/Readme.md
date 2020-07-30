@@ -1,110 +1,18 @@
-# Setup A New Server
+# Creating a Server
+You can use the scripts in this folder to create a VM that will run the programs. Make sure you don't have any src, data or secret folders in your clone and then run SetupAll.ps1.
 
-## Setup Firewall
-```
-sudo ufw enable && \
-sudo ufw allow http && \
-sudo ufw allow https && \
-sudo ufw allow 22
-```
+# Create SSH Key
+Run `ssh-keygen` to create a key. If this is created without a password login is automatic. If you do this throw it away at the end.
 
-## Install Docker
-```
-sudo apt-get update && \
-sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y && \
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && \
-sudo apt-key fingerprint 0EBFCD88 && \
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" && \
-sudo apt-get update && \
-sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-```
+# Remove Sudo Password Prompt
+1. Connect to the server `ssh threax@UbuntuTestServer`.
+1. Run `sudo visudo`
+1. At the bottom of the file add `YOUR_USERNAME_HERE ALL=(ALL) NOPASSWD: ALL`. The username is the one you want to use to sudo without a password.
+1. Ctrl+x to save and close.
 
-## Create Network
-```
-sudo docker network create -d bridge appnet
-```
+Scripts will run without prompts once you do these things.
 
-## Install Threax.DockerTools
-```
-curl -L https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerTools_1.0.0-pre01/Threax.DockerTools > ~/Threax.DockerTools && \
-sudo mv ~/Threax.DockerTools /bin/Threax.DockerTools && \
-sudo chmod 700 /bin/Threax.DockerTools
-```
-
-## Setup Nginx
-Create appsettings.json in /app/nginx
-```
-sudo mkdir /app/nginx && \
-sudo touch /app/nginx/appsettings.json && \
-sudo chmod 666 /app/nginx/appsettings.json && \
-sudo touch /app/nginx/Dockerfile && \
-sudo chmod 666 /app/nginx/Dockerfile && \
-sudo touch /app/nginx/nginx.conf && \
-sudo chmod 666 /app/nginx/nginx.conf
-```
-Copy the contents from the nginx example directory.
-
-Add ssl cert to nginx secrets, this needs to be created somewhere else like a self signed or let's encrypt. Copy the certs to `/app/cert/`.
-```
-sudo Threax.DockerTools setsecret /app/nginx/appsettings.json private-key /app/cert/privkey1.pem && \
-sudo Threax.DockerTools setsecret /app/nginx/appsettings.json public-key /app/cert/fullchain1.pem
-```
-
-Remove the cert:
-```
-sudo rm -r /app/cert
-```
-
-Build and Run with
-```
-sudo Threax.DockerTools build /app/nginx/appsettings.json && \
-sudo Threax.DockerTools run /app/nginx/appsettings.json
-```
-
-## Setup Id server
-Create appsettings.json in /app/id
-```
-sudo mkdir /app/id && \
-sudo touch /app/id/appsettings.json && \
-sudo chmod 666 /app/id/appsettings.json
-```
-Copy contents from example folder.
-
-Clone and build
-```
-sudo Threax.DockerTools clone /app/id/appsettings.json && \
-sudo Threax.DockerTools build /app/id/appsettings.json
-```
-
-Create a cert by running
-```
-sudo docker run --rm -v /app/id/secrets:/out threaxacr.azurecr.io/id:threaxpipe-current tools "createCert signing 100 /out/id-server-signing-cert"
-```
-
-Finally run the id server
-```
-sudo Threax.DockerTools run /app/id/appsettings.json
-```
-
-Create an account on the id server and get the user id.
-
-Add this guid to the id server as an admin by running:
-```
-sudo docker exec -it id dotnet /app/Threax.IdServer.dll tools "addadmin YOUR_GUID"
-```
-
-## Setup App Dashboard
-Create appsettings.json in /app/appdashboard
-```
-sudo mkdir /app/appdashboard && \
-sudo touch /app/appdashboard/appsettings.json && \
-sudo chmod 666 /app/appdashboard/appsettings.json
-```
-Copy contents from example folder.
-
-Clone, build and run
-```
-sudo Threax.DockerTools clone /app/appdashboard/appsettings.json && \
-sudo Threax.DockerTools build /app/appdashboard/appsettings.json && \
-sudo Threax.DockerTools run /app/appdashboard/appsettings.json
-```
+# Setting Up Server
+1. Create the new server with ssh installed. Unlock sudo if wanted.
+1. Run `ssh-keygen` if you haven't already.
+1. Run `SetupAll.ps1`. Create an account and enter the guid when prompted.
