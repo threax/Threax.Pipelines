@@ -16,7 +16,7 @@ Scripts will run without prompts once you do these things.
 This will create a new server setup on a remote server. This can be used on a totally blank Ubuntu server and all prereqs will be installed.
 
 If you want to setup containers on a new remote Ubuntu server do the following:
-1. Create the new server with ssh installed. Unlock sudo if wanted.
+1. Create the new server with ssh installed. Unlock sudo if wanted. This is ideal or you will enter the password a lot.
 1. Create certs in the cert folder.
 1. Run `ssh-keygen` if you haven't already.
 1. Run `RemoteSetupAll.ps1`.
