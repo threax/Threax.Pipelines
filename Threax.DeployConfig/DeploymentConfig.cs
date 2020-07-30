@@ -88,6 +88,11 @@ namespace Threax.DeployConfig
         public Dictionary<String, String> Environment { get; set; }
 
         /// <summary>
+        /// Key vaulue pairs for commands that can be run through the tools against a running instance of the app.
+        /// </summary>
+        public Dictionary<String, String> Commands { get; set; }
+
+        /// <summary>
         /// The memory limit to set. Null means unlimited. This should be in the docker memory format, e.g. '400m'. Default: null
         /// </summary>
         public String MemoryLimit { get; set; }

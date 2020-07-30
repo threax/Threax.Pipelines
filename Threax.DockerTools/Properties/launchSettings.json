@@ -47,6 +47,10 @@
       "commandName": "Project",
       "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
     },
+    "Exec Notes AddAdmin": {
+      "commandName": "Project",
+      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/notes/appsettings.json AddAdmin"
+    },
     "Build Nginx": {
       "commandName": "Project",
       "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/nginx/appsettings.json"

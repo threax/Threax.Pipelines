@@ -55,11 +55,23 @@ namespace Threax.ConsoleApp
             {
                 var current = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Error");
+                Console.Write("Exception");
                 Console.ForegroundColor = current;
                 Console.Write(": ");
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
+                var inner = ex.InnerException;
+                while(inner != null)
+                {
+                    current = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("InnerException");
+                    Console.ForegroundColor = current;
+                    Console.Write(": ");
+                    Console.WriteLine(inner.Message);
+                    Console.WriteLine(inner.StackTrace);
+                    inner = inner.InnerException;
+                }
                 result = -1;
             }
 
