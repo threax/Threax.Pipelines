@@ -12,7 +12,16 @@ Run `ssh-keygen` to create a key. If this is created without a password login is
 
 Scripts will run without prompts once you do these things.
 
-# Setting Up Server
+# Setting Up Remote Server
+This will create a new server setup on a remote server.
 1. Create the new server with ssh installed. Unlock sudo if wanted.
+1. Create certs in the cert folder.
 1. Run `ssh-keygen` if you haven't already.
-1. Run `SetupAll.ps1`. Create an account and enter the guid when prompted.
+1. Run `RemoteSetupAll.ps1`.
+1. Create an account and enter the guid when prompted.
+
+# Setting Up Local Server
+If you want to run the containers on the current box do the following:
+1. Create certs in the cert folder.
+1. Run `LocalSetupAll.ps1`.
+1. Create an account and enter the guid when prompted.
