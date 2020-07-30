@@ -9,7 +9,7 @@ $dirName = [System.IO.Path]::GetFileName($scriptPath)
 ssh -t $sshConnection "mkdir ~/$dirName"
 
 # Copy Files
-scp -r "$scriptPath/Local.bash" "${sshConnection}:~/$dirName"
+scp -r "$scriptPath/UbuntuSetup.bash" "${sshConnection}:~/$dirName"
 
 # Run server side setup
-ssh -t $sshConnection "chmod 777 ~/$dirName/Local.bash;~/$dirName/Local.bash;rm -r ~/init"
+ssh -t $sshConnection "chmod 777 ~/$dirName/UbuntuSetup.bash;~/$dirName/UbuntuSetup.bash;rm -r ~/init"

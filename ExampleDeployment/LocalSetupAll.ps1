@@ -1,5 +1,6 @@
 $scriptPath = Split-Path $script:MyInvocation.MyCommand.Path
-docker network create -d bridge appnet
+
+&"$scriptPath/init/Local.ps1"
 &"$scriptPath/nginx/Local.ps1"
 &"$scriptPath/id/Local.ps1"
 &"$scriptPath/appdashboard/Local.ps1"
