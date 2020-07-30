@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using Threax.Azure.Abstractions;
 using Threax.Provision.CheapAzure.ArmTemplates.AppInsights;
+using Threax.Provision.CheapAzure.ArmTemplates.ArmVm;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -77,7 +78,6 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 
             var imageName = $"{buildConfig.ImageName}:{buildConfig.Branch}";
             var appName = resource.Name ?? throw new InvalidOperationException($"You must provide a '{nameof(Compute.Name)}' property on your '{nameof(Compute)}' resource.");
-            logger.LogInformation($"Creating docker webapp '{appName}' with '{imageName}'.");
 
             var acrCreds = await acrManager.GetAcrCredential(config.AcrName, config.ResourceGroup);
 
@@ -89,6 +89,8 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 var spName = $"{resource.Name}-app";
                 if (!await servicePrincipalManager.Exists(spName))
                 {
+                    logger.LogInformation($"Creating service principal '{spName}'.");
+
                     var sp = await servicePrincipalManager.CreateServicePrincipal(spName, config.SubscriptionId, config.ResourceGroup);
                     await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, "sp-id", sp.Id);
                     await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, "sp-appkey", sp.Secret);
@@ -100,6 +102,11 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 var id = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id");
                 await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, Guid.Parse(id));
             }
+
+            //Setup Vm
+            logger.LogInformation($"Creating virtual machine '{resource.Name}'.");
+            var vm = new ArmVm(resource.Name, config.ResourceGroup);
+            await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 
             //Setup App Insights
             if (!String.IsNullOrEmpty(resource.AppInsightsSecretName))
