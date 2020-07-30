@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security;
 using System.Text;
 using Threax.Provision.AzPowershell;
 
@@ -7,15 +8,17 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.ArmVm
 {
     class ArmVm : ArmTemplate
     {
-        public ArmVm(String baseName, String resourceGroup)
+        public ArmVm(String baseName, String resourceGroup, String adminUsername, SecureString adminPassword)
         {
-            networkInterfaceName = $"{baseName}-ni";
-            networkSecurityGroupName = $"{baseName}-nsg";
-            virtualNetworkName = $"{baseName}-vnet";
-            publicIpAddressName = $"{baseName}-ip";
-            virtualMachineName = baseName;
-            virtualMachineComputerName = baseName;
-            virtualMachineRG = resourceGroup;
+            this.networkInterfaceName = $"{baseName}-ni";
+            this.networkSecurityGroupName = $"{baseName}-nsg";
+            this.virtualNetworkName = $"{baseName}-vnet";
+            this.publicIpAddressName = $"{baseName}-ip";
+            this.virtualMachineName = baseName;
+            this.virtualMachineComputerName = baseName;
+            this.virtualMachineRG = resourceGroup;
+            this.adminUsername = adminUsername;
+            this.adminPassword = adminPassword;
         }
 
         public String networkInterfaceName { get; set; }
@@ -31,5 +34,9 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.ArmVm
         public String virtualMachineComputerName { get; set; }
 
         public String virtualMachineRG { get; set; }
+
+        public String adminUsername { get; set; }
+
+        public SecureString adminPassword { get; set; }
     }
 }

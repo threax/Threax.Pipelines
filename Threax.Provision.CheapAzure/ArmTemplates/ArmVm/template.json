@@ -52,6 +52,9 @@
         },
         "adminUsername": {
             "type": "string"
+        },
+        "adminPassword": {
+            "type": "secureString"
         }
     },
     "variables": {
@@ -159,9 +162,7 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachineComputerName')]",
                     "adminUsername": "[parameters('adminUsername')]",
-                    "linuxConfiguration": {
-                        "disablePasswordAuthentication": true
-                    }
+                    "adminPassword": "[parameters('adminPassword')]"
                 }
             }
         }

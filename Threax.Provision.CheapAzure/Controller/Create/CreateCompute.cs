@@ -12,6 +12,7 @@ using System.Threading;
 using Threax.Azure.Abstractions;
 using Threax.Provision.CheapAzure.ArmTemplates.AppInsights;
 using Threax.Provision.CheapAzure.ArmTemplates.ArmVm;
+using Threax.Provision.CheapAzure.Services;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -29,6 +30,8 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly IWebAppManager webAppManager;
         private readonly IAppInsightsManager appInsightsManager;
         private readonly IServicePrincipalManager servicePrincipalManager;
+        private readonly ICredentialLookup credentialLookup;
+        private readonly Random rand = new Random();
 
         public CreateCompute(
             Config config, 
@@ -42,7 +45,8 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             AzureKeyVaultConfig azureKeyVaultConfig,
             IWebAppManager webAppManager,
             IAppInsightsManager appInsightsManager,
-            IServicePrincipalManager servicePrincipalManager)
+            IServicePrincipalManager servicePrincipalManager,
+            ICredentialLookup credentialLookup)
         {
             this.config = config;
             this.buildConfig = buildConfig;
@@ -56,6 +60,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             this.webAppManager = webAppManager;
             this.appInsightsManager = appInsightsManager;
             this.servicePrincipalManager = servicePrincipalManager;
+            this.credentialLookup = credentialLookup;
         }
 
         public async Task Execute(Compute resource)
@@ -104,8 +109,11 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             }
 
             //Setup Vm
+            await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
+            var vmCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.VmAdminBaseKey, FixPass, FixUser);
+
             logger.LogInformation($"Creating virtual machine '{resource.Name}'.");
-            var vm = new ArmVm(resource.Name, config.ResourceGroup);
+            var vm = new ArmVm(resource.Name, config.ResourceGroup, vmCreds.User, vmCreds.Pass.ToSecureString());
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 
             //Setup App Insights
@@ -120,6 +128,22 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
                 await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, resource.AppInsightsSecretName, instrumentationKey);
             }
+        }
+
+        private String FixPass(String input)
+        {
+            return $"{input}!2Ab";
+        }
+
+        private String FixUser(String input)
+        {
+            var output = input.Replace('+', RandomLetter()).Replace('/', RandomLetter()).Replace('=', RandomLetter());
+            return RandomLetter() + output; //Ensure first character is a letter
+        }
+
+        private char RandomLetter()
+        {
+            return (char)rand.Next(97, 123);
         }
     }
 }

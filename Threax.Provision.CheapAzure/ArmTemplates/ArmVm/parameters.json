@@ -101,6 +101,9 @@
         },
         "adminUsername": {
             "value": "azureuser"
+        },
+        "adminPassword": {
+            "value": null
         }
     }
 }

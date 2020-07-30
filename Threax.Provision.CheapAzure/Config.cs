@@ -72,6 +72,11 @@ namespace Threax.Provision.CheapAzure
         public string SqlSaBaseKey { get; set; } = "sqlsrv-sa";
 
         /// <summary>
+        /// The base name of the secret in the infra kv for the vm admin. Default: 'vm-admin'
+        /// </summary>
+        public string VmAdminBaseKey { get; set; } = "vm-admin";
+
+        /// <summary>
         /// The thumbprint of the ssl certificate to use.
         /// </summary>
         public string SslCertThumb { get; set; }
