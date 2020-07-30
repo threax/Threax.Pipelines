@@ -52,6 +52,11 @@ namespace Threax.Provision.CheapAzure
         public String AcrName { get; set; }
 
         /// <summary>
+        /// The name of the vm to provision.
+        /// </summary>
+        public String VmName { get; set; }
+
+        /// <summary>
         /// The name of the app service plan to create.
         /// </summary>
         public String AppServicePlanName { get; set; }

@@ -112,8 +112,13 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
             var vmCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.VmAdminBaseKey, FixPass, FixUser);
 
-            logger.LogInformation($"Creating virtual machine '{resource.Name}'.");
-            var vm = new ArmVm(resource.Name, config.ResourceGroup, vmCreds.User, vmCreds.Pass.ToSecureString());
+            if (String.IsNullOrEmpty(config.VmName))
+            {
+                throw new InvalidOperationException($"You must supply a '{nameof(Config.VmName)}' property in your config file.");
+            }
+
+            logger.LogInformation($"Creating virtual machine '{config.VmName}'.");
+            var vm = new ArmVm(config.VmName, config.ResourceGroup, vmCreds.User, vmCreds.Pass.ToSecureString());
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 
             //Setup App Insights
