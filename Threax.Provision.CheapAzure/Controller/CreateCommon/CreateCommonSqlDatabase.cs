@@ -15,9 +15,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
 {
     class CreateCommonSqlDatabase : IResourceProcessor<SqlDatabase>
     {
-        private readonly ISqlServerManager sqlServerManager;
         private readonly Config config;
-        private readonly IKeyVaultManager keyVaultManager;
         private readonly ICredentialLookup credentialLookup;
         private readonly IArmTemplateManager armTemplateManager;
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
@@ -26,18 +24,14 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
         private readonly Random rand = new Random();
 
         public CreateCommonSqlDatabase(
-            ISqlServerManager sqlServerManager, 
             Config config, 
-            IKeyVaultManager keyVaultManager, 
             ICredentialLookup credentialLookup,
             IArmTemplateManager armTemplateManager,
             ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, 
             IKeyVaultAccessManager keyVaultAccessManager,
             ILogger<CreateCommonSqlDatabase> logger)
         {
-            this.sqlServerManager = sqlServerManager;
             this.config = config;
-            this.keyVaultManager = keyVaultManager;
             this.credentialLookup = credentialLookup;
             this.armTemplateManager = armTemplateManager;
             this.sqlServerFirewallRuleManager = sqlServerFirewallRuleManager;
