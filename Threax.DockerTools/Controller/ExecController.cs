@@ -42,7 +42,7 @@ namespace Threax.DockerTools.Controller
             var commandName = args[2];
 
             var command = "";
-            if(!deploymentConfig.Commands?.TryGetValue(commandName, out command) == true)
+            if(deploymentConfig.Commands?.TryGetValue(commandName, out command) != true)
             {
                 throw new InvalidOperationException($"Cannot find exec command '{commandName}' in Deploy.Commands.");
             }
