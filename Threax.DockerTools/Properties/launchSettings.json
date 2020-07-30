@@ -49,7 +49,7 @@
     },
     "Exec Notes AddAdmin": {
       "commandName": "Project",
-      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/notes/appsettings.json AddAdmin"
+      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/notes/appsettings.json AddAdmin a5dcd5a3-abef-4814-9f5c-78c3d36b7130"
     },
     "Build Nginx": {
       "commandName": "Project",

@@ -61,9 +61,12 @@ namespace Threax.DockerTools.Controller
             var execArgs = $"exec -it {containerName} {command}";
 
             logger.LogInformation($"Running command '{commandName}' on container '{containerName}'.");
-            logger.LogInformation(execArgs);
 
-            processRunner.RunProcessWithOutput(new System.Diagnostics.ProcessStartInfo("docker", execArgs));
+            var exitCode = processRunner.RunProcessWithOutput(new System.Diagnostics.ProcessStartInfo("docker", execArgs));
+            if(exitCode != 0)
+            {
+                throw new InvalidOperationException($"An error occured running the command '{commandName}' on '{containerName}'");
+            }
 
             return Task.CompletedTask;
         }
