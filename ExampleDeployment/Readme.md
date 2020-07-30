@@ -13,7 +13,9 @@ Run `ssh-keygen` to create a key. If this is created without a password login is
 Scripts will run without prompts once you do these things.
 
 # Setting Up Remote Server
-This will create a new server setup on a remote server.
+This will create a new server setup on a remote server. This can be used on a totally blank Ubuntu server and all prereqs will be installed.
+
+If you want to setup containers on a new remote Ubuntu server do the following:
 1. Create the new server with ssh installed. Unlock sudo if wanted.
 1. Create certs in the cert folder.
 1. Run `ssh-keygen` if you haven't already.
@@ -21,6 +23,8 @@ This will create a new server setup on a remote server.
 1. Create an account and enter the guid when prompted.
 
 # Setting Up Local Server
+The local setup assumes you already have docker and powershell installed.
+
 If you want to run the containers on the current box do the following:
 1. Create certs in the cert folder.
 1. Run `LocalSetupAll.ps1`.
