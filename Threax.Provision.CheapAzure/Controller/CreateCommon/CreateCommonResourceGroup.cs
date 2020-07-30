@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 using Threax.Provision;
 using Threax.Provision.AzPowershell;
 
-namespace Threax.Provision.CheapAzure.Controller.Create
+namespace Threax.Provision.CheapAzure.Controller.CreateCommon
 {
-    class CreateResourceGroup : IResourceProcessor<ResourceGroup>
+    class CreateCommonResourceGroup : IResourceProcessor<ResourceGroup>
     {
         private readonly IArmTemplateManager armTemplateManager;
         private readonly Config config;
 
-        public CreateResourceGroup(IArmTemplateManager armTemplateManager, Config config)
+        public CreateCommonResourceGroup(IArmTemplateManager armTemplateManager, Config config)
         {
             this.armTemplateManager = armTemplateManager;
             this.config = config;

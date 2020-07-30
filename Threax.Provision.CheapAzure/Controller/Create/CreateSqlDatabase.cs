@@ -1,15 +1,12 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Threax.Provision.CheapAzure.ArmTemplates.SqlDb;
-using Threax.Provision.CheapAzure.ArmTemplates.SqlServer;
-using Threax.Provision.CheapAzure.Resources;
-using Threax.Provision.CheapAzure.Services;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using Threax.Provision;
-using Threax.Provision.AzPowershell;
-using Microsoft.Extensions.Logging;
 using Threax.Azure.Abstractions;
+using Threax.Provision.AzPowershell;
+using Threax.Provision.CheapAzure.Resources;
+using Threax.Provision.CheapAzure.Services;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -53,17 +50,8 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             var saCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.SqlSaBaseKey, FixPass, FixUser);
             var saConnectionString = sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, saCreds.User, saCreds.Pass);
 
-            //Setup logical server
-            logger.LogInformation($"Setting up SQL Logical Server '{config.SqlServerName}' in Resource Group '{config.ResourceGroup}'.");
-            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlServer(config.SqlServerName, saCreds.User, saCreds.Pass.ToSecureString()));
-            await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
-
-            //Setup shared sql db
-            logger.LogInformation($"Setting up Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");
-            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlDb(config.SqlServerName, config.SqlDbName));
-
             //Setup user in new db
-            logger.LogInformation($"Setting up user for {readerKeyBase} in Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");
+            logger.LogInformation($"Setting up users for {resource.Name} in Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");
             var dbContext = new ProvisionDbContext(saConnectionString);
             var readWriteCreds = await credentialLookup.GetOrCreateCredentials(azureKeyVaultConfig.VaultName, readerKeyBase, FixPass, FixUser);
             var ownerCreds = await credentialLookup.GetOrCreateCredentials(azureKeyVaultConfig.VaultName, ownerKeyBase, FixPass, FixUser);

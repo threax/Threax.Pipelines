@@ -1,25 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Namotion.Reflection;
 using Newtonsoft.Json;
-using Threax.Provision.CheapAzure.HiddenResources;
-using Threax.Provision.CheapAzure.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Threax.Provision;
-using Threax.Provision.Processing;
-using Threax.DockerBuildConfig;
-using Threax.Extensions.Configuration.SchemaBinder;
-using Microsoft.Extensions.Configuration;
-using System.Diagnostics;
-using Threax.DeployConfig;
 using Threax.Azure.Abstractions;
 using Threax.ConsoleApp;
+using Threax.DeployConfig;
+using Threax.DockerBuildConfig;
+using Threax.Extensions.Configuration.SchemaBinder;
+using Threax.Provision.CheapAzure.HiddenResources;
+using Threax.Provision.CheapAzure.Resources;
+using Threax.Provision.CheapAzure.Services;
+using Threax.Provision.Processing;
 
 namespace Threax.Provision.CheapAzure
 {
@@ -29,7 +26,7 @@ namespace Threax.Provision.CheapAzure
         {
             var command = args[0];
             var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(args[1]));
-            var jsonConfigPath = Path.GetFullPath(args[2]);
+            String jsonConfigPath = "unknown.json";
 
             return AppHost
             .Setup(services =>
@@ -116,9 +113,22 @@ namespace Threax.Provision.CheapAzure
             .Run(async scope =>
             {
                 var loader = scope.ServiceProvider.GetRequiredService<IResourceDefinitionLoader>();
-                var definition = loader.LoadFromFile(jsonConfigPath);
-                definition.Resources.Add(new ResourceGroup(config.ResourceGroup));
-                definition.Resources.Add(new KeyVault());
+                ResourceDefinition definition;
+                switch (command?.ToLowerInvariant())
+                {
+                    case "createcommon":
+                        definition = new ResourceDefinition();
+                        definition.Resources.Add(new Compute());
+                        definition.Resources.Add(new KeyVault());
+                        definition.Resources.Add(new ResourceGroup(config.ResourceGroup));
+                        definition.Resources.Add(new SqlDatabase());
+                        break;
+                    default:
+                        jsonConfigPath = Path.GetFullPath(args[2]);
+                        definition = loader.LoadFromFile(jsonConfigPath);
+                        definition.Resources.Add(new KeyVault());
+                        break;
+                }
                 definition.SortResources();
                 var provisioner = scope.ServiceProvider.GetRequiredService<IProvisioner>();
                 await provisioner.ProcessResources(definition, scope);

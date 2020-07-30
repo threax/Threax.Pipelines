@@ -6,7 +6,7 @@ namespace Threax.Provision
 {
     public class ResourceDefinition
     {
-        public List<Object> Resources { get; set; }
+        public List<Object> Resources { get; set; } = new List<object>();
 
         /// <summary>
         /// Sort any IOrderedResource instances in this object.

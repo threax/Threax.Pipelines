@@ -3,6 +3,10 @@
     "Threax.Provision.CheapAzure": {
       "commandName": "Project"
     },
+    "Create Common": {
+      "commandName": "Project",
+      "commandLineArgs": "CreateCommon \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/id/appsettings.json\""
+    },
     "Create Id": {
       "commandName": "Project",
       "commandLineArgs": "Create \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/id/appsettings.json\""
@@ -34,6 +38,10 @@
     "Create smo app dash": {
       "commandName": "Project",
       "commandLineArgs": "Create \"C:/DevFreight/DevOps/coreconfig.json\" \"C:/DevFreight/smofreight/SmoFreight/appsettings.Production.json\""
+    },
+    "Create smo common": {
+      "commandName": "Project",
+      "commandLineArgs": "CreateCommon \"C:/DevFreight/DevOps/coreconfig.json\" \"C:/DevFreight/smofreight/SmoFreight/appsettings.Production.json\""
     }
   }
 }

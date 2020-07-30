@@ -28,12 +28,6 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 
         public async Task Execute(KeyVault resource)
         {
-            if (!await keyVaultManager.Exists(config.InfraKeyVaultName))
-            {
-                var keyVaultArm = new ArmKeyVault(config.InfraKeyVaultName, config.Location, config.TenantId.ToString());
-                await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, keyVaultArm);
-            }
-
             if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
             {
                 if (!await keyVaultManager.Exists(azureKeyVaultConfig.VaultName))
