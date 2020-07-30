@@ -152,6 +152,25 @@ namespace Threax.Provision.AzPowershell
             }
         }
 
+        public async Task SetSecret(String VaultName, String Name, SecureString SecretValue)
+        {
+            using (var pwsh = PowerShell.Create())
+            {
+                pwsh.PrintInformationStream(logger);
+                pwsh.PrintErrorStream(logger);
+
+                pwsh.SetUnrestrictedExecution();
+                pwsh.AddScript("Import-Module Az.KeyVault");
+                var parm = new { VaultName, Name, SecretValue };
+                pwsh.AddParamLine(parm);
+                pwsh.AddCommandWithParams("Set-AzKeyVaultSecret", parm);
+
+                var outputCollection = await pwsh.RunAsync();
+
+                pwsh.ThrowOnErrors($"Error setting secret '{Name}' in Key Vault '{VaultName}'.");
+            }
+        }
+
         public async Task<String> GetSecret(String keyVaultName, String name)
         {
             using (var pwsh = PowerShell.Create())

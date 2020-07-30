@@ -27,6 +27,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly AzureKeyVaultConfig azureKeyVaultConfig;
         private readonly IWebAppManager webAppManager;
         private readonly IAppInsightsManager appInsightsManager;
+        private readonly IServicePrincipalManager servicePrincipalManager;
 
         public CreateCompute(
             Config config, 
@@ -39,7 +40,8 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             IWebAppIdentityManager webAppIdentityManager,
             AzureKeyVaultConfig azureKeyVaultConfig,
             IWebAppManager webAppManager,
-            IAppInsightsManager appInsightsManager)
+            IAppInsightsManager appInsightsManager,
+            IServicePrincipalManager servicePrincipalManager)
         {
             this.config = config;
             this.buildConfig = buildConfig;
@@ -52,6 +54,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             this.azureKeyVaultConfig = azureKeyVaultConfig;
             this.webAppManager = webAppManager;
             this.appInsightsManager = appInsightsManager;
+            this.servicePrincipalManager = servicePrincipalManager;
         }
 
         public async Task Execute(Compute resource)
@@ -78,55 +81,24 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 
             var acrCreds = await acrManager.GetAcrCredential(config.AcrName, config.ResourceGroup);
 
-            //Deploy app itself
-            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmDockerWebApp()
-            {
-                dockerRegistryPassword = acrCreds.Password.ToSecureString(),
-                dockerRegistryUsername = acrCreds.Username,
-                dockerRegistryUrl = $"{config.AcrName}.azurecr.io",
-                alwaysOn = resource.AlwaysOn,
-                nameFromTemplate = appName,
-                hostingPlanName = config.AppServicePlanName,
-                serverFarmResourceGroup = config.ResourceGroup,
-                location = config.Location,
-                subscriptionId = config.SubscriptionId,
-                linuxFxVersion = $"DOCKER|{imageName}"
-            });
-
-            //Need to setup continuous deployment and connection to acr
-            logger.LogWarning("Compute does not deploy correctly. Please update the settings manually to use the container registry, image and continuous deployment settings. This needs to be automated, but is not possible at this time.");
-
             //Update app permissions in key vault
             if (!string.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
             {
-                var appId = await webAppIdentityManager.GetOrCreateWebAppIdentity(appName, config.ResourceGroup);
+                await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
 
-                try
+                var spName = $"{resource.Name}-app";
+                if (!await servicePrincipalManager.Exists(spName))
                 {
-                    await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
+                    var sp = await servicePrincipalManager.CreateServicePrincipal(spName, config.SubscriptionId, config.ResourceGroup);
+                    await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, "sp-id", sp.Id);
+                    await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, "sp-appkey", sp.Secret);
+                    var appKey = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-appkey");
+                    var spConnectionString = $"RunAs=App;AppId={sp.ApplicationId};TenantId={config.TenantId};AppKey={appKey}";
+                    await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring", spConnectionString);
                 }
-                catch (Exception ex)
-                {
-                    var delay = 8000;
-                    logger.LogError(ex, $"An error occured setting the key vault permissions. Trying again after {delay}ms...");
-                    Thread.Sleep(delay);
-                    logger.LogInformation("Sleep complete. Trying permissions again.");
-                    await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, appId);
-                }
-            }
 
-            //Setup dns
-            var hostNames = (resource.DnsNames ?? Enumerable.Empty<String>()).Concat(new string[] { $"{resource.Name}.azurewebsites.net" });
-            logger.LogInformation($"Updating Host Names to '[{String.Join(", ", hostNames)}]'");
-            await this.webAppManager.SetHostnames(resource.Name, config.ResourceGroup, hostNames);
-
-            if (!String.IsNullOrEmpty(config.SslCertThumb) && resource.DnsNames.Count > 0)
-            {
-                logger.LogInformation($"Creating SSL Bindings to '[{String.Join(", ", resource.DnsNames)}]' with thumb '{config.SslCertThumb}'.");
-                foreach (var host in resource.DnsNames)
-                {
-                    await this.webAppManager.CreateSslBinding(resource.Name, config.ResourceGroup, config.SslCertThumb, host);
-                }
+                var id = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id");
+                await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, Guid.Parse(id));
             }
 
             //Setup App Insights

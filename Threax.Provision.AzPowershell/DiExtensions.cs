@@ -25,6 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
             }
             services.TryAddScoped<IArmTemplateManager, ArmTemplateManager>();
             services.TryAddScoped<IAppInsightsManager, AppInsightsManager>();
+            services.TryAddScoped<IServicePrincipalManager, ServicePrincipalManager>();
             services.TryAddScoped<ISqlServerFirewallRuleManager, SqlServerFirewallRuleManager>();
             services.TryAddScoped<ISqlServerManager, SqlServerManager>();
             services.TryAddScoped<IAcrManager, AcrManager>();

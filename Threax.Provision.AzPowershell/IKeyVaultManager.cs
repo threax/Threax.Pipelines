@@ -15,6 +15,7 @@ namespace Threax.Provision.AzPowershell
         Task LockSecrets(string keyVaultName, Guid userId);
         Task RemoveVault(string keyVaultName, string location);
         Task SetSecret(string keyVaultName, string name, string value);
+        Task SetSecret(String VaultName, String Name, SecureString SecretValue);
         Task UnlockSecrets(string keyVaultName, Guid userId);
         Task UnlockSecretsRead(string keyVaultName, Guid userId);
     }

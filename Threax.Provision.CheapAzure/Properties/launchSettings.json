@@ -29,11 +29,11 @@
     },
     "Deploy smo app dash": {
       "commandName": "Project",
-      "commandLineArgs": "Deploy \"C:/DevFreight/smofreight/coreconfig.json\" \"C:/DevFreight/IdServer/AppDashboard/appsettings.Production.json\""
+      "commandLineArgs": "Deploy \"C:/DevFreight/DevOps/coreconfig.json\" \"C:/DevFreight/smofreight/SmoFreight/appsettings.Production.json\""
     },
     "Create smo app dash": {
       "commandName": "Project",
-      "commandLineArgs": "Create \"C:/DevFreight/smofreight/coreconfig.json\" \"C:/DevFreight/smofreight/SmoFreight/appsettings.Production.json\""
+      "commandLineArgs": "Create \"C:/DevFreight/DevOps/coreconfig.json\" \"C:/DevFreight/smofreight/SmoFreight/appsettings.Production.json\""
     }
   }
 }
