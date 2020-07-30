@@ -1,2 +1,0 @@
-param ([Parameter(Position=0,mandatory=$true)]$sshConnection, [Parameter(Position=1,mandatory=$true)]$userId)
-ssh -t $sshConnection "sudo docker exec -it id dotnet /app/Threax.IdServer.dll tools 'addadmin $userId'"

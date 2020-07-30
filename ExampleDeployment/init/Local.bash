@@ -22,7 +22,7 @@ sudo docker network create -d bridge appnet
 sudo snap install powershell --classic
 
 # Setup Threax.DockerTools
-curl -L https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerTools_1.0.0-pre02/Threax.DockerTools > ~/Threax.DockerTools && \
+curl -L https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerBuild_1.0.0-pre03/Threax.DockerTools > ~/Threax.DockerTools && \
 sudo mv ~/Threax.DockerTools /bin/Threax.DockerTools && \
 sudo chmod 700 /bin/Threax.DockerTools
 

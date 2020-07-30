@@ -9,5 +9,5 @@ $scriptPath = Split-Path $script:MyInvocation.MyCommand.Path
 'Remote Server Setup Complete'
 'Visit https://id.dev.threax.com/Manage/Index and create an account.'
 $userId = Read-Host -Prompt 'Enter the new user''s User Id here'
-&"$scriptPath/id/AddAdmin.ps1" $sshConnection $userId
+ssh -t $sshConnection "sudo Threax.DockerTools exec /app/id/appsettings.json AddAdmin $userId"
 'Visit https://appdashboard.dev.threax.com to test the account.'
