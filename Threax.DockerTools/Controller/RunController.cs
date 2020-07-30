@@ -100,13 +100,15 @@ namespace Threax.DockerTools.Controller
             {
                 foreach (var vol in deploymentConfig.Secrets)
                 {
-                    var path = deploymentConfig.GetSecretDataPath(vol.Value.SecretName);
+                    var secretName = vol.Value.GetSecretName(deploymentConfig.Name, vol.Key);
+                    var path = deploymentConfig.GetSecretDataPath(secretName);
 
                     EnsureDirectory(path, vol.Value.Type);
 
                     if (!String.IsNullOrEmpty(vol.Value.Source))
                     {
-                        File.Copy(vol.Value.Source, path, true);
+                        var source = deploymentConfig.GetConfigPath(vol.Value.Source);
+                        File.Copy(source, path, true);
                     }
 
                     osHandler.SetPermissions(path, deploymentConfig.User, deploymentConfig.Group);

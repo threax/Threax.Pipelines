@@ -43,6 +43,10 @@
       "commandName": "Project",
       "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
     },
+    "Run Notes": {
+      "commandName": "Project",
+      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
+    },
     "Build Nginx": {
       "commandName": "Project",
       "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/nginx/appsettings.json"

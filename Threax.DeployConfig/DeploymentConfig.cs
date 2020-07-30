@@ -131,16 +131,31 @@ namespace Threax.DeployConfig
             //Does nothing right now
         }
 
+        /// <summary>
+        /// Get a path in the app data path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public String GetAppDataPath(String path)
         {
             return Path.GetFullPath(Path.Combine(AppDataBasePath, path));
         }
 
+        /// <summary>
+        /// Get a path in the secret folder.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public String GetSecretDataPath(String path)
         {
             return Path.GetFullPath(Path.Combine(SecretDataBasePath, path));
         }
 
+        /// <summary>
+        /// Get a path relative to the config file.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public String GetConfigPath(String path)
         {
             return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(SourceFile), path));
