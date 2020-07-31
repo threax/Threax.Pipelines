@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Needs Error Checking
+
 # Setup Firewall
 sudo ufw allow http
 sudo ufw allow https

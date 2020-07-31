@@ -42,6 +42,10 @@ namespace Threax.Provision.AzPowershell
                 foreach (dynamic value in result.Value)
                 {
                     String message = $@"{value.DisplayStatus}\n{value.Message}";
+                    if (message.Contains("Invoke-AzVMRunCommand_ALERT_ERROR_OCCURED"))
+                    {
+                        throw new InvalidOperationException($"An error occured running the server side script of Invoke-AzVMRunCommand for '{Name}' in '{ResourceGroupName}'");
+                    }
                     logger.LogInformation(message);
                 }
             }
