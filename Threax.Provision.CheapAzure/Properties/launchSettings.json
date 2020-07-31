@@ -30,18 +30,6 @@
     "Deploy Notes": {
       "commandName": "Project",
       "commandLineArgs": "Deploy \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/notes/appsettings.json\""
-    },
-    "Deploy smo app dash": {
-      "commandName": "Project",
-      "commandLineArgs": "Deploy \"C:/DevFreight/DevOps/coreconfig.json\" \"C:/DevFreight/smofreight/SmoFreight/appsettings.Production.json\""
-    },
-    "Create smo app dash": {
-      "commandName": "Project",
-      "commandLineArgs": "Create \"C:/DevFreight/DevOps/coreconfig.json\" \"C:/DevFreight/smofreight/SmoFreight/appsettings.Production.json\""
-    },
-    "Create smo common": {
-      "commandName": "Project",
-      "commandLineArgs": "CreateCommon \"C:/DevFreight/DevOps/coreconfig.json\" \"C:/DevFreight/smofreight/SmoFreight/appsettings.Production.json\""
     }
   }
 }

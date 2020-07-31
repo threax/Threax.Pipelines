@@ -35,12 +35,12 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                     var keyVaultArm = new ArmKeyVault(azureKeyVaultConfig.VaultName, config.Location, config.TenantId.ToString());
                     await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, keyVaultArm);
                 }
-            }
 
-            //Allow AzDo user in the key vault if one is set.
-            if (config.AzDoUser != null)
-            {
-                await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, config.AzDoUser.Value);
+                //Allow AzDo user in the key vault if one is set.
+                if (config.AzDoUser != null)
+                {
+                    await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, config.AzDoUser.Value);
+                }
             }
         }
     }
