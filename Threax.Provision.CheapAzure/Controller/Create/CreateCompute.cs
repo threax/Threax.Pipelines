@@ -13,6 +13,7 @@ using Threax.Azure.Abstractions;
 using Threax.Provision.CheapAzure.ArmTemplates.AppInsights;
 using Threax.Provision.CheapAzure.ArmTemplates.ArmVm;
 using Threax.Provision.CheapAzure.Services;
+using System.Collections;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -25,6 +26,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly AzureKeyVaultConfig azureKeyVaultConfig;
         private readonly IAppInsightsManager appInsightsManager;
         private readonly IServicePrincipalManager servicePrincipalManager;
+        private readonly IVmManager vmManager;
 
         public CreateCompute(
             Config config, 
@@ -33,7 +35,8 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             ILogger<CreateCompute> logger,
             AzureKeyVaultConfig azureKeyVaultConfig,
             IAppInsightsManager appInsightsManager,
-            IServicePrincipalManager servicePrincipalManager)
+            IServicePrincipalManager servicePrincipalManager,
+            IVmManager vmManager)
         {
             this.config = config;
             this.keyVaultManager = keyVaultManager;
@@ -42,6 +45,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             this.azureKeyVaultConfig = azureKeyVaultConfig;
             this.appInsightsManager = appInsightsManager;
             this.servicePrincipalManager = servicePrincipalManager;
+            this.vmManager = vmManager;
         }
 
         public async Task Execute(Compute resource)
@@ -66,6 +70,13 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 
                 var id = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id");
                 await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, Guid.Parse(id));
+
+                //Setup App Connection String Secret
+                logger.LogInformation("Setting app key vault connection string secret.");
+                var vaultCs = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring");
+                var armVm = new ArmVm(config.VmName, config.ResourceGroup, "", "".ToSecureString()); //Don't actually create this, just looking up file locs
+                var threaxDockerToolsPath = armVm.GetThreaxDockerToolsPath();
+                await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", threaxDockerToolsPath, new Hashtable { {  } });
             }
 
             //Setup App Insights

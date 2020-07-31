@@ -40,6 +40,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ArmTemplates\ArmVm\WriteFileContent.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ArmTemplates\ArmVm\ThreaxDockerTools.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="ArmTemplates\ArmVm\UbuntuSetup.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

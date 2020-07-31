@@ -48,5 +48,14 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.ArmVm
             var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location), "ArmTemplates", templateFolder, "UbuntuSetup.sh");
             return path;
         }
+
+        public virtual String GetThreaxDockerToolsPath()
+        {
+            var type = this.GetType();
+            string templateFolder = GetTemplateFolder(type);
+
+            var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location), "ArmTemplates", templateFolder, "ThreaxDockerTools.sh");
+            return path;
+        }
     }
 }
