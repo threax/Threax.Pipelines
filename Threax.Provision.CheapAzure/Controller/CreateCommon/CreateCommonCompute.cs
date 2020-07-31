@@ -25,16 +25,18 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly ILogger<CreateCommonCompute> logger;
         private readonly ICredentialLookup credentialLookup;
+        private readonly IVmManager vmManager;
         private readonly Random rand = new Random();
 
         public CreateCommonCompute(
-            Config config, 
-            IAcrManager acrManager, 
-            IArmTemplateManager armTemplateManager, 
-            IKeyVaultManager keyVaultManager, 
+            Config config,
+            IAcrManager acrManager,
+            IArmTemplateManager armTemplateManager,
+            IKeyVaultManager keyVaultManager,
             IKeyVaultAccessManager keyVaultAccessManager,
             ILogger<CreateCommonCompute> logger,
-            ICredentialLookup credentialLookup)
+            ICredentialLookup credentialLookup,
+            IVmManager vmManager)
         {
             this.config = config;
             this.acrManager = acrManager;
@@ -43,6 +45,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             this.keyVaultAccessManager = keyVaultAccessManager;
             this.logger = logger;
             this.credentialLookup = credentialLookup;
+            this.vmManager = vmManager;
         }
 
         public async Task Execute(Compute resource)
@@ -71,6 +74,10 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             logger.LogInformation($"Creating virtual machine '{config.VmName}'.");
             var vm = new ArmVm(config.VmName, config.ResourceGroup, vmCreds.User, vmCreds.Pass.ToSecureString());
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
+
+            logger.LogInformation("Running setup script on server.");
+            var setupPath = vm.GetSetupFilePath();
+            await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", setupPath);
 
             //Setup App Insights
             if (!String.IsNullOrEmpty(resource.AppInsightsSecretName))

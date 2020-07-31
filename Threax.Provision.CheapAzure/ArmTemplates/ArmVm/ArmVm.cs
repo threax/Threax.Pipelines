@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security;
 using System.Text;
 using Threax.Provision.AzPowershell;
@@ -38,5 +39,14 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.ArmVm
         public String adminUsername { get; set; }
 
         public SecureString adminPassword { get; set; }
+
+        public virtual String GetSetupFilePath()
+        {
+            var type = this.GetType();
+            string templateFolder = GetTemplateFolder(type);
+
+            var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location), "ArmTemplates", templateFolder, "UbuntuSetup.sh");
+            return path;
+        }
     }
 }

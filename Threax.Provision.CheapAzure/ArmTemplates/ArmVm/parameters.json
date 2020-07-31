@@ -79,7 +79,7 @@
             "value": "invalid!"
         },
         "publicIpAddressType": {
-            "value": "Dynamic"
+            "value": "Static"
         },
         "publicIpAddressSku": {
             "value": "Basic"

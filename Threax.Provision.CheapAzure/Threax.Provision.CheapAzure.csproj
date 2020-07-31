@@ -39,4 +39,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ArmTemplates\ArmVm\UbuntuSetup.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
