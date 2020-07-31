@@ -30,6 +30,10 @@
     "Deploy Notes": {
       "commandName": "Project",
       "commandLineArgs": "Deploy \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/notes/appsettings.json\""
+    },
+    "Build Id": {
+      "commandName": "Project",
+      "commandLineArgs": "Build \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/id/appsettings.json\""
     }
   }
 }

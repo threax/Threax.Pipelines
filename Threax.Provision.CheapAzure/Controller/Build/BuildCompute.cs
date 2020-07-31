@@ -1,5 +1,4 @@
-﻿using LibGit2Sharp;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,23 +7,24 @@ using System.Text;
 using System.Threading.Tasks;
 using Threax.DockerBuildConfig;
 using Threax.Pipelines.Core;
+using Threax.Provision.CheapAzure.Resources;
 
-namespace Threax.DockerTools.Controller
+namespace Threax.Provision.CheapAzure.Controller.Build
 {
-    class BuildController : IController
+    class BuildCompute : IResourceProcessor<Compute>
     {
-        private BuildConfig buildConfig;
-        private ILogger logger;
-        private IProcessRunner processRunner;
+        private readonly BuildConfig buildConfig;
+        private readonly ILogger<BuildCompute> logger;
+        private readonly IProcessRunner processRunner;
 
-        public BuildController(BuildConfig buildConfig, ILogger<BuildController> logger, IProcessRunner processRunner)
+        public BuildCompute(BuildConfig buildConfig, ILogger<BuildCompute> logger, IProcessRunner processRunner)
         {
             this.buildConfig = buildConfig;
             this.logger = logger;
             this.processRunner = processRunner;
         }
 
-        public Task Run()
+        public Task Execute(Compute resource)
         {
             var context = buildConfig.GetContext();
             var dockerFile = Path.GetFullPath(Path.Combine(context, buildConfig.Dockerfile ?? throw new InvalidOperationException($"Please provide {nameof(buildConfig.Dockerfile)} when using build.")));
@@ -40,7 +40,7 @@ namespace Threax.DockerTools.Controller
             }
 
             var exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", args));
-            if(exitCode != 0)
+            if (exitCode != 0)
             {
                 throw new InvalidOperationException("An error occured during the docker build.");
             }
