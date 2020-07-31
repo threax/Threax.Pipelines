@@ -58,7 +58,7 @@ namespace Threax.DockerTools.Controller
 
             var containerName = deploymentConfig.Name;
 
-            var execArgs = $"exec -it {containerName} {command}";
+            var execArgs = $"exec {containerName} {command}";
 
             logger.LogInformation($"Running command '{commandName}' on container '{containerName}'.");
 

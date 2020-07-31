@@ -151,7 +151,7 @@ namespace Threax.DockerTools.Controller
                     cmd = deploymentConfig.InitCommand.Substring(entryPoint.Length);
                 }
 
-                var initArgs = $"run -it --rm --entrypoint {entryPoint} {args}{cmd}";
+                var initArgs = $"run --rm --entrypoint {entryPoint} {args}{cmd}";
                 logger.LogInformation(initArgs);
                 exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", initArgs));
                 if (exitCode != 0)
