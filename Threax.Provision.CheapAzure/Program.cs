@@ -13,6 +13,7 @@ using Threax.ConsoleApp;
 using Threax.DeployConfig;
 using Threax.DockerBuildConfig;
 using Threax.Extensions.Configuration.SchemaBinder;
+using Threax.Pipelines.Core;
 using Threax.Provision.CheapAzure.HiddenResources;
 using Threax.Provision.CheapAzure.Resources;
 using Threax.Provision.CheapAzure.Services;
@@ -107,7 +108,11 @@ namespace Threax.Provision.CheapAzure
 
                 services.AddScoped<IStringGenerator, StringGenerator>();
                 services.AddScoped<ICredentialLookup, CredentialLookup>();
-                services.AddThreaxPipelines();
+                services.AddScoped<IVmCommands, VmCommands>();
+                services.AddThreaxPipelines(o =>
+                {
+                    o.SetupConfigFileProvider = s => new ConfigFileProvider(jsonConfigPath);
+                });
                 services.AddThreaxPipelinesDocker();
             })
             .Run(async scope =>

@@ -19,23 +19,6 @@ namespace Threax.Provision.AzPowershell
             this.logger = logger;
         }
 
-        public async Task RunCommand(String Name, String ResourceGroupName, String CommandId, string ScriptPath)
-        {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
-
-            pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.ContainerRegistry");
-            var parm = new { Name, ResourceGroupName, CommandId, ScriptPath };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("Invoke-AzVMRunCommand", parm);
-
-            var outputCollection = await pwsh.RunAsync();
-
-            pwsh.ThrowOnErrors($"Error running Invoke-AzVMRunCommand for VM '{Name}' in Resource Group '{ResourceGroupName}'.");
-        }
-
         public async Task RunCommand(String Name, String ResourceGroupName, String CommandId, string ScriptPath, Hashtable Parameter)
         {
             using var pwsh = PowerShell.Create()
@@ -51,22 +34,16 @@ namespace Threax.Provision.AzPowershell
             var outputCollection = await pwsh.RunAsync();
 
             pwsh.ThrowOnErrors($"Error running Invoke-AzVMRunCommand for VM '{Name}' in Resource Group '{ResourceGroupName}'.");
-        }
 
-        public async Task RunCommandFromString(String Name, String ResourceGroupName, String CommandId, string command, String tempFileName = null)
-        {
-            if (tempFileName == null)
+            dynamic result = outputCollection.FirstOrDefault();
+
+            if (result != null)
             {
-                tempFileName = Path.GetTempFileName();
-            }
-            try
-            {
-                File.WriteAllText(tempFileName, command);
-                await RunCommand(Name, ResourceGroupName, CommandId, tempFileName);
-            }
-            finally
-            {
-                File.Delete(tempFileName);
+                foreach (dynamic value in result.Value)
+                {
+                    String message = $@"{value.DisplayStatus}\n{value.Message}";
+                    logger.LogInformation(message);
+                }
             }
         }
     }

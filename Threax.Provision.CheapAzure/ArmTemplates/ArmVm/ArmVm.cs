@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Security;
 using System.Text;
+using System.Threading.Tasks;
 using Threax.Provision.AzPowershell;
 
 namespace Threax.Provision.CheapAzure.ArmTemplates.ArmVm
@@ -39,32 +41,5 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.ArmVm
         public String adminUsername { get; set; }
 
         public SecureString adminPassword { get; set; }
-
-        public virtual String GetSetupFilePath()
-        {
-            var type = this.GetType();
-            string templateFolder = GetTemplateFolder(type);
-
-            var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location), "ArmTemplates", templateFolder, "UbuntuSetup.sh");
-            return path;
-        }
-
-        public virtual String GetThreaxDockerToolsPath()
-        {
-            var type = this.GetType();
-            string templateFolder = GetTemplateFolder(type);
-
-            var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location), "ArmTemplates", templateFolder, "ThreaxDockerTools.sh");
-            return path;
-        }
-
-        public virtual String GetWriteFileContentPath()
-        {
-            var type = this.GetType();
-            string templateFolder = GetTemplateFolder(type);
-
-            var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location), "ArmTemplates", templateFolder, "WriteFileContent.sh");
-            return path;
-        }
     }
 }

@@ -18,6 +18,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Threax.DeployConfig;
 using Threax.Azure.Abstractions;
+using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace Threax.Provision.CheapAzure.Controller.Deploy
 {
@@ -33,7 +35,8 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
         private readonly AzureKeyVaultConfig azureKeyVaultConfig;
-        private readonly IWebAppManager webAppManager;
+        private readonly IVmCommands vmCommands;
+        private readonly IConfigFileProvider configFileProvider;
 
         public DeployCompute(
             Config config,
@@ -46,7 +49,8 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             IKeyVaultAccessManager keyVaultAccessManager,
             ISqlServerFirewallRuleManager sqlServerFirewallRuleManager,
             AzureKeyVaultConfig azureKeyVaultConfig,
-            IWebAppManager webAppManager)
+            IVmCommands vmCommands,
+            IConfigFileProvider configFileProvider)
         {
             this.config = config;
             this.buildConfig = buildConfig;
@@ -58,7 +62,8 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             this.keyVaultAccessManager = keyVaultAccessManager;
             this.sqlServerFirewallRuleManager = sqlServerFirewallRuleManager;
             this.azureKeyVaultConfig = azureKeyVaultConfig;
-            this.webAppManager = webAppManager;
+            this.vmCommands = vmCommands;
+            this.configFileProvider = configFileProvider;
         }
 
         public async Task Execute(Compute resource)
@@ -75,45 +80,8 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             var branchTag = $"{image}:{buildConfig.Branch}";
             int exitCode;
 
-            //Run Init Command if present
-            if (deployConfig.InitCommand != null)
-            {
-                logger.LogInformation($"Running Init Command for '{image}' with tag '{taggedImageName}'.");
-
-                await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
-                var secrets = deployConfig.InitSecrets?.Select(i => new KeyValuePair<string, string>(i.Key.Replace(".", "__"), i.Value))?.ToList()
-                    ?? Enumerable.Empty<KeyValuePair<String, String>>();
-
-                var sb = new StringBuilder("run "); //Trailing space is important
-                foreach (var secret in secrets)
-                {
-                    sb.Append($"--env {secret.Key} "); //Trailing space is important
-                }
-                sb.Append($"{taggedImageName} {deployConfig.InitCommand}");
-                var psi = new ProcessStartInfo("docker", sb.ToString());
-
-                if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
-                {
-                    foreach (var secret in secrets)
-                    {
-                        var secretValue = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, secret.Value);
-                        psi.EnvironmentVariables.Add(secret.Key, secretValue);
-                    }
-                }
-                else
-                {
-                    logger.LogInformation($"No 'KeyVault.{nameof(AzureKeyVaultConfig.VaultName)}' property defined in config. Skipping secret load during deploy.");
-                }
-
-                exitCode = processRunner.RunProcessWithOutput(psi);
-                if (exitCode != 0)
-                {
-                    throw new InvalidOperationException("An error occured during the init command.");
-                }
-            }
-
-            //Deploy
-            logger.LogInformation($"Deploying '{image}' for branch '{buildConfig.Branch}'.");
+            //Push
+            logger.LogInformation($"Pushing '{image}' for branch '{buildConfig.Branch}'.");
 
             exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"tag {taggedImageName} {branchTag}"));
             if (exitCode != 0)
@@ -127,14 +95,21 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                 throw new InvalidOperationException("An error occured during the docker push.");
             }
 
-            if (!resource.EnableContinuousDeployment)
+            //Deploy
+            logger.LogInformation($"Deploying '{image}' for branch '{buildConfig.Branch}'.");
+            var jobj = configFileProvider.GetConfigJObject();
+
+            var deploy = jobj["Deploy"];
+            if(deploy == null)
             {
-                logger.LogInformation($"Restarting '{resource.Name}' in '{config.ResourceGroup}'.");
-
-                await webAppManager.Restart(resource.Name, config.ResourceGroup);
-
-                logger.LogInformation($"Restarted '{resource.Name}' in '{config.ResourceGroup}'.");
+                deploy = new JObject();
+                jobj["Deploy"] = deploy;
             }
+            deploy["ImageName"] = branchTag;
+
+            var fileName = Path.GetFileName(configFileProvider.GetConfigPath());
+            var configJson = jobj.ToString(Newtonsoft.Json.Formatting.Indented);
+            await vmCommands.ThreaxDockerToolsRun($"/app/{resource.Name}/{fileName}", configJson);
         }
     }
 }

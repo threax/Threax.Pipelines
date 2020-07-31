@@ -13,6 +13,7 @@ using Threax.Azure.Abstractions;
 using Threax.Provision.CheapAzure.ArmTemplates.AppInsights;
 using Threax.Provision.CheapAzure.ArmTemplates.ArmVm;
 using Threax.Provision.CheapAzure.Services;
+using System.Collections;
 
 namespace Threax.Provision.CheapAzure.Controller.CreateCommon
 {
@@ -26,6 +27,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
         private readonly ILogger<CreateCommonCompute> logger;
         private readonly ICredentialLookup credentialLookup;
         private readonly IVmManager vmManager;
+        private readonly IVmCommands vmCommands;
         private readonly Random rand = new Random();
 
         public CreateCommonCompute(
@@ -36,7 +38,8 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             IKeyVaultAccessManager keyVaultAccessManager,
             ILogger<CreateCommonCompute> logger,
             ICredentialLookup credentialLookup,
-            IVmManager vmManager)
+            IVmManager vmManager,
+            IVmCommands vmCommands)
         {
             this.config = config;
             this.acrManager = acrManager;
@@ -46,6 +49,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             this.logger = logger;
             this.credentialLookup = credentialLookup;
             this.vmManager = vmManager;
+            this.vmCommands = vmCommands;
         }
 
         public async Task Execute(Compute resource)
@@ -76,8 +80,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 
             logger.LogInformation("Running setup script on server.");
-            var setupPath = vm.GetSetupFilePath();
-            await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", setupPath);
+            await vmCommands.RunSetupScript(config.VmName, config.ResourceGroup, $"{config.AcrName}.azurecr.io", acrCreds);
 
             //Setup App Insights
             if (!String.IsNullOrEmpty(resource.AppInsightsSecretName))

@@ -27,7 +27,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly AzureKeyVaultConfig azureKeyVaultConfig;
         private readonly IAppInsightsManager appInsightsManager;
         private readonly IServicePrincipalManager servicePrincipalManager;
-        private readonly IVmManager vmManager;
+        private readonly IVmCommands vmCommands;
 
         public CreateCompute(
             Config config, 
@@ -37,7 +37,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             AzureKeyVaultConfig azureKeyVaultConfig,
             IAppInsightsManager appInsightsManager,
             IServicePrincipalManager servicePrincipalManager,
-            IVmManager vmManager)
+            IVmCommands vmCommands)
         {
             this.config = config;
             this.keyVaultManager = keyVaultManager;
@@ -46,7 +46,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             this.azureKeyVaultConfig = azureKeyVaultConfig;
             this.appInsightsManager = appInsightsManager;
             this.servicePrincipalManager = servicePrincipalManager;
-            this.vmManager = vmManager;
+            this.vmCommands = vmCommands;
         }
 
         public async Task Execute(Compute resource)
@@ -76,16 +76,9 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 logger.LogInformation("Setting app key vault connection string secret.");
                 var vaultCs = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring");
                 //Escape all chars
-                var sb = new StringBuilder(vaultCs.Length * 2);
-                foreach(var c in vaultCs)
-                {
-                    sb.Append('\\');
-                    sb.Append(c);
-                }
-                vaultCs = sb.ToString();
+                
                 var armVm = new ArmVm(config.VmName, config.ResourceGroup, "", "".ToSecureString()); //Don't actually create this, just looking up file locs
-                var writeFileContentPath = armVm.GetWriteFileContentPath();
-                await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", writeFileContentPath, new Hashtable { { "file", $"/app/{resource.Name}/secrets/serviceprincipal-cs" }, { "content", vaultCs } });
+                await vmCommands.WriteFileContent($"/app/{resource.Name}/secrets/serviceprincipal-cs", vaultCs);
             }
 
             //Setup App Insights

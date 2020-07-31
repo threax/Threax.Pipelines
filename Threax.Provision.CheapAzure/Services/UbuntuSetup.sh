@@ -18,6 +18,9 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io -y
 # Setup Network
 sudo docker network create -d bridge appnet
 
+# Login to ACR
+sudo docker login -u $acrUser -p $acrPass $acrHost
+
 # Setup Threax.DockerTools
 curl -L https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerBuild_1.0.0-pre03/Threax.DockerTools > ~/Threax.DockerTools && \
 sudo mv ~/Threax.DockerTools /bin/Threax.DockerTools && \
