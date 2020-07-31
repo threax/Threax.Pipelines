@@ -27,53 +27,32 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
     {
         private readonly Config config;
         private readonly BuildConfig buildConfig;
-        private readonly DeploymentConfig deployConfig;
         private readonly ILogger<DeployCompute> logger;
-        private readonly IKeyVaultManager keyVaultManager;
         private readonly IImageManager imageManager;
         private readonly IProcessRunner processRunner;
-        private readonly IKeyVaultAccessManager keyVaultAccessManager;
-        private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
-        private readonly AzureKeyVaultConfig azureKeyVaultConfig;
         private readonly IVmCommands vmCommands;
         private readonly IConfigFileProvider configFileProvider;
 
         public DeployCompute(
             Config config,
             BuildConfig buildConfig,
-            DeploymentConfig deployConfig,
             ILogger<DeployCompute> logger,
-            IKeyVaultManager keyVaultManager,
             IImageManager imageManager,
             IProcessRunner processRunner,
-            IKeyVaultAccessManager keyVaultAccessManager,
-            ISqlServerFirewallRuleManager sqlServerFirewallRuleManager,
-            AzureKeyVaultConfig azureKeyVaultConfig,
             IVmCommands vmCommands,
             IConfigFileProvider configFileProvider)
         {
             this.config = config;
             this.buildConfig = buildConfig;
-            this.deployConfig = deployConfig;
             this.logger = logger;
-            this.keyVaultManager = keyVaultManager;
             this.imageManager = imageManager;
             this.processRunner = processRunner;
-            this.keyVaultAccessManager = keyVaultAccessManager;
-            this.sqlServerFirewallRuleManager = sqlServerFirewallRuleManager;
-            this.azureKeyVaultConfig = azureKeyVaultConfig;
             this.vmCommands = vmCommands;
             this.configFileProvider = configFileProvider;
         }
 
         public async Task Execute(Compute resource)
         {
-            if (!String.IsNullOrEmpty(azureKeyVaultConfig.VaultName))
-            {
-                logger.LogInformation($"Unlocking '{azureKeyVaultConfig.VaultName}' for user id '{config.UserId}'.");
-                await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
-            }
-
             if (String.IsNullOrEmpty(resource.Name))
             {
                 throw new InvalidOperationException("You must include a resource 'Name' property to deploy compute.");
