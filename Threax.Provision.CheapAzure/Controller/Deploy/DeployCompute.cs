@@ -74,6 +74,11 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                 await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
             }
 
+            if (String.IsNullOrEmpty(resource.Name))
+            {
+                throw new InvalidOperationException("You must include a resource 'Name' property to deploy compute.");
+            }
+
             var image = buildConfig.ImageName;
             var currentTag = buildConfig.GetCurrentTag();
             var taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
