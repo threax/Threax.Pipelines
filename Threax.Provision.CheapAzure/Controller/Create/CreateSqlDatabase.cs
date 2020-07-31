@@ -46,6 +46,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             //You would want to have separate dbs in a larger setup.
             await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
             await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
+            await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
 
             var saCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.SqlSaBaseKey, FixPass, FixUser);
             var saConnectionString = sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, saCreds.User, saCreds.Pass);

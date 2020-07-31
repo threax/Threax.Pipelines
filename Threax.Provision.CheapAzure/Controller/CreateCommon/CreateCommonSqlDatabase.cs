@@ -18,7 +18,6 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
         private readonly Config config;
         private readonly ICredentialLookup credentialLookup;
         private readonly IArmTemplateManager armTemplateManager;
-        private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly ILogger<CreateCommonSqlDatabase> logger;
         private readonly Random rand = new Random();
@@ -27,14 +26,12 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             Config config, 
             ICredentialLookup credentialLookup,
             IArmTemplateManager armTemplateManager,
-            ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, 
             IKeyVaultAccessManager keyVaultAccessManager,
             ILogger<CreateCommonSqlDatabase> logger)
         {
             this.config = config;
             this.credentialLookup = credentialLookup;
             this.armTemplateManager = armTemplateManager;
-            this.sqlServerFirewallRuleManager = sqlServerFirewallRuleManager;
             this.keyVaultAccessManager = keyVaultAccessManager;
             this.logger = logger;
         }
@@ -51,7 +48,6 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             //Setup logical server
             logger.LogInformation($"Setting up SQL Logical Server '{config.SqlServerName}' in Resource Group '{config.ResourceGroup}'.");
             await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlServer(config.SqlServerName, saCreds.User, saCreds.Pass.ToSecureString()));
-            await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
 
             //Setup shared sql db
             logger.LogInformation($"Setting up Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");

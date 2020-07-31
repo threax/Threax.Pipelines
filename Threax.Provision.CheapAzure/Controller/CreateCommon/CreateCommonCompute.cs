@@ -83,13 +83,10 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             await vmCommands.RunSetupScript(config.VmName, config.ResourceGroup, $"{config.AcrName}.azurecr.io", acrCreds);
 
             //Setup App Insights
-            if (!String.IsNullOrEmpty(resource.AppInsightsSecretName))
-            {
-                logger.LogInformation($"Creating App Insights '{config.AppInsightsName}' in Resource Group '{config.ResourceGroup}'");
+            logger.LogInformation($"Creating App Insights '{config.AppInsightsName}' in Resource Group '{config.ResourceGroup}'");
 
-                var armAppInsights = new ArmAppInsights(config.AppInsightsName, config.Location);
-                await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, armAppInsights);
-            }
+            var armAppInsights = new ArmAppInsights(config.AppInsightsName, config.Location);
+            await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, armAppInsights);
         }
 
         private String FixPass(String input)
