@@ -36,6 +36,40 @@ namespace Threax.Provision.AzPowershell
             return outputCollection.Any();
         }
 
+        public async Task Remove(String DisplayName)
+        {
+            using var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger);
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddScript("Import-Module Az.Resources");
+            var parm = new { DisplayName };
+            pwsh.AddParamLine(parm);
+            pwsh.AddCommandWithParams("Remove-AzADServicePrincipal -Force", parm);
+
+            var outputCollection = await pwsh.RunAsync();
+
+            pwsh.ThrowOnErrors($"Error getting service principal '{DisplayName}'.");
+        }
+
+        public async Task RemoveApplication(String DisplayName)
+        {
+            using var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger);
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddScript("Import-Module Az.Resources");
+            var parm = new { DisplayName };
+            pwsh.AddParamLine(parm);
+            pwsh.AddCommandWithParams("Remove-AzADApplication -Force", parm);
+
+            var outputCollection = await pwsh.RunAsync();
+
+            pwsh.ThrowOnErrors($"Error getting service principal '{DisplayName}'.");
+        }
+
         public async Task<ServicePrincipal> CreateServicePrincipal(String displayName, String subscription, String resourceGroup, String role = "Reader")
         {
             using var pwsh = PowerShell.Create()
