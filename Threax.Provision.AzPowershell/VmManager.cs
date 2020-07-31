@@ -36,7 +36,7 @@ namespace Threax.Provision.AzPowershell
             pwsh.ThrowOnErrors($"Error running Invoke-AzVMRunCommand for VM '{Name}' in Resource Group '{ResourceGroupName}'.");
         }
 
-        public async Task RunCommand(String Name, String ResourceGroupName, String CommandId, string ScriptPath, Hashtable Parameters)
+        public async Task RunCommand(String Name, String ResourceGroupName, String CommandId, string ScriptPath, Hashtable Parameter)
         {
             using var pwsh = PowerShell.Create()
                 .PrintInformationStream(logger)
@@ -44,7 +44,7 @@ namespace Threax.Provision.AzPowershell
 
             pwsh.SetUnrestrictedExecution();
             pwsh.AddScript("Import-Module Az.ContainerRegistry");
-            var parm = new { Name, ResourceGroupName, CommandId, ScriptPath, Parameters };
+            var parm = new { Name, ResourceGroupName, CommandId, ScriptPath, Parameter };
             pwsh.AddParamLine(parm);
             pwsh.AddCommandWithParams("Invoke-AzVMRunCommand", parm);
 
