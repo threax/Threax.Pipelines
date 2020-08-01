@@ -44,5 +44,14 @@ namespace Threax.Provision.CheapAzure.Services
         /// <param name="secrets"></param>
         /// <returns></returns>
         Task SetSecrets(String vmName, String resourceGroup, String settingsFile, String settingsContent, IEnumerable<SetSecretModel> secrets);
+
+        /// <summary>
+        /// Run an exec command with the docker tools.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="command"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        Task ThreaxDockerToolsExec(String file, String command, params String[] args);
     }
 }

@@ -38,6 +38,27 @@ namespace Threax.Provision.CheapAzure.Services
             await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", scriptPath, new Hashtable { { "file", file }, { "content", Escape(content) } });
         }
 
+        public async Task ThreaxDockerToolsExec(String file, String command, params String[] args)
+        {
+            var scriptPath = Path.Combine(GetBasePath(), "ThreaxDockerToolsExec.sh");
+            var hashTable = new Hashtable {
+                { "file", file },
+                { "command", command }
+            };
+
+            if(args.Length > 4)
+            {
+                throw new InvalidOperationException("Only up to 5 additional arguments are supported for exec calls.");
+            }
+
+            for (var i = 0; i < args.Length; ++i)
+            {
+                hashTable[$"arg{i}"] = args[i];
+            }
+
+            await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", scriptPath, hashTable);
+        }
+
         public async Task RunSetupScript(String vmName, String resourceGroup, String acrHost, AcrCredential acrCreds)
         {
             var scriptPath = Path.Combine(GetBasePath(), "UbuntuSetup.sh");
