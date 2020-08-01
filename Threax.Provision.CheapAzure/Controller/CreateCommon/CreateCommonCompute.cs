@@ -70,13 +70,21 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
             var vmCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.VmAdminBaseKey, FixPass, FixUser);
 
+            var publicKeyName = $"{config.VmAdminBaseKey}-ssh-public-key";
+            var publicKey = await keyVaultManager.GetSecret(config.InfraKeyVaultName, publicKeyName);
+            if(publicKey == null)
+            {
+                var privateKeyName = $"{config.VmAdminBaseKey}-ssh-private-key";
+                throw new InvalidOperationException($"You must create a key pair with \"ssh-keygen -t rsa -b 2048 -f newazurevm\" and save it as '{publicKeyName}' and '{privateKeyName}' in the '{config.InfraKeyVaultName}' key vault. Then run this program again. There is no automation for this step at this time.");
+            }
+
             if (String.IsNullOrEmpty(config.VmName))
             {
                 throw new InvalidOperationException($"You must supply a '{nameof(Config.VmName)}' property in your config file.");
             }
 
             logger.LogInformation($"Creating virtual machine '{config.VmName}'.");
-            var vm = new ArmVm(config.VmName, config.ResourceGroup, vmCreds.User, vmCreds.Pass.ToSecureString());
+            var vm = new ArmVm(config.VmName, config.ResourceGroup, vmCreds.User, publicKey);
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 
             logger.LogInformation("Running setup script on server.");

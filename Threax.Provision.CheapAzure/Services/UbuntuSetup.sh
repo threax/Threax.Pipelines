@@ -5,6 +5,7 @@
 # Setup Firewall
 sudo ufw allow http
 sudo ufw allow https
+sudo ufw allow 22
 sudo ufw --force enable
 
 # Setup Docker

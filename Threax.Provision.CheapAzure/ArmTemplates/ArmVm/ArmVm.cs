@@ -11,7 +11,7 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.ArmVm
 {
     class ArmVm : ArmTemplate
     {
-        public ArmVm(String baseName, String resourceGroup, String adminUsername, SecureString adminPassword)
+        public ArmVm(String baseName, String resourceGroup, String adminUsername, String adminPublicKey)
         {
             this.networkInterfaceName = $"{baseName}-ni";
             this.networkSecurityGroupName = $"{baseName}-nsg";
@@ -21,7 +21,7 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.ArmVm
             this.virtualMachineComputerName = baseName;
             this.virtualMachineRG = resourceGroup;
             this.adminUsername = adminUsername;
-            this.adminPassword = adminPassword;
+            this.adminPublicKey = adminPublicKey;
         }
 
         public String networkInterfaceName { get; set; }
@@ -40,6 +40,6 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.ArmVm
 
         public String adminUsername { get; set; }
 
-        public SecureString adminPassword { get; set; }
+        public String adminPublicKey { get; set; }
     }
 }
