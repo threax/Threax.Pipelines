@@ -17,8 +17,14 @@ namespace Threax.DockerTools
         {
             var jsonConfigPath = args.Length > 1 ? args[1] : "unknown.json";
 
+            string command = null;
+            if (args.Length > 0)
+            {
+                command = args[0];
+            }
+
             return AppHost
-            .Setup(services =>
+            .Setup<IController, HelpController>(command, services =>
             {
                 services.AddSingleton<IArgsProvider>(s => new ArgsProvider(args));
 
@@ -53,25 +59,12 @@ namespace Threax.DockerTools
                     return deployConfig;
                 });
 
-                var controllerType = typeof(HelpController);
-                //Determine which controller to use.
-                if (args.Length > 0)
-                {
-                    var command = args[0];
-                    controllerType = ControllerFinder.GetControllerType(command);
-                }
-                services.AddScoped(typeof(IController), controllerType);
-
                 services.AddLogging(o =>
                 {
                     o.AddConsole();
                 });
             })
-            .Run(async scope =>
-            {
-                var controller = scope.ServiceProvider.GetRequiredService<IController>();
-                await controller.Run();
-            });
+            .Run(c => c.Run());
         }
     }
 }

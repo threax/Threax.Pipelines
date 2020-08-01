@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using Threax.DockerTools;
-using Threax.DockerTools.Controller;
 
-namespace Threax.DockerTools
+namespace Threax.ConsoleApp
 {
-    static class ControllerFinder
+    public class ControllerFinder<IControllerType, CommandNotFoundType>
     {
-        public static Type GetControllerType(String name)
+        public Type GetControllerType(String name)
         {
             return GetControllerType(name, Assembly.GetEntryAssembly());
         }
@@ -19,9 +16,8 @@ namespace Threax.DockerTools
         /// </summary>
         /// <param name="assembly">The assembly to scan.</param>
         /// <returns>An enumerable over the matching controller types.</returns>
-        public static Type GetControllerType(String name, Assembly assembly)
+        public Type GetControllerType(String name, Assembly assembly)
         {
-            var iContollerType = typeof(IController);
             foreach (var type in GetControllerTypes(assembly))
             {
                 if (type.Name.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
@@ -30,7 +26,7 @@ namespace Threax.DockerTools
                 }
             }
 
-            return typeof(CommandNotFoundController);
+            return typeof(CommandNotFoundType);
         }
 
         /// <summary>
@@ -38,10 +34,10 @@ namespace Threax.DockerTools
         /// </summary>
         /// <param name="assembly">The assembly to scan.</param>
         /// <returns>An enumerable over the matching controller types.</returns>
-        private static IEnumerable<Type> GetControllerTypes(Assembly assembly)
+        private IEnumerable<Type> GetControllerTypes(Assembly assembly)
         {
-            var iContollerType = typeof(IController);
-            foreach(var type in assembly.GetTypes())
+            var iContollerType = typeof(IControllerType);
+            foreach (var type in assembly.GetTypes())
             {
                 if (iContollerType.IsAssignableFrom(type) && type != iContollerType)
                 {
