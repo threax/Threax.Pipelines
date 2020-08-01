@@ -59,7 +59,7 @@ namespace Threax.Provision.CheapAzure.Services
             var publicKey = await keyVaultManager.GetSecret(config.InfraKeyVaultName, publicKeyName);
             if (publicKey == null)
             {
-                throw new InvalidOperationException($"You must create a key pair with \"ssh-keygen -t rsa -b 2048 -f newazurevm\" and save it as '{publicKeyName}' and '{PrivateKeySecretName}' in the '{config.InfraKeyVaultName}' key vault. Then run this program again. There is no automation for this step at this time.");
+                throw new InvalidOperationException($"You must create a key pair with \"ssh-keygen -t rsa -b 2048 -f newazurevm\" and save it as '{publicKeyName}' and '{PrivateKeySecretName}' in the '{config.InfraKeyVaultName}' key vault. Also replace all the newlines with '**lf**'. This is needed to preserve them when they are reloaded. Then run this program again. There is no automation for this step at this time.");
             }
 
             return publicKey;
