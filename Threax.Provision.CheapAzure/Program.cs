@@ -33,6 +33,7 @@ namespace Threax.Provision.CheapAzure
             .Setup(services =>
             {
                 services.AddSingleton<Config>(config);
+                services.AddSingleton<IArgsProvider>(s => new ArgsProvider(args));
 
                 var assembly = Assembly.GetEntryAssembly();
                 var controllerNs = $"{typeof(Program).Namespace}.Controller.{command}";

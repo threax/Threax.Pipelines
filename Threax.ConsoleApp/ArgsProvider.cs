@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Threax.DockerTools
+namespace Threax.ConsoleApp
 {
     public class ArgsProvider : IArgsProvider
     {

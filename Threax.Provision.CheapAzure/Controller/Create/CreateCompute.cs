@@ -83,9 +83,6 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 //Setup App Connection String Secret
                 logger.LogInformation("Setting app key vault connection string secret.");
                 var vaultCs = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring");
-                //Escape all chars
-
-                var armVm = new ArmVm(config.VmName, config.ResourceGroup, "", "".ToSecureString()); //Don't actually create this, just looking up file locs
                 await vmCommands.WriteFileContent($"/app/{resource.Name}/secrets/serviceprincipal-cs", vaultCs);
             }
 

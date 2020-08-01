@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Threax.Provision.AzPowershell;
+using Threax.Provision.CheapAzure.Model;
 
 namespace Threax.Provision.CheapAzure.Services
 {
@@ -31,5 +33,7 @@ namespace Threax.Provision.CheapAzure.Services
         /// <param name="acrCreds"></param>
         /// <returns></returns>
         Task RunSetupScript(String vmName, String resourceGroup, String acrHost, AcrCredential acrCreds);
+
+        Task SetSecrets(String vmName, String resourceGroup, String settingsFile, String settingsContent, IEnumerable<SetSecretModel> secrets);
     }
 }

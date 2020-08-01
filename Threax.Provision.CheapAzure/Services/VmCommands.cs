@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Threax.DeployConfig;
 using Threax.Provision.AzPowershell;
+using Threax.Provision.CheapAzure.Model;
 
 namespace Threax.Provision.CheapAzure.Services
 {
@@ -40,6 +42,35 @@ namespace Threax.Provision.CheapAzure.Services
         {
             var scriptPath = Path.Combine(GetBasePath(), "UbuntuSetup.sh");
             await vmManager.RunCommand(vmName, resourceGroup, "RunShellScript", scriptPath, new Hashtable { { "acrHost", Escape(acrHost) }, { "acrUser", Escape(acrCreds.Username) }, { "acrPass", Escape(acrCreds.Password) } });
+        }
+
+        public async Task SetSecrets(String vmName, String resourceGroup, String settingsFile, String settingsContent, IEnumerable<SetSecretModel> secrets)
+        {
+            var scriptPath = Path.Combine(GetBasePath(), "SetSecrets.sh");
+            var hashTable = new Hashtable { { "settingsFile", Escape(settingsFile) }, { "settingsContent", Escape(settingsContent) } };
+
+            int i = 0;
+            foreach(var s in secrets)
+            {
+                if(i > 4)
+                {
+                    //Can only send 5 secrets at a time, send what we have so far, ideally this won't happen the RunCommand is very slow
+                    await vmManager.RunCommand(vmName, resourceGroup, "RunShellScript", scriptPath, hashTable);
+
+                    //Reset the hash table and counter
+                    hashTable = new Hashtable { { "settingsFile", Escape(settingsFile) }, { "settingsContent", Escape(settingsContent) } };
+                    i = 0;
+                }
+
+                hashTable[$"file{i}"] = s.File;
+                hashTable[$"name{i}"] = Escape(s.Name);
+                hashTable[$"content{i}"] = Escape(s.Content);
+
+                ++i;
+            }
+
+            //Send anything not sent above
+            await vmManager.RunCommand(vmName, resourceGroup, "RunShellScript", scriptPath, hashTable);
         }
 
         private static string Escape(string content)

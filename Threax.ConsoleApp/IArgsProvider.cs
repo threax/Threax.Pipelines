@@ -1,4 +1,4 @@
-﻿namespace Threax.DockerTools
+﻿namespace Threax.ConsoleApp
 {
     public interface IArgsProvider
     {
