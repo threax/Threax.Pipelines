@@ -82,11 +82,6 @@ namespace Threax.Provision.CheapAzure
         public string VmAdminBaseKey { get; set; } = "vm-admin";
 
         /// <summary>
-        /// The thumbprint of the ssl certificate to use.
-        /// </summary>
-        public string SslCertThumb { get; set; }
-
-        /// <summary>
         /// The guid of the Azure Devops user to set permissions for.
         /// </summary>
         public Guid? AzDoUser { get; set; }
