@@ -18,7 +18,6 @@ using System.Text;
 using System.IO;
 using Threax.Pipelines.Core;
 using System.Collections.Generic;
-using Threax.Provision.CheapAzure.Model;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -92,19 +91,9 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 var vaultCs = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring");
 
                 var fileName = Path.GetFileName(configFileProvider.GetConfigPath());
-                var configFilePath = $"/app/{resource.Name}/{fileName}";
-                var configContents = configFileProvider.GetConfigText();
-                var secrets = new List<SetSecretModel>()
-                {
-                    new SetSecretModel()
-                    {
-                        Content = vaultCs,
-                        File = $"/app/{resource.Name}/temp/serviceprincipal-cs",
-                        Name = "serviceprincipal-cs"
-                    }
-                };
+                var serverConfigFilePath = $"/app/{resource.Name}/{fileName}";
 
-                await vmCommands.SetSecrets(config.VmName, config.ResourceGroup, configFilePath, configContents, secrets);
+                await vmCommands.SetSecretFromString(config.VmName, config.ResourceGroup, configFileProvider.GetConfigPath(), serverConfigFilePath, "serviceprincipal-cs", vaultCs);
             }
 
             //Setup App Insights

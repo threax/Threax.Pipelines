@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Threax.DeployConfig;
 using Threax.Provision.AzPowershell;
-using Threax.Provision.CheapAzure.Model;
 
 namespace Threax.Provision.CheapAzure.Services
 {
@@ -14,11 +13,13 @@ namespace Threax.Provision.CheapAzure.Services
     {
         private readonly Config config;
         private readonly IVmManager vmManager;
+        private readonly ISshCredsManager sshCredsManager;
 
-        public VmCommands(Config config, IVmManager vmManager)
+        public VmCommands(Config config, IVmManager vmManager, ISshCredsManager sshCredsManager)
         {
             this.config = config;
             this.vmManager = vmManager;
+            this.sshCredsManager = sshCredsManager;
         }
 
         private String GetBasePath()
@@ -65,33 +66,47 @@ namespace Threax.Provision.CheapAzure.Services
             await vmManager.RunCommand(vmName, resourceGroup, "RunShellScript", scriptPath, new Hashtable { { "acrHost", Escape(acrHost) }, { "acrUser", Escape(acrCreds.Username) }, { "acrPass", Escape(acrCreds.Password) } });
         }
 
-        public async Task SetSecrets(String vmName, String resourceGroup, String settingsFile, String settingsContent, IEnumerable<SetSecretModel> secrets)
+        public async Task SetSecretFromString(String vmName, String resourceGroup, String settingsFile, String settingsDest, String name, String content)
         {
-            var scriptPath = Path.Combine(GetBasePath(), "SetSecrets.sh");
-            var hashTable = new Hashtable { { "settingsFile", Escape(settingsFile) }, { "settingsContent", Escape(settingsContent) } };
-
-            int i = 0;
-            foreach(var s in secrets)
+            var tempFile = Path.GetTempFileName();
+            try
             {
-                if(i > 4)
-                {
-                    //Can only send 5 secrets at a time, send what we have so far, ideally this won't happen the RunCommand is very slow
-                    await vmManager.RunCommand(vmName, resourceGroup, "RunShellScript", scriptPath, hashTable);
-
-                    //Reset the hash table and counter
-                    hashTable = new Hashtable { { "settingsFile", Escape(settingsFile) }, { "settingsContent", Escape(settingsContent) } };
-                    i = 0;
-                }
-
-                hashTable[$"file{i}"] = s.File;
-                hashTable[$"name{i}"] = Escape(s.Name);
-                hashTable[$"content{i}"] = Escape(s.Content);
-
-                ++i;
+                File.WriteAllText(tempFile, content);
+                await SetSecretFromFile(vmName, resourceGroup, settingsFile, settingsDest, name, tempFile);
             }
+            finally
+            {
+                //Any exceptions here are intentionally left to bubble up
+                if (File.Exists(tempFile))
+                {
+                    File.Delete(tempFile);
+                }
+            }
+        }
 
-            //Send anything not sent above
-            await vmManager.RunCommand(vmName, resourceGroup, "RunShellScript", scriptPath, hashTable);
+        public async Task SetSecretFromFile(String vmName, String resourceGroup, String settingsFile, String settingsDest, String name, String source)
+        {
+            var tempPath = $"~/{Path.GetFileName(Path.GetRandomFileName())}";
+            try
+            {
+                //Copy settings file
+                var settingsFolder = Path.GetDirectoryName(settingsDest).Replace('\\', '/');
+                await sshCredsManager.RunSshCommand($"sudo mkdir \"{settingsFolder}\"");
+                await sshCredsManager.CopySshFile(settingsFile, tempPath);
+                await sshCredsManager.RunSshCommand($"sudo mv \"{tempPath}\" \"{settingsDest}\"");
+
+                //Copy Secret
+                await sshCredsManager.CopySshFile(source, tempPath);
+                var exitCode = await sshCredsManager.RunSshCommand($"sudo Threax.DockerTools SetSecret \"{settingsDest}\" \"{name}\" \"{tempPath}\"");
+                if (exitCode != 0)
+                {
+                    throw new InvalidOperationException("Error setting secret.");
+                }
+            }
+            finally
+            {
+                await sshCredsManager.RunSshCommand($"sudo rm {tempPath}");
+            }
         }
 
         private static string Escape(string content)

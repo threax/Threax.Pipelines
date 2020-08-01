@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Threax.ConsoleApp;
 using Threax.DockerBuildConfig;
 using Threax.Pipelines.Core;
-using Threax.Provision.CheapAzure.Model;
 using Threax.Provision.CheapAzure.Resources;
 using Threax.Provision.CheapAzure.Services;
 
@@ -41,26 +40,18 @@ namespace Threax.Provision.CheapAzure.Controller.SetSecret
         public async Task Execute(Compute resource)
         {
             var args = argsProvider.Args.Skip(3).ToList();
-            var secrets = new List<SetSecretModel>();
-
-            for(var i = 0; i + 1 < args.Count; i += 2)
+            if(args.Count < 2)
             {
-                var name = args[i];
-                var file = args[i + 1];
-
-                secrets.Add(new SetSecretModel()
-                {
-                    File = $"/app/{resource.Name}/temp/{name}",
-                    Name = name,
-                    Content = File.ReadAllText(file)
-                });
+                throw new InvalidOperationException("You must provide a name and source file to set a secret.");
             }
+
+            var name = args[0];
+            var source = args[1];
 
             var fileName = Path.GetFileName(configFileProvider.GetConfigPath());
             var configFilePath = $"/app/{resource.Name}/{fileName}";
-            var configContents = configFileProvider.GetConfigText();
 
-            await vmCommands.SetSecrets(config.VmName, config.ResourceGroup, configFilePath, configContents, secrets);
+            await vmCommands.SetSecretFromFile(config.VmName, config.ResourceGroup, configFileProvider.GetConfigPath(), configFilePath, name, source);
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Threax.Provision.AzPowershell;
-using Threax.Provision.CheapAzure.Model;
 
 namespace Threax.Provision.CheapAzure.Services
 {
@@ -35,7 +34,7 @@ namespace Threax.Provision.CheapAzure.Services
         Task RunSetupScript(String vmName, String resourceGroup, String acrHost, AcrCredential acrCreds);
 
         /// <summary>
-        /// Set multiple secrets on the server. These are batched up to try to overcome the built in delays of doing this.
+        /// Set a secret from string content in memory.
         /// </summary>
         /// <param name="vmName"></param>
         /// <param name="resourceGroup"></param>
@@ -43,7 +42,19 @@ namespace Threax.Provision.CheapAzure.Services
         /// <param name="settingsContent"></param>
         /// <param name="secrets"></param>
         /// <returns></returns>
-        Task SetSecrets(String vmName, String resourceGroup, String settingsFile, String settingsContent, IEnumerable<SetSecretModel> secrets);
+        Task SetSecretFromString(String vmName, String resourceGroup, String settingsFile, String settingsDest, String name, String content);
+
+        /// <summary>
+        /// Set a secret from an existing file.
+        /// </summary>
+        /// <param name="vmName"></param>
+        /// <param name="resourceGroup"></param>
+        /// <param name="settingsFile"></param>
+        /// <param name="settingsDest"></param>
+        /// <param name="name"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        Task SetSecretFromFile(String vmName, String resourceGroup, String settingsFile, String settingsDest, String name, String source);
 
         /// <summary>
         /// Run an exec command with the docker tools.

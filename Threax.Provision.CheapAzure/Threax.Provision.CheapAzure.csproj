@@ -40,9 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Services\SetSecrets.sh">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Services\ThreaxDockerToolsExec.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

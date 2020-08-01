@@ -8,9 +8,8 @@ namespace Threax.Provision.CheapAzure.Services
         string PublicKeySecretName { get; }
 
         Task CopySshFile(string file, string dest);
-        Task CopySshStringToFile(string content, string dest);
         void Dispose();
         Task<string> LoadPublicKey();
-        Task RunSshCommand(string command, int safeExitCode = 0);
+        Task<int> RunSshCommand(string command);
     }
 }
