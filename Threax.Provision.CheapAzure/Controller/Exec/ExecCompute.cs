@@ -22,7 +22,7 @@ using System.IO;
 using Newtonsoft.Json.Linq;
 using Threax.ConsoleApp;
 
-namespace Threax.Provision.CheapAzure.Controller.Deploy
+namespace Threax.Provision.CheapAzure.Controller.Exec
 {
     class ExecCompute : IResourceProcessor<Compute>
     {

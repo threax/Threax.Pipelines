@@ -41,23 +41,12 @@ namespace Threax.Provision.CheapAzure.Services
 
         public async Task ThreaxDockerToolsExec(String file, String command, params String[] args)
         {
-            var scriptPath = Path.Combine(GetBasePath(), "ThreaxDockerToolsExec.sh");
-            var hashTable = new Hashtable {
-                { "file", file },
-                { "command", command }
-            };
-
-            if(args.Length > 4)
+            var expanded = args.Length > 0 ? $"\"{String.Join("\", \"", args)}\"" : null;
+            var exitCode = await sshCredsManager.RunSshCommand($"sudo Threax.DockerTools \"exec\" \"{file}\" \"{command}\" {expanded}");
+            if (exitCode != 0)
             {
-                throw new InvalidOperationException("Only up to 5 additional arguments are supported for exec calls.");
+                throw new InvalidOperationException("Error running exec.");
             }
-
-            for (var i = 0; i < args.Length; ++i)
-            {
-                hashTable[$"arg{i}"] = args[i];
-            }
-
-            await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", scriptPath, hashTable);
         }
 
         public async Task RunSetupScript(String vmName, String resourceGroup, String acrHost, AcrCredential acrCreds)
