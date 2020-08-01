@@ -20,7 +20,6 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
         private readonly IArmTemplateManager armTemplateManager;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly ILogger<CreateCommonSqlDatabase> logger;
-        private readonly Random rand = new Random();
 
         public CreateCommonSqlDatabase(
             Config config, 
@@ -43,7 +42,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             //You would want to have separate dbs in a larger setup.
             await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
 
-            var saCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.SqlSaBaseKey, FixPass, FixUser);
+            var saCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.SqlSaBaseKey);
 
             //Setup logical server
             logger.LogInformation($"Setting up SQL Logical Server '{config.SqlServerName}' in Resource Group '{config.ResourceGroup}'.");
@@ -52,22 +51,6 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             //Setup shared sql db
             logger.LogInformation($"Setting up Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");
             await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlDb(config.SqlServerName, config.SqlDbName));
-        }
-
-        private String FixPass(String input)
-        {
-            return $"{input}!2Ab";
-        }
-
-        private String FixUser(String input)
-        {
-            var output = input.Replace('+', RandomLetter()).Replace('/', RandomLetter()).Replace('=', RandomLetter());
-            return RandomLetter() + output; //Ensure first character is a letter
-        }
-
-        private char RandomLetter()
-        {
-            return (char)rand.Next(97, 123);
         }
     }
 }

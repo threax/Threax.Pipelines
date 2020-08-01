@@ -91,5 +91,10 @@ namespace Threax.Provision.CheapAzure
         /// will be made and the current user must have permissions set from somewhere else. Default: true
         /// </summary>
         public bool UnlockCurrentUserInKeyVaults { get; set; } = true;
+
+        /// <summary>
+        /// The ssh host address of the vm.
+        /// </summary>
+        public String VmSshHost { get; set; }
     }
 }

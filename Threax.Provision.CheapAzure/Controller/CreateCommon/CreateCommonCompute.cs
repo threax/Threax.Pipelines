@@ -28,7 +28,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
         private readonly ICredentialLookup credentialLookup;
         private readonly IVmManager vmManager;
         private readonly IVmCommands vmCommands;
-        private readonly Random rand = new Random();
+        private readonly ISshCredsManager sshCredsManager;
 
         public CreateCommonCompute(
             Config config,
@@ -39,7 +39,8 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             ILogger<CreateCommonCompute> logger,
             ICredentialLookup credentialLookup,
             IVmManager vmManager,
-            IVmCommands vmCommands)
+            IVmCommands vmCommands,
+            ISshCredsManager sshCredsManager)
         {
             this.config = config;
             this.acrManager = acrManager;
@@ -50,6 +51,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             this.credentialLookup = credentialLookup;
             this.vmManager = vmManager;
             this.vmCommands = vmCommands;
+            this.sshCredsManager = sshCredsManager;
         }
 
         public async Task Execute(Compute resource)
@@ -68,15 +70,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
 
             //Setup Vm
             await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
-            var vmCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.VmAdminBaseKey, FixPass, FixUser);
-
-            var publicKeyName = $"{config.VmAdminBaseKey}-ssh-public-key";
-            var publicKey = await keyVaultManager.GetSecret(config.InfraKeyVaultName, publicKeyName);
-            if(publicKey == null)
-            {
-                var privateKeyName = $"{config.VmAdminBaseKey}-ssh-private-key";
-                throw new InvalidOperationException($"You must create a key pair with \"ssh-keygen -t rsa -b 2048 -f newazurevm\" and save it as '{publicKeyName}' and '{privateKeyName}' in the '{config.InfraKeyVaultName}' key vault. Then run this program again. There is no automation for this step at this time.");
-            }
+            var vmCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.VmAdminBaseKey);
 
             if (String.IsNullOrEmpty(config.VmName))
             {
@@ -84,6 +78,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             }
 
             logger.LogInformation($"Creating virtual machine '{config.VmName}'.");
+            var publicKey = await sshCredsManager.LoadPublicKey();
             var vm = new ArmVm(config.VmName, config.ResourceGroup, vmCreds.User, publicKey);
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 
@@ -95,22 +90,6 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
 
             var armAppInsights = new ArmAppInsights(config.AppInsightsName, config.Location);
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, armAppInsights);
-        }
-
-        private String FixPass(String input)
-        {
-            return $"{input}!2Ab";
-        }
-
-        private String FixUser(String input)
-        {
-            var output = input.Replace('+', RandomLetter()).Replace('/', RandomLetter()).Replace('=', RandomLetter());
-            return RandomLetter() + output; //Ensure first character is a letter
-        }
-
-        private char RandomLetter()
-        {
-            return (char)rand.Next(97, 123);
         }
     }
 }

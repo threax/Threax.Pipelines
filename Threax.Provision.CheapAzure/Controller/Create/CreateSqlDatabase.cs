@@ -48,14 +48,14 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
             await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
 
-            var saCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.SqlSaBaseKey, FixPass, FixUser);
+            var saCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.SqlSaBaseKey);
             var saConnectionString = sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, saCreds.User, saCreds.Pass);
 
             //Setup user in new db
             logger.LogInformation($"Setting up users for {resource.Name} in Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");
             var dbContext = new ProvisionDbContext(saConnectionString);
-            var readWriteCreds = await credentialLookup.GetOrCreateCredentials(azureKeyVaultConfig.VaultName, readerKeyBase, FixPass, FixUser);
-            var ownerCreds = await credentialLookup.GetOrCreateCredentials(azureKeyVaultConfig.VaultName, ownerKeyBase, FixPass, FixUser);
+            var readWriteCreds = await credentialLookup.GetOrCreateCredentials(azureKeyVaultConfig.VaultName, readerKeyBase);
+            var ownerCreds = await credentialLookup.GetOrCreateCredentials(azureKeyVaultConfig.VaultName, ownerKeyBase);
             int result;
             //This isn't great, but just ignore this exception for now. If the user isn't created the lines below will fail.
             try
@@ -90,22 +90,6 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                     await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, resource.OwnerConnectionStringName, ownerConnectionString);
                 }
             }
-        }
-
-        private String FixPass(String input)
-        {
-            return $"{input}!2Ab";
-        }
-
-        private String FixUser(String input)
-        {
-            var output = input.Replace('+', RandomLetter()).Replace('/', RandomLetter()).Replace('=', RandomLetter());
-            return RandomLetter() + output; //Ensure first character is a letter
-        }
-
-        private char RandomLetter()
-        {
-            return (char)rand.Next(97, 123);
         }
     }
 }

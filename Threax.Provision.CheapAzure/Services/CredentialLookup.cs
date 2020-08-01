@@ -10,6 +10,8 @@ namespace Threax.Provision.CheapAzure.Services
 {
     class CredentialLookup : ICredentialLookup
     {
+        private readonly Random rand = new Random();
+
         private readonly IKeyVaultManager keyVaultManager;
         private readonly IStringGenerator stringGenerator;
 
@@ -19,7 +21,7 @@ namespace Threax.Provision.CheapAzure.Services
             this.stringGenerator = stringGenerator;
         }
 
-        public async Task<Credential> GetOrCreateCredentials(String keyVaultName, String credBaseName, Func<String, String> fixPassword = null, Func<String, String> fixUsername = null)
+        public async Task<Credential> GetOrCreateCredentials(String keyVaultName, String credBaseName)
         {
             var creds = await GetCredentials(keyVaultName, credBaseName);
 
@@ -27,10 +29,7 @@ namespace Threax.Provision.CheapAzure.Services
             {
                 creds.Created = true;
                 creds.User = stringGenerator.CreateBase64String(24);
-                if(fixUsername != null)
-                {
-                    creds.User = fixUsername.Invoke(creds.User);
-                }
+                creds.User = FixUser(creds.User);
                 await this.keyVaultManager.SetSecret(keyVaultName, creds.UserKey, creds.User);
             }
 
@@ -38,10 +37,7 @@ namespace Threax.Provision.CheapAzure.Services
             {
                 creds.Created = true;
                 creds.Pass = stringGenerator.CreateBase64String(32);
-                if (fixPassword != null)
-                {
-                    creds.Pass = fixPassword.Invoke(creds.Pass);
-                }
+                creds.Pass = FixPass(creds.Pass);
                 await this.keyVaultManager.SetSecret(keyVaultName, creds.PassKey, creds.Pass);
             }
 
@@ -65,6 +61,22 @@ namespace Threax.Provision.CheapAzure.Services
                 UserKey = userKey,
                 PassKey = passKey
             };
+        }
+
+        private String FixPass(String input)
+        {
+            return $"{input}!2Ab";
+        }
+
+        private String FixUser(String input)
+        {
+            var output = input.Replace('+', RandomLetter()).Replace('/', RandomLetter()).Replace('=', RandomLetter());
+            return RandomLetter() + output; //Ensure first character is a letter
+        }
+
+        private char RandomLetter()
+        {
+            return (char)rand.Next(97, 123);
         }
     }
 }
