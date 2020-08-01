@@ -8,14 +8,6 @@ namespace Threax.Provision.CheapAzure.Services
     interface IVmCommands
     {
         /// <summary>
-        /// Write a file to the server.
-        /// </summary>
-        /// <param name="file">The file.</param>
-        /// <param name="content">The content.</param>
-        /// <returns></returns>
-        Task WriteFileContent(string file, string content);
-
-        /// <summary>
         /// Write a file to the server and then run it with `Threax.DockerTools run /file`.
         /// </summary>
         /// <param name="file">The destination file. Should be a json settings file for Threax.DockerTools.</param>

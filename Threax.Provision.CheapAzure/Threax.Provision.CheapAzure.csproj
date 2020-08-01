@@ -40,9 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Services\WriteFileContent.sh">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Services\ThreaxDockerToolsRun.sh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -27,12 +27,6 @@ namespace Threax.Provision.CheapAzure.Services
             return Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Services");
         }
 
-        public async Task WriteFileContent(String file, String content)
-        {
-            var scriptPath = Path.Combine(GetBasePath(), "WriteFileContent.sh");
-            await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", scriptPath, new Hashtable { { "file", file }, { "content", Escape(content) } });
-        }
-
         public async Task ThreaxDockerToolsRun(String file, String content)
         {
             var scriptPath = Path.Combine(GetBasePath(), "ThreaxDockerToolsRun.sh");
