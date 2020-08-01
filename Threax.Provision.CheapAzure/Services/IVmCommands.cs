@@ -34,6 +34,15 @@ namespace Threax.Provision.CheapAzure.Services
         /// <returns></returns>
         Task RunSetupScript(String vmName, String resourceGroup, String acrHost, AcrCredential acrCreds);
 
+        /// <summary>
+        /// Set multiple secrets on the server. These are batched up to try to overcome the built in delays of doing this.
+        /// </summary>
+        /// <param name="vmName"></param>
+        /// <param name="resourceGroup"></param>
+        /// <param name="settingsFile"></param>
+        /// <param name="settingsContent"></param>
+        /// <param name="secrets"></param>
+        /// <returns></returns>
         Task SetSecrets(String vmName, String resourceGroup, String settingsFile, String settingsContent, IEnumerable<SetSecretModel> secrets);
     }
 }

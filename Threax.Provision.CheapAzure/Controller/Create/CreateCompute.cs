@@ -15,6 +15,10 @@ using Threax.Provision.CheapAzure.ArmTemplates.ArmVm;
 using Threax.Provision.CheapAzure.Services;
 using System.Collections;
 using System.Text;
+using System.IO;
+using Threax.Pipelines.Core;
+using System.Collections.Generic;
+using Threax.Provision.CheapAzure.Model;
 
 namespace Threax.Provision.CheapAzure.Controller.Create
 {
@@ -28,6 +32,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly IAppInsightsManager appInsightsManager;
         private readonly IServicePrincipalManager servicePrincipalManager;
         private readonly IVmCommands vmCommands;
+        private readonly IConfigFileProvider configFileProvider;
 
         public CreateCompute(
             Config config,
@@ -37,7 +42,8 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             AzureKeyVaultConfig azureKeyVaultConfig,
             IAppInsightsManager appInsightsManager,
             IServicePrincipalManager servicePrincipalManager,
-            IVmCommands vmCommands)
+            IVmCommands vmCommands,
+            IConfigFileProvider configFileProvider)
         {
             this.config = config;
             this.keyVaultManager = keyVaultManager;
@@ -47,6 +53,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             this.appInsightsManager = appInsightsManager;
             this.servicePrincipalManager = servicePrincipalManager;
             this.vmCommands = vmCommands;
+            this.configFileProvider = configFileProvider;
         }
 
         public async Task Execute(Compute resource)
@@ -83,7 +90,21 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                 //Setup App Connection String Secret
                 logger.LogInformation("Setting app key vault connection string secret.");
                 var vaultCs = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring");
-                await vmCommands.WriteFileContent($"/app/{resource.Name}/secrets/serviceprincipal-cs", vaultCs);
+
+                var fileName = Path.GetFileName(configFileProvider.GetConfigPath());
+                var configFilePath = $"/app/{resource.Name}/{fileName}";
+                var configContents = configFileProvider.GetConfigText();
+                var secrets = new List<SetSecretModel>()
+                {
+                    new SetSecretModel()
+                    {
+                        Content = vaultCs,
+                        File = $"/app/{resource.Name}/temp/serviceprincipal-cs",
+                        Name = "serviceprincipal-cs"
+                    }
+                };
+
+                await vmCommands.SetSecrets(config.VmName, config.ResourceGroup, configFilePath, configContents, secrets);
             }
 
             //Setup App Insights
