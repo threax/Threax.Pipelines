@@ -121,6 +121,10 @@ namespace Threax.Provision.CheapAzure
             })
             .Run(async scope =>
             {
+                var log = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                var assembly = typeof(Program).Assembly.GetName();
+                log.LogInformation($"{assembly.Name} {assembly.Version}");
+
                 var loader = scope.ServiceProvider.GetRequiredService<IResourceDefinitionLoader>();
                 ResourceDefinition definition;
                 switch (command?.ToLowerInvariant())
