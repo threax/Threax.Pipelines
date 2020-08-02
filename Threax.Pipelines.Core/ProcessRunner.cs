@@ -38,6 +38,11 @@ namespace Threax.Pipelines.Core
 
         public String RunProcessWithOutputGetOutput(ProcessStartInfo startInfo)
         {
+            return RunProcessWithOutputGetOutput(startInfo, out _);
+        }
+
+        public String RunProcessWithOutputGetOutput(ProcessStartInfo startInfo, out int exitCode)
+        {
             StringBuilder output = new StringBuilder();
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardOutput = true;
@@ -62,6 +67,8 @@ namespace Threax.Pipelines.Core
                 process.BeginOutputReadLine();
 
                 process.WaitForExit();
+
+                exitCode = process.ExitCode;
             }
 
             return output.ToString();

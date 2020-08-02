@@ -86,6 +86,10 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             };
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 
+            //Save Ssh Key
+            logger.LogInformation($"Saving known hosts secret.");
+            await sshCredsManager.SaveSshKnownHostsSecret();
+
             logger.LogInformation("Running setup script on server.");
             await vmCommands.RunSetupScript(config.VmName, config.ResourceGroup, $"{config.AcrName}.azurecr.io", acrCreds);
 

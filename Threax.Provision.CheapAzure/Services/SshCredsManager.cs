@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Management.Automation;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Threax.Pipelines.Core;
 using Threax.Provision.AzPowershell;
@@ -115,11 +116,41 @@ namespace Threax.Provision.CheapAzure.Services
             }
         }
 
+        public async Task SaveSshKnownHostsSecret()
+        {
+            await EnsureSshHost();
+            await vmManager.SetSecurityRuleAccess(config.NsgName, config.ResourceGroup, SshRuleName, "Allow");
+            String key;
+            int retry = 0;
+            do
+            {
+                logger.LogInformation($"Trying key scan connection to '{sshHost}'. Retry '{retry}'.");
+                key = processRunner.RunProcessWithOutputGetOutput(new ProcessStartInfo("ssh-keyscan", $"-t rsa {sshHost}"));
+
+                if(++retry > 100)
+                {
+                    throw new InvalidOperationException($"Retried ssh-keyscan '{retry}' times. Giving up.");
+                }
+            } while (String.IsNullOrEmpty(key));
+
+            var existing = await keyVaultManager.GetSecret(config.InfraKeyVaultName, config.SshKnownHostKey);
+            if(existing != null && existing != key)
+            {
+                logger.LogInformation($"Current saved server key (top) does not match current key on server (bottom). \n'{existing}'\n{key}");
+                logger.LogInformation("If this is because the vm was recreated please enter y below. Otherwise this will be considered an error and the provisioning will stop.");
+
+                if(!"y".Equals(Console.ReadLine(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    throw new InvalidOperationException("The ssh keys did not match and were rejected by the user. Key vault not updated.");
+                }
+            }
+
+            await keyVaultManager.SetSecret(config.InfraKeyVaultName, config.SshKnownHostKey, key);
+        }
+
         public String PublicKeySecretName => $"{config.VmAdminBaseKey}-ssh-public-key";
 
         public String PrivateKeySecretName => $"{config.VmAdminBaseKey}-ssh-private-key";
-
-
 
         private async Task<String> LoadKeysAndGetSshPrivateKeyPath()
         {
@@ -142,14 +173,14 @@ namespace Threax.Provision.CheapAzure.Services
                     throw new InvalidOperationException($"Please create an ssh profile at '{knownHostsFile}'.");
                 }
 
-                var key = processRunner.RunProcessWithOutputGetOutput(new ProcessStartInfo("ssh-keyscan", $"-t rsa {sshHost}"));
+                await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
+
+                var key = await keyVaultManager.GetSecret(config.InfraKeyVaultName, config.SshKnownHostKey);
                 var currentKeys = File.ReadAllText(knownHostsFile);
                 if (!currentKeys.Contains(key))
                 {
                     File.AppendAllText(knownHostsFile, key);
                 }
-
-                await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
 
                 var publicKey = await keyVaultManager.GetSecret(config.InfraKeyVaultName, PublicKeySecretName);
                 var privateKey = await keyVaultManager.GetSecret(config.InfraKeyVaultName, PrivateKeySecretName);
@@ -162,7 +193,7 @@ namespace Threax.Provision.CheapAzure.Services
                 vmUser = creds.User;
 
                 //Validate that access has been granted
-                int exitCode = 0;
+                int exitCode;
                 int retry = 0;
                 do
                 {

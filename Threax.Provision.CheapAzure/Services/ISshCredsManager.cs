@@ -11,5 +11,6 @@ namespace Threax.Provision.CheapAzure.Services
         void Dispose();
         Task<string> LoadPublicKey();
         Task<int> RunSshCommand(string command);
+        Task SaveSshKnownHostsSecret();
     }
 }

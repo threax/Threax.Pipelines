@@ -17,5 +17,7 @@ namespace Threax.Pipelines.Core
         /// <param name="startInfo">The start info.</param>
         /// <returns>A string with all the standard output.</returns>
         String RunProcessWithOutputGetOutput(ProcessStartInfo startInfo);
+
+        String RunProcessWithOutputGetOutput(ProcessStartInfo startInfo, out int exitCode);
     }
 }

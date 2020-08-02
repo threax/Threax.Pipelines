@@ -96,6 +96,11 @@ namespace Threax.Provision.CheapAzure
         public string VmAdminBaseKey { get; set; } = "vm-admin";
 
         /// <summary>
+        /// The name of the key in the infra key vault that holds the known hosts key. Default: 'known-hosts'
+        /// </summary>
+        public string SshKnownHostKey { get; set; } = "known-hosts";
+
+        /// <summary>
         /// The guid of the Azure Devops user to set permissions for.
         /// </summary>
         public Guid? AzDoUser { get; set; }
