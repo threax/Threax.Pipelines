@@ -29,10 +29,37 @@ namespace Threax.Provision.CheapAzure.Services
             return Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Services");
         }
 
-        public async Task ThreaxDockerToolsRun(String file, String content, String user)
+        public async Task ThreaxDockerToolsRun(String file, String content)
         {
-            var scriptPath = Path.Combine(GetBasePath(), "ThreaxDockerToolsRun.sh");
-            await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", scriptPath, new Hashtable { { "file", file }, { "content", Escape(content) }, { "user", Escape(user) } });
+            int exitCode;
+            var tempFile = appFolderFinder.GetTempProvisionPath();
+            try
+            {
+                File.WriteAllText(tempFile, content);
+
+                var tempLoc = $"~/{Path.GetFileName(tempFile)}";
+                await sshCredsManager.CopySshFile(tempFile, tempLoc);
+
+                exitCode = await sshCredsManager.RunSshCommand($"sudo mkdir \"{Path.GetDirectoryName(file).Replace('\\', '/')}\"");
+                exitCode = await sshCredsManager.RunSshCommand($"sudo mv \"{tempLoc}\" \"{file}\"");
+                if (exitCode != 0)
+                {
+                    throw new InvalidOperationException($"Error moving the file.");
+                }
+
+                exitCode = await sshCredsManager.RunSshCommand($"sudo Threax.DockerTools run {file}");
+                if (exitCode != 0)
+                {
+                    throw new InvalidOperationException($"Error during docker tools run.");
+                }
+            }
+            finally
+            {
+                if (File.Exists(tempFile))
+                {
+                    File.Delete(tempFile);
+                }
+            }
         }
 
         public async Task ThreaxDockerToolsExec(String file, String command, params String[] args)

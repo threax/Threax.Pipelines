@@ -13,7 +13,7 @@ namespace Threax.Provision.CheapAzure.Services
         /// <param name="file">The destination file. Should be a json settings file for Threax.DockerTools.</param>
         /// <param name="content">The content of the settings file to write out.</param>
         /// <returns></returns>
-        Task ThreaxDockerToolsRun(String file, String content, String user);
+        Task ThreaxDockerToolsRun(String file, String content);
 
         /// <summary>
         /// Run the main setup script on the server.
