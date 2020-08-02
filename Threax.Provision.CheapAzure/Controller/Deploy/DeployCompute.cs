@@ -32,6 +32,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
         private readonly IProcessRunner processRunner;
         private readonly IVmCommands vmCommands;
         private readonly IConfigFileProvider configFileProvider;
+        private readonly ICredentialLookup credentialLookup;
 
         public DeployCompute(
             Config config,
@@ -40,7 +41,8 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             IImageManager imageManager,
             IProcessRunner processRunner,
             IVmCommands vmCommands,
-            IConfigFileProvider configFileProvider)
+            IConfigFileProvider configFileProvider,
+            ICredentialLookup credentialLookup)
         {
             this.config = config;
             this.buildConfig = buildConfig;
@@ -49,6 +51,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             this.processRunner = processRunner;
             this.vmCommands = vmCommands;
             this.configFileProvider = configFileProvider;
+            this.credentialLookup = credentialLookup;
         }
 
         public async Task Execute(Compute resource)
@@ -57,6 +60,9 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
             {
                 throw new InvalidOperationException("You must include a resource 'Name' property to deploy compute.");
             }
+
+            //Start getting creds, then push
+            var credsTask = credentialLookup.GetCredentials(config.InfraKeyVaultName, config.VmAdminBaseKey);
 
             var image = buildConfig.ImageName;
             var currentTag = buildConfig.GetCurrentTag();
@@ -79,6 +85,8 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
                 throw new InvalidOperationException("An error occured during the docker push.");
             }
 
+            var creds = await credsTask;
+
             //Deploy
             logger.LogInformation($"Deploying '{image}' for branch '{buildConfig.Branch}'.");
             var jobj = configFileProvider.GetConfigJObject();
@@ -93,7 +101,7 @@ namespace Threax.Provision.CheapAzure.Controller.Deploy
 
             var fileName = Path.GetFileName(configFileProvider.GetConfigPath());
             var configJson = jobj.ToString(Newtonsoft.Json.Formatting.Indented);
-            await vmCommands.ThreaxDockerToolsRun($"/app/{resource.Name}/{fileName}", configJson);
+            await vmCommands.ThreaxDockerToolsRun($"/app/{resource.Name}/{fileName}", configJson, creds.User);
         }
     }
 }

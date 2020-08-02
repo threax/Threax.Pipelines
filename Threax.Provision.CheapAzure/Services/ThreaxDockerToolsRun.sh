@@ -1,8 +1,8 @@
 #!/bin/bash
 
 destDir="$(dirname "${file}")"
-sudo mkdir -p $destDir
-sudo echo $content > $file
+sudo -u $user mkdir -p $destDir
+sudo -u $user echo $content > $file
 if [ $? -ne 0 ]
 then 
 	echo "Could not write file content."
@@ -10,7 +10,7 @@ then
 	exit 1
 fi
 
-sudo Threax.DockerTools run $file
+sudo -u $user Threax.DockerTools run $file
 if [ $? -ne 0 ]
 then 
 	echo "Problem during Threax.DockerTools run."

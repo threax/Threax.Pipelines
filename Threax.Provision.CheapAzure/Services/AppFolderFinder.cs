@@ -14,6 +14,8 @@ namespace Threax.Provision.CheapAzure.Services
 
         public String AppUserFolder => Path.Combine(GetUserHomePath(), ".threaxprovision");
 
+        public String UserSshFolder => Path.Combine(GetUserHomePath(), ".ssh");
+
         /// <summary>
         /// Get a temporary file path in the user's ~/.threaxprovision/temp folder.
         /// </summary>

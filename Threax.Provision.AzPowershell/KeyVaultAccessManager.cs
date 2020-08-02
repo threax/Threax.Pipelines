@@ -34,11 +34,12 @@ namespace Threax.Provision.AzPowershell
 
         public void Dispose()
         {
-            var ruleTasks = createdRules.Select(i => Task.Run(() => this.keyVaultManager.LockSecrets(i.KeyVaultName, i.UserId))).ToList();
-            foreach (var task in ruleTasks)
-            {
-                task.GetAwaiter().GetResult();
-            }
+            //Just leave access as is, uncomment to remove when program shuts down
+            //var ruleTasks = createdRules.Select(i => Task.Run(() => this.keyVaultManager.LockSecrets(i.KeyVaultName, i.UserId))).ToList();
+            //foreach (var task in ruleTasks)
+            //{
+            //    task.GetAwaiter().GetResult();
+            //}
         }
 
         class KeyVaultRuleInfo

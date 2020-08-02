@@ -4,6 +4,8 @@
     {
         string AppUserFolder { get; }
 
+        string UserSshFolder { get; }
+
         string GetTempProvisionPath();
     }
 }

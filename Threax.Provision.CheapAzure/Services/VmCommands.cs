@@ -29,10 +29,10 @@ namespace Threax.Provision.CheapAzure.Services
             return Path.Combine(Path.GetDirectoryName(this.GetType().Assembly.Location), "Services");
         }
 
-        public async Task ThreaxDockerToolsRun(String file, String content)
+        public async Task ThreaxDockerToolsRun(String file, String content, String user)
         {
             var scriptPath = Path.Combine(GetBasePath(), "ThreaxDockerToolsRun.sh");
-            await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", scriptPath, new Hashtable { { "file", file }, { "content", Escape(content) } });
+            await vmManager.RunCommand(config.VmName, config.ResourceGroup, "RunShellScript", scriptPath, new Hashtable { { "file", file }, { "content", Escape(content) }, { "user", Escape(user) } });
         }
 
         public async Task ThreaxDockerToolsExec(String file, String command, params String[] args)
@@ -57,6 +57,7 @@ namespace Threax.Provision.CheapAzure.Services
                 //This won't do happen, needs real error checking.
                 throw new InvalidOperationException("Error running setup script.");
             }
+            //Good way, send password as file
             var passwordFile = appFolderFinder.GetTempProvisionPath();
             try
             {
@@ -78,6 +79,14 @@ namespace Threax.Provision.CheapAzure.Services
                     File.Delete(passwordFile);
                 }
             }
+
+            //Bad way that exposes password
+            //exitCode = await sshCredsManager.RunSshCommand($"sudo docker login -u \"{acrCreds.Username}\" -p \"{acrCreds.Password}\" \"{acrHost}\"");
+            //if (exitCode != 0)
+            //{
+            //    //This won't do happen, needs real error checking.
+            //    throw new InvalidOperationException($"Error Logging ACR '{acrHost}'.");
+            //}
         }
 
         public async Task SetSecretFromString(String vmName, String resourceGroup, String settingsFile, String settingsDest, String name, String content)

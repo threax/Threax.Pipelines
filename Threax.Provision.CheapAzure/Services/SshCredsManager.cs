@@ -27,6 +27,7 @@ namespace Threax.Provision.CheapAzure.Services
         private readonly ILogger<SshCredsManager> logger;
         private String publicKeyFile;
         private String privateKeyFile;
+        private String sshKeyFolder;
         private String vmUser;
         private String sshHost;
 
@@ -125,17 +126,27 @@ namespace Threax.Provision.CheapAzure.Services
             if (privateKeyFile == null)
             {
                 await vmManager.SetSecurityRuleAccess(config.NsgName, config.ResourceGroup, SshRuleName, "Allow");
-
-                publicKeyFile = Path.Combine(appFolderFinder.AppUserFolder, "azure-ssh.pub");
-                if (!Directory.Exists(Path.GetDirectoryName(publicKeyFile)))
+                sshKeyFolder = Path.Combine(appFolderFinder.AppUserFolder, "sshkeys");
+                if (!Directory.Exists(sshKeyFolder))
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(publicKeyFile));
+                    Directory.CreateDirectory(sshKeyFolder);
                 }
 
-                privateKeyFile = Path.Combine(appFolderFinder.AppUserFolder, "azure-ssh");
-                if (!Directory.Exists(Path.GetDirectoryName(privateKeyFile)))
+                publicKeyFile = Path.Combine(sshKeyFolder, "azure-ssh.pub");
+                privateKeyFile = Path.Combine(sshKeyFolder, "azure-ssh");
+
+                await EnsureSshHost();
+                var knownHostsFile = Path.Combine(appFolderFinder.UserSshFolder, "known_hosts");
+                if (!File.Exists(knownHostsFile))
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(privateKeyFile));
+                    throw new InvalidOperationException($"Please create an ssh profile at '{knownHostsFile}'.");
+                }
+
+                var key = processRunner.RunProcessWithOutputGetOutput(new ProcessStartInfo("ssh-keyscan", $"-t rsa {sshHost}"));
+                var currentKeys = File.ReadAllText(knownHostsFile);
+                if (!currentKeys.Contains(key))
+                {
+                    File.AppendAllText(knownHostsFile, key);
                 }
 
                 await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
