@@ -116,5 +116,10 @@ namespace Threax.Provision.CheapAzure
         /// Otherwise the ip is looked up from PublicIpName. This has no effect when creating the ip.
         /// </summary>
         public String VmIpAddress { get; set; }
+
+        /// <summary>
+        /// The name of the Network Security Group.
+        /// </summary>
+        public String NsgName { get; set; }
     }
 }

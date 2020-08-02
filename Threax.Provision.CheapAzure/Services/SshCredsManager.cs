@@ -15,6 +15,8 @@ namespace Threax.Provision.CheapAzure.Services
 {
     class SshCredsManager : IDisposable, ISshCredsManager
     {
+        private const string SshRuleName = "SSH";
+
         private readonly Config config;
         private readonly IKeyVaultManager keyVaultManager;
         private readonly ICredentialLookup credentialLookup;
@@ -28,10 +30,10 @@ namespace Threax.Provision.CheapAzure.Services
         private String vmUser;
         private String sshHost;
 
-        public SshCredsManager(Config config, 
-            IKeyVaultManager keyVaultManager, 
+        public SshCredsManager(Config config,
+            IKeyVaultManager keyVaultManager,
             ICredentialLookup credentialLookup,
-            IProcessRunner processRunner, 
+            IProcessRunner processRunner,
             IKeyVaultAccessManager keyVaultAccessManager,
             IVmManager vmManager,
             IAppFolderFinder appFolderFinder,
@@ -62,6 +64,14 @@ namespace Threax.Provision.CheapAzure.Services
                 try
                 {
                     File.Delete(privateKeyFile);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An {ex.GetType().Name} occured cleaning up private key file '{privateKeyFile}'. Message: {ex.Message}\n{ex.StackTrace}");
+                }
+                try
+                {
+                    Task.Run(() => vmManager.SetSecurityRuleAccess(config.NsgName, config.ResourceGroup, SshRuleName, "Deny")).GetAwaiter().GetResult();
                 }
                 catch (Exception ex)
                 {
@@ -108,18 +118,20 @@ namespace Threax.Provision.CheapAzure.Services
 
         public String PrivateKeySecretName => $"{config.VmAdminBaseKey}-ssh-private-key";
 
-        
+
 
         private async Task<String> LoadKeysAndGetSshPrivateKeyPath()
         {
             if (privateKeyFile == null)
             {
+                await vmManager.SetSecurityRuleAccess(config.NsgName, config.ResourceGroup, SshRuleName, "Allow");
+
                 publicKeyFile = Path.Combine(appFolderFinder.AppUserFolder, "azure-ssh.pub");
                 if (!Directory.Exists(Path.GetDirectoryName(publicKeyFile)))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(publicKeyFile));
                 }
-                
+
                 privateKeyFile = Path.Combine(appFolderFinder.AppUserFolder, "azure-ssh");
                 if (!Directory.Exists(Path.GetDirectoryName(privateKeyFile)))
                 {
@@ -137,6 +149,21 @@ namespace Threax.Provision.CheapAzure.Services
 
                 var creds = await credentialLookup.GetCredentials(config.InfraKeyVaultName, config.VmAdminBaseKey);
                 vmUser = creds.User;
+
+                //Validate that access has been granted
+                int exitCode = 0;
+                int retry = 0;
+                do
+                {
+                    logger.LogInformation($"Trying connection to '{sshHost}'. Retry '{retry}'.");
+                    var startInfo = new ProcessStartInfo("ssh", $"-i \"{privateKeyFile}\" -t \"{vmUser}@{sshHost}\" \"pwd\"");
+                    exitCode = processRunner.RunProcessWithOutput(startInfo);
+
+                    if(++retry > 100)
+                    {
+                        throw new InvalidOperationException($"Could not establish connection to ssh host '{sshHost}' after '{retry}' retries. Giving up.");
+                    }
+                } while (exitCode != 0);
             }
 
             return privateKeyFile;
@@ -144,7 +171,7 @@ namespace Threax.Provision.CheapAzure.Services
 
         private async Task EnsureSshHost()
         {
-            if(sshHost == null)
+            if (sshHost == null)
             {
                 sshHost = config.VmIpAddress ?? await vmManager.GetPublicIp(config.PublicIpName);
             }

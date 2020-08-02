@@ -73,5 +73,48 @@ namespace Threax.Provision.AzPowershell
             dynamic result = outputCollection.First();
             return result.IpAddress;
         }
+
+        public async Task SetSecurityRuleAccess(String NetworkSecurityGroup, String ResourceGroup, String Name, String Access)
+        {
+            dynamic nsg;
+            using (var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger)){
+
+                pwsh.SetUnrestrictedExecution();
+                pwsh.AddScript("Import-Module Az.Network");
+                var parm = new { Name = NetworkSecurityGroup, ResourceGroup };
+                pwsh.AddParamLine(parm);
+                pwsh.AddCommandWithParams("Get-AzNetworkSecurityGroup", parm);
+
+                var outputCollection = await pwsh.RunAsync();
+
+                pwsh.ThrowOnErrors($"Error Getting NSG '{NetworkSecurityGroup}' from '{ResourceGroup}'.");
+
+                nsg = outputCollection.First();
+            }
+
+            using (var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger)){
+
+                //Workaround from spaelling at https://github.com/Azure/azure-powershell/issues/8371
+                //Just modify the nsg that was loaded
+                foreach (var rule in ((IEnumerable<dynamic>)nsg.SecurityRules).Where(i => i.Name == Name))
+                {
+                    rule.Access = Access;
+                }
+
+                pwsh.SetUnrestrictedExecution();
+                pwsh.AddScript("Import-Module Az.Network");
+                var parm = new { NetworkSecurityGroup = nsg };
+                pwsh.AddParamLine(parm);
+                pwsh.AddCommandWithParams("Set-AzNetworkSecurityGroup", parm);
+
+                var outputCollection = await pwsh.RunAsync();
+
+                pwsh.ThrowOnErrors($"Error setting NSG '{NetworkSecurityGroup}' Rule: '{Name}' to '{Access}'.");
+            }
+        }
     }
 }

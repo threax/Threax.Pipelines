@@ -81,7 +81,8 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             var publicKey = await sshCredsManager.LoadPublicKey();
             var vm = new ArmVm(config.VmName, config.ResourceGroup, vmCreds.User, publicKey)
             {
-                publicIpAddressName = config.PublicIpName
+                publicIpAddressName = config.PublicIpName,
+                networkSecurityGroupName = config.NsgName,
             };
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 
