@@ -1,13 +1,16 @@
 {
   "ResourceGroup": "threax-rg",
   "Location": "East US",
-  "TenantId": "",
-  "UserId": "",
-  "SubscriptionId": null,
   "SqlServerName": "threax-sqlsrv",
   "SqlDbName": "threax-db",
   "InfraKeyVaultName": "threax-infra-kv",
   "AcrName": "threaxacr",
-  "AppServicePlanName": "threax-asp",
-  "SslCertThumb": null
+  "AppInsightsName": "threax-ai",
+  "VmName": "threax-vm",
+  "PublicIpName": "threax-vm-ip",
+
+  "TenantId": "",
+  "UserId": "",
+  "SubscriptionId": "",
+  "AzDoUser": ""
 }

@@ -16,24 +16,32 @@ namespace Threax.Provision.CheapAzure.Controller.Create
         private readonly Config config;
         private readonly IKeyVaultManager keyVaultManager;
         private readonly ICredentialLookup credentialLookup;
-        private readonly IArmTemplateManager armTemplateManager;
         private readonly ISqlServerFirewallRuleManager sqlServerFirewallRuleManager;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly ILogger<CreateSqlDatabase> logger;
         private readonly AzureKeyVaultConfig azureKeyVaultConfig;
-        private readonly Random rand = new Random();
+        private readonly IMachineIpManager machineIpManager;
 
-        public CreateSqlDatabase(ISqlServerManager sqlServerManager, Config config, IKeyVaultManager keyVaultManager, ICredentialLookup credentialLookup, IArmTemplateManager armTemplateManager, ISqlServerFirewallRuleManager sqlServerFirewallRuleManager, IKeyVaultAccessManager keyVaultAccessManager, ILogger<CreateSqlDatabase> logger, AzureKeyVaultConfig azureKeyVaultConfig)
+        public CreateSqlDatabase(
+            ISqlServerManager sqlServerManager, 
+            Config config, 
+            IKeyVaultManager keyVaultManager, 
+            ICredentialLookup credentialLookup,
+            ISqlServerFirewallRuleManager sqlServerFirewallRuleManager,
+            IKeyVaultAccessManager keyVaultAccessManager,
+            ILogger<CreateSqlDatabase> logger, 
+            AzureKeyVaultConfig azureKeyVaultConfig,
+            IMachineIpManager machineIpManager)
         {
             this.sqlServerManager = sqlServerManager;
             this.config = config;
             this.keyVaultManager = keyVaultManager;
             this.credentialLookup = credentialLookup;
-            this.armTemplateManager = armTemplateManager;
             this.sqlServerFirewallRuleManager = sqlServerFirewallRuleManager;
             this.keyVaultAccessManager = keyVaultAccessManager;
             this.logger = logger;
             this.azureKeyVaultConfig = azureKeyVaultConfig;
+            this.machineIpManager = machineIpManager;
         }
 
         public async Task Execute(SqlDatabase resource)
@@ -46,7 +54,8 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             //You would want to have separate dbs in a larger setup.
             await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
             await keyVaultAccessManager.Unlock(azureKeyVaultConfig.VaultName, config.UserId);
-            await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, config.MachineIp, config.MachineIp);
+            var machineIp = await config.GetMachineIp(machineIpManager);
+            await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, machineIp, machineIp);
 
             var saCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.SqlSaBaseKey);
             var saConnectionString = sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, saCreds.User, saCreds.Pass);

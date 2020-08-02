@@ -53,5 +53,25 @@ namespace Threax.Provision.AzPowershell
                 throw new InvalidOperationException($"An error occured running the server side script of Invoke-AzVMRunCommand for '{Name}' in '{ResourceGroupName}'");
             }
         }
+
+        public async Task<String> GetPublicIp(String Name)
+        {
+            using var pwsh = PowerShell.Create()
+                .PrintInformationStream(logger)
+                .PrintErrorStream(logger);
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddScript("Import-Module Az.Network");
+            var parm = new { Name, };
+            pwsh.AddParamLine(parm);
+            pwsh.AddCommandWithParams("Get-AzPublicIpAddress", parm);
+
+            var outputCollection = await pwsh.RunAsync();
+
+            pwsh.ThrowOnErrors($"Error getting Public Ip Address '{Name}'.");
+
+            dynamic result = outputCollection.First();
+            return result.IpAddress;
+        }
     }
 }

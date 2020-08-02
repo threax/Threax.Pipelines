@@ -79,7 +79,10 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
 
             logger.LogInformation($"Creating virtual machine '{config.VmName}'.");
             var publicKey = await sshCredsManager.LoadPublicKey();
-            var vm = new ArmVm(config.VmName, config.ResourceGroup, vmCreds.User, publicKey);
+            var vm = new ArmVm(config.VmName, config.ResourceGroup, vmCreds.User, publicKey)
+            {
+                publicIpAddressName = config.PublicIpName
+            };
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 
             logger.LogInformation("Running setup script on server.");

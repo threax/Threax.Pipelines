@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -17,17 +18,25 @@ namespace Threax.Provision.CheapAzure.Services
         private readonly ICredentialLookup credentialLookup;
         private readonly IProcessRunner processRunner;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
+        private readonly IVmManager vmManager;
         private String publicKeyFile;
         private String privateKeyFile;
         private String vmUser;
+        private String sshHost;
 
-        public SshCredsManager(Config config, IKeyVaultManager keyVaultManager, ICredentialLookup credentialLookup, IProcessRunner processRunner, IKeyVaultAccessManager keyVaultAccessManager)
+        public SshCredsManager(Config config, 
+            IKeyVaultManager keyVaultManager, 
+            ICredentialLookup credentialLookup,
+            IProcessRunner processRunner, 
+            IKeyVaultAccessManager keyVaultAccessManager,
+            IVmManager vmManager)
         {
             this.config = config;
             this.keyVaultManager = keyVaultManager;
             this.credentialLookup = credentialLookup;
             this.processRunner = processRunner;
             this.keyVaultAccessManager = keyVaultAccessManager;
+            this.vmManager = vmManager;
         }
 
         public void Dispose()
@@ -67,25 +76,19 @@ namespace Threax.Provision.CheapAzure.Services
 
         public async Task<int> RunSshCommand(String command)
         {
-            if (String.IsNullOrEmpty(config.VmSshHost))
-            {
-                throw new InvalidOperationException($"You must include a '{nameof(config.VmSshHost)}' propety with the ip or hostname of your vm in your core configuration.");
-            }
+            await EnsureSshHost();
 
             var privateKeyPath = await LoadKeysAndGetSshPrivateKeyPath();
-            var startInfo = new ProcessStartInfo("ssh", $"-i \"{privateKeyPath}\" -t \"{vmUser}@{config.VmSshHost}\" \"{command}\"");
+            var startInfo = new ProcessStartInfo("ssh", $"-i \"{privateKeyPath}\" -t \"{vmUser}@{sshHost}\" \"{command}\"");
             return processRunner.RunProcessWithOutput(startInfo);
         }
 
         public async Task CopySshFile(String file, String dest)
         {
-            if (String.IsNullOrEmpty(config.VmSshHost))
-            {
-                throw new InvalidOperationException($"You must include a '{nameof(config.VmSshHost)}' propety with the ip or hostname of your vm in your core configuration.");
-            }
+            await EnsureSshHost();
 
             var privateKeyPath = await LoadKeysAndGetSshPrivateKeyPath();
-            var startInfo = new ProcessStartInfo("scp", $"-i \"{privateKeyPath}\" \"{file}\" \"{vmUser}@{config.VmSshHost}:{dest}\"");
+            var startInfo = new ProcessStartInfo("scp", $"-i \"{privateKeyPath}\" \"{file}\" \"{vmUser}@{sshHost}:{dest}\"");
             var exitCode = processRunner.RunProcessWithOutput(startInfo);
             if (exitCode != 0)
             {
@@ -136,6 +139,14 @@ namespace Threax.Provision.CheapAzure.Services
             }
 
             return privateKeyFile;
+        }
+
+        private async Task EnsureSshHost()
+        {
+            if(sshHost == null)
+            {
+                sshHost = config.VmIpAddress ?? await vmManager.GetPublicIp(config.PublicIpName);
+            }
         }
     }
 }

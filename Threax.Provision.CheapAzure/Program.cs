@@ -116,6 +116,8 @@ namespace Threax.Provision.CheapAzure
                     o.SetupConfigFileProvider = s => new ConfigFileProvider(jsonConfigPath);
                 });
                 services.AddThreaxPipelinesDocker();
+
+                services.AddHttpClient<IMachineIpManager, MachineIpManager>();
             })
             .Run(async scope =>
             {

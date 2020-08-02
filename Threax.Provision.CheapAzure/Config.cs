@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using Threax.Provision.AzPowershell;
+using Threax.Provision.CheapAzure.Services;
 
 namespace Threax.Provision.CheapAzure
 {
@@ -43,8 +46,19 @@ namespace Threax.Provision.CheapAzure
 
         /// <summary>
         /// The public ip of the current machine to temporarly create a sql server firewall rule for.
+        /// Use GetMachineIp to get the real value of this property, since it can be looked up.
         /// </summary>
         public string MachineIp { get; set; }
+
+        public async Task<String> GetMachineIp(IMachineIpManager machineIpManager)
+        {
+            if(this.MachineIp == null)
+            {
+                this.MachineIp = await machineIpManager.GetExternalIp();
+            }
+
+            return this.MachineIp;
+        }
 
         /// <summary>
         /// The name of the acr to create.
@@ -93,8 +107,14 @@ namespace Threax.Provision.CheapAzure
         public bool UnlockCurrentUserInKeyVaults { get; set; } = true;
 
         /// <summary>
-        /// The ssh host address of the vm.
+        /// The name of the public ip for the vm.
         /// </summary>
-        public String VmSshHost { get; set; }
+        public String PublicIpName { get; set; }
+
+        /// <summary>
+        /// If the vm ip address is known you can set it here for a small speed improvement since it will avoid lookups.
+        /// Otherwise the ip is looked up from PublicIpName. This has no effect when creating the ip.
+        /// </summary>
+        public String VmIpAddress { get; set; }
     }
 }
