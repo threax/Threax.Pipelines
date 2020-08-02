@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
 using Threax.Pipelines.Core;
@@ -19,6 +21,8 @@ namespace Threax.Provision.CheapAzure.Services
         private readonly IProcessRunner processRunner;
         private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly IVmManager vmManager;
+        private readonly IAppFolderFinder appFolderFinder;
+        private readonly ILogger<SshCredsManager> logger;
         private String publicKeyFile;
         private String privateKeyFile;
         private String vmUser;
@@ -29,7 +33,9 @@ namespace Threax.Provision.CheapAzure.Services
             ICredentialLookup credentialLookup,
             IProcessRunner processRunner, 
             IKeyVaultAccessManager keyVaultAccessManager,
-            IVmManager vmManager)
+            IVmManager vmManager,
+            IAppFolderFinder appFolderFinder,
+            ILogger<SshCredsManager> logger)
         {
             this.config = config;
             this.keyVaultManager = keyVaultManager;
@@ -37,6 +43,8 @@ namespace Threax.Provision.CheapAzure.Services
             this.processRunner = processRunner;
             this.keyVaultAccessManager = keyVaultAccessManager;
             this.vmManager = vmManager;
+            this.appFolderFinder = appFolderFinder;
+            this.logger = logger;
         }
 
         public void Dispose()
@@ -100,26 +108,19 @@ namespace Threax.Provision.CheapAzure.Services
 
         public String PrivateKeySecretName => $"{config.VmAdminBaseKey}-ssh-private-key";
 
-        private String GetUserHomePath()
-        {
-            //Thanks to MiffTheFox at https://stackoverflow.com/questions/1143706/getting-the-path-of-the-home-directory-in-c
-
-            return (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
-                ? Environment.GetEnvironmentVariable("HOME")
-                : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
-        }
+        
 
         private async Task<String> LoadKeysAndGetSshPrivateKeyPath()
         {
             if (privateKeyFile == null)
             {
-                publicKeyFile = Path.Combine(GetUserHomePath(), ".threaxprovision", "azure-ssh.pub");
+                publicKeyFile = Path.Combine(appFolderFinder.AppUserFolder, "azure-ssh.pub");
                 if (!Directory.Exists(Path.GetDirectoryName(publicKeyFile)))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(publicKeyFile));
                 }
                 
-                privateKeyFile = Path.Combine(GetUserHomePath(), ".threaxprovision", "azure-ssh");
+                privateKeyFile = Path.Combine(appFolderFinder.AppUserFolder, "azure-ssh");
                 if (!Directory.Exists(Path.GetDirectoryName(privateKeyFile)))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(privateKeyFile));

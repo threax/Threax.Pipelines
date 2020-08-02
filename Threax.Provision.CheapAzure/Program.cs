@@ -111,6 +111,7 @@ namespace Threax.Provision.CheapAzure
                 services.AddScoped<ICredentialLookup, CredentialLookup>();
                 services.AddScoped<IVmCommands, VmCommands>();
                 services.AddScoped<ISshCredsManager, SshCredsManager>();
+                services.AddScoped<IAppFolderFinder, AppFolderFinder>();
                 services.AddThreaxPipelines(o =>
                 {
                     o.SetupConfigFileProvider = s => new ConfigFileProvider(jsonConfigPath);

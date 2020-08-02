@@ -14,12 +14,14 @@ namespace Threax.Provision.CheapAzure.Services
         private readonly Config config;
         private readonly IVmManager vmManager;
         private readonly ISshCredsManager sshCredsManager;
+        private readonly IAppFolderFinder appFolderFinder;
 
-        public VmCommands(Config config, IVmManager vmManager, ISshCredsManager sshCredsManager)
+        public VmCommands(Config config, IVmManager vmManager, ISshCredsManager sshCredsManager, IAppFolderFinder appFolderFinder)
         {
             this.config = config;
             this.vmManager = vmManager;
             this.sshCredsManager = sshCredsManager;
+            this.appFolderFinder = appFolderFinder;
         }
 
         private String GetBasePath()
@@ -45,8 +47,37 @@ namespace Threax.Provision.CheapAzure.Services
 
         public async Task RunSetupScript(String vmName, String resourceGroup, String acrHost, AcrCredential acrCreds)
         {
-            var scriptPath = Path.Combine(GetBasePath(), "UbuntuSetup.sh");
-            await vmManager.RunCommand(vmName, resourceGroup, "RunShellScript", scriptPath, new Hashtable { { "acrHost", Escape(acrHost) }, { "acrUser", Escape(acrCreds.Username) }, { "acrPass", Escape(acrCreds.Password) } });
+            var scriptName = "UbuntuSetup.sh";
+            var scriptPath = Path.Combine(GetBasePath(), scriptName);
+            var scriptDest = $"~/{scriptName}";
+            await sshCredsManager.CopySshFile(scriptPath, scriptDest);
+            var exitCode = await sshCredsManager.RunSshCommand($"chmod 777 \"{scriptDest}\"; sudo sh \"{scriptDest}\";rm \"{scriptDest}\";");
+            if(exitCode != 0)
+            {
+                //This won't do happen, needs real error checking.
+                throw new InvalidOperationException("Error running setup script.");
+            }
+            var passwordFile = appFolderFinder.GetTempProvisionPath();
+            try
+            {
+                File.WriteAllText(passwordFile, acrCreds.Password);
+
+                var destPasswordFile = "~/acrpass";
+                await sshCredsManager.CopySshFile(passwordFile, destPasswordFile);
+                exitCode = await sshCredsManager.RunSshCommand($"cat \"{destPasswordFile}\" | sudo docker login -u \"{acrCreds.Username}\" --password-stdin \"{acrHost}\"; rm \"{destPasswordFile}\"");
+                if (exitCode != 0)
+                {
+                    //This won't do happen, needs real error checking.
+                    throw new InvalidOperationException($"Error Logging ACR '{acrHost}'.");
+                }
+            }
+            finally
+            {
+                if (File.Exists(passwordFile))
+                {
+                    File.Delete(passwordFile);
+                }
+            }
         }
 
         public async Task SetSecretFromString(String vmName, String resourceGroup, String settingsFile, String settingsDest, String name, String content)
