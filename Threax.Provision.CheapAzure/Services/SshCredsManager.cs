@@ -22,7 +22,6 @@ namespace Threax.Provision.CheapAzure.Services
         private readonly IKeyVaultManager keyVaultManager;
         private readonly ICredentialLookup credentialLookup;
         private readonly IProcessRunner processRunner;
-        private readonly IKeyVaultAccessManager keyVaultAccessManager;
         private readonly IVmManager vmManager;
         private readonly IAppFolderFinder appFolderFinder;
         private readonly ILogger<SshCredsManager> logger;
@@ -36,7 +35,6 @@ namespace Threax.Provision.CheapAzure.Services
             IKeyVaultManager keyVaultManager,
             ICredentialLookup credentialLookup,
             IProcessRunner processRunner,
-            IKeyVaultAccessManager keyVaultAccessManager,
             IVmManager vmManager,
             IAppFolderFinder appFolderFinder,
             ILogger<SshCredsManager> logger)
@@ -45,7 +43,6 @@ namespace Threax.Provision.CheapAzure.Services
             this.keyVaultManager = keyVaultManager;
             this.credentialLookup = credentialLookup;
             this.processRunner = processRunner;
-            this.keyVaultAccessManager = keyVaultAccessManager;
             this.vmManager = vmManager;
             this.appFolderFinder = appFolderFinder;
             this.logger = logger;
@@ -172,8 +169,6 @@ namespace Threax.Provision.CheapAzure.Services
                 {
                     throw new InvalidOperationException($"Please create an ssh profile at '{knownHostsFile}'.");
                 }
-
-                await keyVaultAccessManager.Unlock(config.InfraKeyVaultName, config.UserId);
 
                 var key = await keyVaultManager.GetSecret(config.InfraKeyVaultName, config.SshKnownHostKey);
                 var currentKeys = File.ReadAllText(knownHostsFile);
