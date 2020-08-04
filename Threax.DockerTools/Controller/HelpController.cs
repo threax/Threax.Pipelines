@@ -15,9 +15,11 @@ namespace Threax.DockerTools.Controller
             this.logger = logger;
         }
 
-        public async Task Run()
+        public Task Run()
         {
             logger.LogInformation("Help");
+
+            return Task.CompletedTask;
         }
     }
 }

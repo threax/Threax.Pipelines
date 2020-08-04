@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Pipelines.Core", "Th
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.K8sDeploy", "Threax.K8sDeploy\Threax.K8sDeploy.csproj", "{6A1C700E-88BF-4035-926B-ED9766CDFF8D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleDeployment", "ExampleDeployment\ExampleDeployment.csproj", "{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision", "Threax.Provision\Threax.Provision.csproj", "{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.AzPowershell", "Threax.Provision.AzPowershell\Threax.Provision.AzPowershell.csproj", "{4F7BD4C3-DB4B-4292-85D5-B3670DDBD5F8}"
@@ -25,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DeployConfig", "Thre
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.ConsoleApp", "Threax.ConsoleApp\Threax.ConsoleApp.csproj", "{147D0875-D7D2-478C-95EA-041856E4F719}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Threax.DockerTools", "Threax.DockerTools\Threax.DockerTools.csproj", "{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DockerTools", "Threax.DockerTools\Threax.DockerTools.csproj", "{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,10 +47,6 @@ Global
 		{6A1C700E-88BF-4035-926B-ED9766CDFF8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A1C700E-88BF-4035-926B-ED9766CDFF8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A1C700E-88BF-4035-926B-ED9766CDFF8D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D3A9BCD6-1491-49D6-BE9F-32F1C36DE305}.Release|Any CPU.Build.0 = Release|Any CPU
 		{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18152F7E-EF7E-4AB6-9B10-8D1EB892B7F6}.Release|Any CPU.ActiveCfg = Release|Any CPU

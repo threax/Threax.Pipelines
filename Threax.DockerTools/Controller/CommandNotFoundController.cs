@@ -18,9 +18,11 @@ namespace Threax.DockerTools.Controller
             this.argsProvider = argsProvider;
         }
 
-        public async Task Run()
+        public Task Run()
         {
             logger.LogInformation($"Command not found {argsProvider.Args[0]}.");
+
+            return Task.CompletedTask;
         }
     }
 }
