@@ -19,7 +19,7 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io -y
 sudo docker network create -d bridge appnet
 
 # Setup Threax.DockerTools
-curl -L https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerBuild_1.0.0-pre03/Threax.DockerTools > ~/Threax.DockerTools && \
+curl -L https://github.com/threax/Threax.Pipelines/releases/download/vThreax.DockerTools_1.0.0-pre07/Threax.DockerTools > ~/Threax.DockerTools && \
 sudo mv ~/Threax.DockerTools /bin/Threax.DockerTools && \
 sudo chmod 700 /bin/Threax.DockerTools
 
