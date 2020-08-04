@@ -19,3 +19,4 @@ RUN curl -sSL https://get.docker.com/ | sh
 
 WORKDIR /app
 COPY --from=publish /app .
+ENTRYPOINT ["dotnet", "Threax.DockerTools.dll"]

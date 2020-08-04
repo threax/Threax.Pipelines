@@ -1,3 +1,8 @@
+param (
+    [Parameter(mandatory=$true)]$RootPath,
+    [Parameter(Position=1, ValueFromRemainingArguments)]$Remaining
+)
+
 $scriptPath = Split-Path $script:MyInvocation.MyCommand.Path
 
-docker run -d --rm -v /var/run/docker.sock:/var/run/docker.sock --name threax-docker-tools threax/docker-tools tail -f /dev/null
+docker run -it --rm -v /var/run/docker.sock:/var/run/docker.sock -v "${RootPath}:/apps" threax/docker-tools @Remaining
