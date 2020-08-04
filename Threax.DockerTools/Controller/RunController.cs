@@ -111,9 +111,15 @@ namespace Threax.DockerTools.Controller
                         File.Copy(source, path, true);
                     }
 
-                    osHandler.SetPermissions(path, deploymentConfig.User, deploymentConfig.Group);
-
-                    args.Append($"-v \"{path}:{vol.Value.Destination}\" ");
+                    if (File.Exists(path))
+                    {
+                        osHandler.SetPermissions(path, deploymentConfig.User, deploymentConfig.Group);
+                        args.Append($"-v \"{path}:{vol.Value.Destination}\" ");
+                    }
+                    else if (!vol.Value.AllowMissing)
+                    {
+                        throw new FileNotFoundException($"Cannot find secret file '{path}' and {nameof(Secret.AllowMissing)} is false for '{secretName}'.", path);
+                    }
                 }
             }
 

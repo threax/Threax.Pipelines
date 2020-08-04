@@ -39,5 +39,11 @@ namespace Threax.DeployConfig
         /// The type of the secret mount. Default: Directory
         /// </summary>
         public PathType Type { get; set; } = PathType.Directory;
+
+        /// <summary>
+        /// Allow the app to start even if this secret is missing. If this is false and the file does not exist the deployment tools
+        /// will stop with an error. Default: false
+        /// </summary>
+        public bool AllowMissing { get; set; } = false;
     }
 }
