@@ -108,7 +108,14 @@ namespace Threax.DockerTools.Controller
                     if (!String.IsNullOrEmpty(vol.Value.Source))
                     {
                         var source = deploymentConfig.GetConfigPath(vol.Value.Source);
-                        File.Copy(source, path, true);
+                        if (File.Exists(source))
+                        {
+                            File.Copy(source, path, true);
+                        }
+                        else if(!vol.Value.AllowMissing)
+                        {
+                            throw new FileNotFoundException($"Cannot find secret source file '{source}' and {nameof(Secret.AllowMissing)} is false for '{secretName}'.", source);
+                        }
                     }
 
                     if (File.Exists(path))
