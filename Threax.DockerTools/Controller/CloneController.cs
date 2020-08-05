@@ -12,9 +12,6 @@ namespace Threax.DockerTools.Controller
 {
     class CloneController : IController
     {
-        string localRefRoot = "refs/heads/";
-        String remoteRefRoot = "refs/remotes/origin/";
-
         private BuildConfig appConfig;
         private ILogger logger;
         private readonly IProcessRunner processRunner;
