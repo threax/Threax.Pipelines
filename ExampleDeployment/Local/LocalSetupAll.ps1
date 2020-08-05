@@ -10,4 +10,6 @@ $scriptPath = Split-Path $script:MyInvocation.MyCommand.Path
 'Visit https://id.dev.threax.com/Manage/Index and create an account.'
 $userId = Read-Host -Prompt 'Enter the new user''s User Id here'
 &"$scriptPath/tools/bin/Threax.DockerTools" exec $scriptPath/id/appsettings.json AddAdmin $userId
+&"$scriptPath/tools/bin/Threax.DockerTools" exec $scriptPath/notes/appsettings.json AddAdmin $userId
 'Visit https://appdashboard.dev.threax.com to test the account.'
+'Visit https://notes.dev.threax.com to test the account.'
