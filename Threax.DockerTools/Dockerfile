@@ -11,7 +11,7 @@ WORKDIR /src/Threax.DockerTools
 RUN dotnet restore Threax.DockerTools.csproj
 
 FROM build AS publish
-RUN dotnet publish Threax.DockerTools.csproj -r ${TARGET} -c Release /p:PublishTrimmed=true -o /app/bin
+RUN dotnet publish Threax.DockerTools.csproj -r $TARGET -c Release /p:PublishTrimmed=true -o /app/bin
 
 FROM base AS final
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
