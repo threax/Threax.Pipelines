@@ -1,5 +1,6 @@
 $scriptPath = Split-Path $script:MyInvocation.MyCommand.Path
 
+&"$scriptPath/tools/Build.ps1"
 &"$scriptPath/init/Local.ps1"
 &"$scriptPath/nginx/Local.ps1"
 &"$scriptPath/id/Local.ps1"
