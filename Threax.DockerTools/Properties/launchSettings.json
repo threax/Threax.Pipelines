@@ -5,71 +5,71 @@
     },
     "Clone Id": {
       "commandName": "Project",
-      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/id/appsettings.json"
+      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json"
     },
     "Build Id": {
       "commandName": "Project",
-      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/id/appsettings.json"
+      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json"
     },
     "Push Id": {
       "commandName": "Project",
-      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/id/appsettings.json"
+      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json"
     },
     "Run Id": {
       "commandName": "Project",
-      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/id/appsettings.json"
+      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json"
     },
     "Clone AppDashboard": {
       "commandName": "Project",
-      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json"
+      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json"
     },
     "Build AppDashboard": {
       "commandName": "Project",
-      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json"
+      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json"
     },
     "Push AppDashboard": {
       "commandName": "Project",
-      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/appdashboard/appsettings.json"
+      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json"
     },
     "Clone Notes": {
       "commandName": "Project",
-      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
+      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json"
     },
     "Build Notes": {
       "commandName": "Project",
-      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
+      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json"
     },
     "Push Notes": {
       "commandName": "Project",
-      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
+      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json"
     },
     "Run Notes": {
       "commandName": "Project",
-      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/notes/appsettings.json"
+      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json"
     },
     "Exec Notes AddAdmin": {
       "commandName": "Project",
-      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/notes/appsettings.json AddAdmin a5dcd5a3-abef-4814-9f5c-78c3d36b7130"
+      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json AddAdmin a5dcd5a3-abef-4814-9f5c-78c3d36b7130"
     },
     "Build Nginx": {
       "commandName": "Project",
-      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/nginx/appsettings.json"
+      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/Local/nginx/appsettings.json"
     },
     "Push Nginx": {
       "commandName": "Project",
-      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/nginx/appsettings.json"
+      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/Local/nginx/appsettings.json"
     },
     "Run Nginx": {
       "commandName": "Project",
-      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/nginx/appsettings.json"
+      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/Local/nginx/appsettings.json"
     },
     "Set Nginx Public Key": {
       "commandName": "Project",
-      "commandLineArgs": "setsecret $(ProjectDir)../ExampleDeployment/nginx/appsettings.json public-key C:/Development/K8sCluster/files/cert/fullchain1.pem"
+      "commandLineArgs": "setsecret $(ProjectDir)../ExampleDeployment/Local/nginx/appsettings.json public-key C:/Development/K8sCluster/files/cert/fullchain1.pem"
     },
     "Set Nginx Private Key": {
       "commandName": "Project",
-      "commandLineArgs": "setsecret $(ProjectDir)../ExampleDeployment/nginx/appsettings.json private-key C:/Development/K8sCluster/files/cert/privkey1.pem"
+      "commandLineArgs": "setsecret $(ProjectDir)../ExampleDeployment/Local/nginx/appsettings.json private-key C:/Development/K8sCluster/files/cert/privkey1.pem"
     }
   }
 }
