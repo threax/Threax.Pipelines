@@ -11,10 +11,20 @@ else {
     git clone $toolsRepo $srcDir
 }
 
-Remove-Item -Recurse "$scriptPath/ubuntu"
-Remove-Item -Recurse "$scriptPath/win"
-docker build "$srcDir" -f "$srcDir/Threax.DockerTools/Dockerfile" -t threax-docker-tools-builder # This builds the tools with docker
-docker run -it --rm -v "${scriptpath}:/out" threax-docker-tools-builder # This run line extracts the compiled tools from the image
-Remove-Item -Recurse "$scriptPath/bin"
-Move-Item "$scriptPath/win" "$scriptPath/bin"
-Remove-Item -Recurse "$scriptPath/ubuntu"
+$os = [System.Environment]::OSVersion.Platform
+
+if($os -eq [System.PlatformID]::Unix){
+    $target = "ubuntu.18.04-x64"
+}
+else {
+    $target = "win-x64"
+}
+
+$binPath = "$scriptPath/bin"
+if(Test-Path $binPath) {
+    Remove-Item -Recurse $binPath
+}
+
+# Build the image then extract the tool from it by running it.
+docker build --build-arg TARGET=$target "$srcDir" -f "$srcDir/Threax.DockerTools/Dockerfile" -t threax-docker-tools-builder
+docker run -it --rm -v "${scriptpath}:/out" threax-docker-tools-builder
