@@ -20,10 +20,7 @@ else {
     $target = "win-x64"
 }
 
-$binPath = "$scriptPath/bin"
-if(Test-Path $binPath) {
-    Remove-Item -Recurse $binPath
-}
+Remove-Item -Recurse "$scriptPath/bin" -ErrorAction 'SilentlyContinue' # Have to call this every time or errors can occur
 
 # Build the image then extract the tool from it by running it.
 docker build --build-arg TARGET=$target "$srcDir" -f "$srcDir/Threax.DockerTools/Dockerfile" -t threax-docker-tools-builder
