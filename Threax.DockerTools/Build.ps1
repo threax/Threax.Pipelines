@@ -14,8 +14,6 @@ else {
     $target = "win-x64"
 }
 
-Remove-Item -Recurse "$destDir/bin" -ErrorAction 'SilentlyContinue' # Have to call this every time or errors can occur
-
 # Build the image then extract the tool from it by running it.
 docker build --build-arg TARGET=$target "$scriptPath/.." -f "$scriptPath/Dockerfile" -t threax-docker-tools-builder
 docker run -it --rm -v "${destDir}:/out" threax-docker-tools-builder
