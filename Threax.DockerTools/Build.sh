@@ -10,6 +10,7 @@ done
 scriptPath="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 target=$0
+destDir=$1
 
 docker build --build-arg TARGET=$target "$scriptPath/.." -f "$scriptPath/Dockerfile" -t threax-docker-tools-builder
 docker run -it --rm -v "${destDir}:/out" threax-docker-tools-builder
