@@ -9,5 +9,15 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 scriptPath="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-bash $scriptPath/BuildThreaxBuild.sh
-bash $scriptPath/BuildDockerTools.sh
+toolsRepo="https://github.com/threax/Threax.Pipelines.git"
+srcDir="$scriptPath/src/Threax.Pipelines"
+if [ -d $srcDir ]
+then
+    pushd $srcDir
+    git pull
+    popd
+else
+    git clone $toolsRepo $srcDir
+fi
+
+bash $srcDir/Threax.DockerTools/Build.sh "linux-arm64" $scriptPath
