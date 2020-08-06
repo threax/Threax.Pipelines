@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -51,9 +52,15 @@ namespace Threax.DockerBuildConfig
         public String ClonePath { get; private set; }
 
         /// <summary>
-        /// Set this to true to always pull base images when building. Default: True.
+        /// An array of images to pull when building. These will be pulled with separate docker pull commands.
         /// </summary>
-        public bool AlwaysPull { get; set; } = true;
+        public List<String> PullImages { get; set; }
+
+        /// <summary>
+        /// Set this to true to always pull base images when building. This will add 
+        /// --pull to build commands. Default: False.
+        /// </summary>
+        public bool PullAllImages { get; set; } = false;
 
         /// <summary>
         /// If RepoUrl is not set this will be the path to the build context. This can be

@@ -31,9 +31,18 @@ namespace Threax.DockerTools.Controller
             var buildTag = buildConfig.GetBuildTag();
             var currentTag = buildConfig.GetCurrentTag();
 
+            if (buildConfig.PullImages != null)
+            {
+                foreach(var pullImage in buildConfig.PullImages)
+                {
+                    logger.LogInformation($"Pulling '{pullImage}'.");
+                    processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"pull {pullImage}"));
+                }
+            }
+
             var args = $"build {context} -f {dockerFile} -t {image}:{buildTag} -t {image}:{currentTag}";
 
-            if (buildConfig.AlwaysPull)
+            if (buildConfig.PullAllImages)
             {
                 args += " --pull";
             }
