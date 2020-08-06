@@ -20,4 +20,4 @@ else
     git clone $toolsRepo $srcDir
 fi
 
-bash $srcDir/Threax.DockerTools/Build.sh "linux-arm64" $scriptPath
+bash $srcDir/Build.sh
