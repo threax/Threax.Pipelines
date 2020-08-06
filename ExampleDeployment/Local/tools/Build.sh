@@ -9,8 +9,8 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 scriptPath="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-toolsRepo = "https://github.com/threax/Threax.Pipelines.git"
-srcDir = "$scriptPath/src/Threax.Pipelines"
+toolsRepo="https://github.com/threax/Threax.Pipelines.git"
+srcDir="$scriptPath/src/Threax.Pipelines"
 if [ -d $srcDir ]
 then
     pushd $srcDir
