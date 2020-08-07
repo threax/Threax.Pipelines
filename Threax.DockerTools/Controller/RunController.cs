@@ -140,7 +140,7 @@ namespace Threax.DockerTools.Controller
                         {
                             createCertificateTask.Execute(
                                 vol.Value.Certificate.CommonName ?? throw new InvalidOperationException($"You must provide a '{nameof(vol.Value.Certificate.CommonName)}' property on your '{nameof(vol.Value.Certificate)}' object."),
-                                vol.Value.Certificate.ExpirationMonths, 
+                                vol.Value.Certificate.ExpirationMonths > 0 ? vol.Value.Certificate.ExpirationMonths : throw new InvalidOperationException($"You must provide a '{nameof(vol.Value.Certificate.ExpirationMonths)}' property greater than 0 on your '{nameof(vol.Value.Certificate)}' object."),
                                 path);
                         }
                     }
