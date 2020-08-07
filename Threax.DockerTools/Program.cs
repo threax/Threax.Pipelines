@@ -6,6 +6,7 @@ using Threax.ConsoleApp;
 using Threax.DeployConfig;
 using Threax.DockerBuildConfig;
 using Threax.DockerTools.Controller;
+using Threax.DockerTools.Tasks;
 using Threax.Extensions.Configuration.SchemaBinder;
 using Threax.Pipelines.Core;
 
@@ -63,6 +64,9 @@ namespace Threax.DockerTools
                 {
                     o.AddConsole();
                 });
+
+                services.AddScoped<ICreateBase64SecretTask, CreateBase64SecretTask>();
+                services.AddScoped<ICreateCertificateTask, CreateCertificateTask>();
             })
             .Run(c => c.Run());
         }

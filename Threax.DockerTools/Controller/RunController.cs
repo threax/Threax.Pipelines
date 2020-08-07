@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Threax.DeployConfig;
 using Threax.DockerBuildConfig;
+using Threax.DockerTools.Tasks;
 using Threax.Pipelines.Core;
 using Threax.Pipelines.Docker;
 
@@ -21,6 +22,8 @@ namespace Threax.DockerTools.Controller
         private readonly IImageManager imageManager;
         private readonly IOSHandler osHandler;
         private readonly IConfigFileProvider configFileProvider;
+        private readonly ICreateBase64SecretTask createBase64SecretTask;
+        private readonly ICreateCertificateTask createCertificateTask;
 
         public RunController(
             BuildConfig buildConfig,
@@ -29,7 +32,9 @@ namespace Threax.DockerTools.Controller
             IProcessRunner processRunner,
             IImageManager imageManager,
             IOSHandler osHandler,
-            IConfigFileProvider configFileProvider)
+            IConfigFileProvider configFileProvider,
+            ICreateBase64SecretTask createBase64SecretTask,
+            ICreateCertificateTask createCertificateTask)
         {
             this.buildConfig = buildConfig;
             this.deploymentConfig = deploymentConfig;
@@ -38,6 +43,8 @@ namespace Threax.DockerTools.Controller
             this.imageManager = imageManager;
             this.osHandler = osHandler;
             this.configFileProvider = configFileProvider;
+            this.createBase64SecretTask = createBase64SecretTask;
+            this.createCertificateTask = createCertificateTask;
         }
 
         public Task Run()
@@ -115,6 +122,26 @@ namespace Threax.DockerTools.Controller
                         else if(!vol.Value.AllowMissing)
                         {
                             throw new FileNotFoundException($"Cannot find secret source file '{source}' and {nameof(Secret.AllowMissing)} is false for '{secretName}'.", source);
+                        }
+                    }
+
+                    if (!File.Exists(path))
+                    {
+                        if (vol.Value.Base64?.Create == true)
+                        {
+                            var length = vol.Value.Base64.MinLength;
+                            if (vol.Value.Base64.MaxLength > length)
+                            {
+                                length = new Random().Next(vol.Value.Base64.MinLength, vol.Value.Base64.MaxLength);
+                            }
+                            createBase64SecretTask.CreateSecret(length, path);
+                        }
+                        else if (vol.Value.Certificate?.Create == true)
+                        {
+                            createCertificateTask.Execute(
+                                vol.Value.Certificate.CommonName ?? throw new InvalidOperationException($"You must provide a '{nameof(vol.Value.Certificate.CommonName)}' property on your '{nameof(vol.Value.Certificate)}' object."),
+                                vol.Value.Certificate.ExpirationMonths, 
+                                path);
                         }
                     }
 

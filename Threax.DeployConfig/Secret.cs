@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
+using System.Security.Principal;
 using System.Text;
 
 namespace Threax.DeployConfig
@@ -46,5 +48,51 @@ namespace Threax.DeployConfig
         /// will stop with an error. Default: false
         /// </summary>
         public bool AllowMissing { get; set; } = false;
+
+        /// <summary>
+        /// Settings for creating a secret from a base64 encoded random number.
+        /// </summary>
+        public CreateBase64Settings Base64 { get; set; } = new CreateBase64Settings();
+
+        /// <summary>
+        /// Settings for creating a secret from an x509 certificate.
+        /// </summary>
+        public CreateCertSettings Certificate { get; set; } = new CreateCertSettings();
+    }
+
+    public class CreateBase64Settings
+    {
+        /// <summary>
+        /// Set this to true to create the secret from a base64 string. Default: false
+        /// </summary>
+        public bool Create { get; set; }
+
+        /// <summary>
+        /// The minimum number of bytes in the base64 string. Default: 32
+        /// </summary>
+        public int MinLength { get; set; } = 32;
+
+        /// <summary>
+        /// The maximum number of bytes in the base64 string. Default: 64
+        /// </summary>
+        public int MaxLength { get; set; } = 64;
+    }
+
+    public class CreateCertSettings
+    {
+        /// <summary>
+        /// The maximum number of bytes in the base64 string. Default false
+        /// </summary>
+        public bool Create { get; set; } = false;
+
+        /// <summary>
+        /// The common name of the certificate. Required
+        /// </summary>
+        public String CommonName { get; set; }
+
+        /// <summary>
+        /// The expiration time in months.
+        /// </summary>
+        public int ExpirationMonths { get; set; }
     }
 }

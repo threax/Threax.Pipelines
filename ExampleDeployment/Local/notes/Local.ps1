@@ -5,10 +5,6 @@ $clientCredsSecretName = "SharedClientCredentials__ClientSecret"
 
 &"$scriptPath/../tools/bin/Threax.DockerTools" clone $scriptPath/appsettings.json
 &"$scriptPath/../tools/bin/Threax.DockerTools" build $scriptPath/appsettings.json; if($LASTEXITCODE -ne 0) {throw "Error during build."}
-
-&"$scriptPath/../tools/bin/Threax.DockerTools" createbase64secret "$scriptPath/appsettings.json" $clientSecretName 32
-&"$scriptPath/../tools/bin/Threax.DockerTools" createbase64secret "$scriptPath/appsettings.json" $clientCredsSecretName 32
-
 &"$scriptPath/../tools/bin/Threax.DockerTools" run $scriptPath/appsettings.json
 
 # Load app metadata into id server
