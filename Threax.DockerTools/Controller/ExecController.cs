@@ -58,8 +58,8 @@ namespace Threax.DockerTools.Controller
                 while (++i < args.Length)
                 {
                     var currentArg = args[i];
-                    //Load optional file arguments, any position can start with -l to load a secret and use its path in the final argument list
-                    if (currentArg == "-l")
+                    //Load optional file arguments, any position can start with --exec-load to load a secret and use its path in the final argument list
+                    if (currentArg == "--exec-load")
                     {
                         var type = args.Length > ++i ? args[i] : throw new InvalidOperationException($"You must include a type argument in position {i}.");
                         var dest = args.Length > ++i ? args[i] : throw new InvalidOperationException($"You must include a destination argument in position {i}.");
@@ -129,7 +129,7 @@ namespace Threax.DockerTools.Controller
                 }
                 else
                 {
-                    throw new InvalidOperationException("In order to use the -l argument on exec commands your app must define a Volume named 'Load'.");
+                    throw new InvalidOperationException("In order to use the --exec-load argument on exec commands your app must define a Volume named 'Load'.");
                 }
                 loadContainerDest = deploymentConfig.Volumes["Load"].Destination;
             }

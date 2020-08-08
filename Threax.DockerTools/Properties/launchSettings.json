@@ -73,11 +73,11 @@
     },
     "Setup App Dashboard (Run id first)": {
       "commandName": "Project",
-      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json SetupAppDashboard -l secret appdashboard/JwtAuth__ClientSecret $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json JwtAuth__ClientSecret"
+      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json SetupAppDashboard --exec-load secret appdashboard/JwtAuth__ClientSecret $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json JwtAuth__ClientSecret"
     },
     "Setup Notes (Run id and notes first)": {
       "commandName": "Project",
-      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json AddFromMetadata \"https://notes.dev.threax.com\" -l secret notes/JwtAuth__ClientSecret $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json JwtAuth__ClientSecret -l secret notes/SharedClientCredentials__ClientSecret $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json SharedClientCredentials__ClientSecret"
+      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json AddFromMetadata \"https://notes.dev.threax.com\" --exec-load secret notes/JwtAuth__ClientSecret $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json JwtAuth__ClientSecret --exec-load secret notes/SharedClientCredentials__ClientSecret $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json SharedClientCredentials__ClientSecret"
     }
   }
 }
