@@ -8,6 +8,7 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
 scriptPath="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+buildTarget="$1"
 
 toolsRepo="https://github.com/threax/Threax.Pipelines.git"
 srcDir="$scriptPath/src/Threax.Pipelines"
@@ -20,4 +21,4 @@ else
     git clone $toolsRepo $srcDir
 fi
 
-bash $srcDir/Threax.DockerTools/Build.sh "linux-x64" $scriptPath
+bash $srcDir/Threax.DockerTools/Build.sh $buildTarget $scriptPath
