@@ -8,11 +8,9 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 done
 scriptPath="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
-dirName="$(basename $scriptPath)"
 
-$scriptPath/../tools/bin/Threax.DockerTools clone $scriptPath/appsettings.json
+$scriptPath/../tools/bin/Threax.DockerTools setsecret $scriptPath/appsettings.json private-key $scriptPath/../cert/privkey1.pem
+$scriptPath/../tools/bin/Threax.DockerTools setsecret $scriptPath/appsettings.json public-key $scriptPath/../cert/fullchain1.pem
+
 $scriptPath/../tools/bin/Threax.DockerTools build $scriptPath/appsettings.json
 $scriptPath/../tools/bin/Threax.DockerTools run $scriptPath/appsettings.json
-$scriptPath/../tools/bin/Threax.DockerTools exec $scriptPath/../id/appsettings.json SetupAppDashboard \
-    -l secret $dirName/JwtAuth__ClientSecret $scriptPath/appsettings.json JwtAuth__ClientSecret
-    -l secret $dirName/SharedClientCredentials__ClientSecret $scriptPath/appsettings.json SharedClientCredentials__ClientSecret
