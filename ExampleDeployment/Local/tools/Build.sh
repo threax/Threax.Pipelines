@@ -9,5 +9,5 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 scriptPath="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-bash $scriptPath/BuildThreaxBuild.sh
-bash $scriptPath/BuildDockerTools.sh
+sudo bash $scriptPath/BuildThreaxBuild.sh
+sudo bash $scriptPath/BuildDockerTools.sh
