@@ -6,6 +6,9 @@ param (
 if($arch -eq "x86_64") {
     $dockerArch = "amd64"
 }
+elseif($arch -eq "aarch64") {
+    $dockerArch = "arm64"
+}
 else {
     $dockerArch = Read-Host -Prompt "Unknown server architecture '$targetArch'. Please enter the docker architecture (amd64, arm64 etc):"
 }

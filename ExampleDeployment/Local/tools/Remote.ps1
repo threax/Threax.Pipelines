@@ -6,6 +6,9 @@ param (
 if($arch -eq "x86_64") {
     $buildTarget = "linux-x64"
 }
+elseif($arch -eq "aarch64") {
+    $buildTarget = "linux-arm64"
+}
 else {
     $buildTarget = Read-Host -Prompt "Unknown server architecture '$targetArch'. Please enter the tools build target (linux-x64, linux-arm64 etc):"
 }
