@@ -22,7 +22,7 @@ Write-Host 'Visit https://id.dev.threax.com/Manage/Index and create an account.'
 $userId = Read-Host -Prompt 'Enter the new user''s User Id here'
 ssh -t $sshConnection "sudo /app/tools/bin/Threax.DockerTools exec /app/id/appsettings.json AddAdmin $userId"
 ssh -t $sshConnection "sudo /app/tools/bin/Threax.DockerTools exec /app/notes/appsettings.json AddAdmin $userId"
-Write-Host 'Visit https://appdashboard.dev.threax.com to test the account. Also add https://notes.dev.threax.com to add the notes app to the id server.'
+Write-Host 'Visit https://appdashboard.dev.threax.com to test the account.'
 Write-Host 'Visit https://notes.dev.threax.com to try the notes app.'
 
 # Disconnect ssh key
