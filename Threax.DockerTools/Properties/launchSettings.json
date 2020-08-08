@@ -70,6 +70,10 @@
     "Set Nginx Private Key": {
       "commandName": "Project",
       "commandLineArgs": "setsecret $(ProjectDir)../ExampleDeployment/Local/nginx/appsettings.json private-key C:/Development/K8sCluster/files/cert/privkey1.pem"
+    },
+    "Setup App Dashboard (Run id first)": {
+      "commandName": "Project",
+      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json SetupAppDashboard -l secret appdashboard/JwtAuth__ClientSecret $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json JwtAuth__ClientSecret"
     }
   }
 }

@@ -67,6 +67,7 @@ namespace Threax.DockerTools
 
                 services.AddScoped<ICreateBase64SecretTask, CreateBase64SecretTask>();
                 services.AddScoped<ICreateCertificateTask, CreateCertificateTask>();
+                services.AddScoped<ILoadTask, LoadTask>();
             })
             .Run(c => c.Run());
         }
