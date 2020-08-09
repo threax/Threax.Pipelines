@@ -15,7 +15,7 @@ ssh -t $sshConnection "sudo Threax.DockerTools build /app/$dirName/appsettings.j
 ssh $sshConnection "if test -f /app/$dirname/secrets/id-server-signing-cert; then exit 0; else exit 1; fi"
 if($LASTEXITCODE -eq 1) {
     Write-Host "Creating Id Server Signing Certificate"
-    ssh -t $sshConnection "sudo docker run --rm -v /app/$dirName/secrets:/out threaxacr.azurecr.io/id:threaxpipe-current tools 'createCert signing 100 /out/id-server-signing-cert'"
+    ssh -t $sshConnection "sudo docker run --rm -v /app/$dirName/secrets:/out threax/id:threaxpipe-current tools 'createCert signing 100 /out/id-server-signing-cert'"
 }
 
 ssh -t $sshConnection "sudo Threax.DockerTools run /app/$dirName/appsettings.json"
