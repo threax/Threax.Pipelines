@@ -21,8 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.Provision.CheapAzure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DeployConfig", "Threax.DeployConfig\Threax.DeployConfig.csproj", "{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.ConsoleApp", "Threax.ConsoleApp\Threax.ConsoleApp.csproj", "{147D0875-D7D2-478C-95EA-041856E4F719}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Threax.DockerTools", "Threax.DockerTools\Threax.DockerTools.csproj", "{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}"
 EndProject
 Global
@@ -67,10 +65,6 @@ Global
 		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAAB2216-B780-4620-9B73-C2AF3DE45C7C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{147D0875-D7D2-478C-95EA-041856E4F719}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{147D0875-D7D2-478C-95EA-041856E4F719}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{147D0875-D7D2-478C-95EA-041856E4F719}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{147D0875-D7D2-478C-95EA-041856E4F719}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BBECCD8-840A-4FAD-BD1C-6122B0DB508B}.Release|Any CPU.ActiveCfg = Release|Any CPU

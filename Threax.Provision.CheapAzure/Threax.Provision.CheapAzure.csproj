@@ -20,10 +20,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.6" />
     <PackageReference Include="Threax.Azure.Abstractions" Version="1.0.0" />
     <PackageReference Include="Threax.Extensions.Configuration.SchemaBinder" Version="1.5.1" />
+    <PackageReference Include="Threax.ConsoleApp" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Threax.ConsoleApp\Threax.ConsoleApp.csproj" />
     <ProjectReference Include="..\Threax.DeployConfig\Threax.DeployConfig.csproj" />
     <ProjectReference Include="..\Threax.DockerBuildConfig\Threax.DockerBuildConfig.csproj" />
     <ProjectReference Include="..\Threax.Pipelines.Docker\Threax.Pipelines.Docker.csproj" />
