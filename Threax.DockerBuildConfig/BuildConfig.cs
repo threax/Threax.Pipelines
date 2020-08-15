@@ -102,20 +102,22 @@ namespace Threax.DockerBuildConfig
         /// <returns></returns>
         public String GetContext()
         {
+            String basePath;
             if (RepoUrl == null)
             {
-                var context = this.Context;
-                var basePath = Path.GetDirectoryName(SourceFile);
-                if (context != null)
-                {
-                    return Path.Combine(basePath, context);
-                }
-                return basePath;
+                basePath = Path.GetDirectoryName(SourceFile);
             }
             else
             {
-                return ClonePath;
+                basePath = ClonePath;
             }
+
+            var context = this.Context;
+            if (context != null)
+            {
+                return Path.Combine(basePath, context);
+            }
+            return basePath;
         }
     }
 }
