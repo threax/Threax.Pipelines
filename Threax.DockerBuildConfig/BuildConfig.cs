@@ -68,6 +68,11 @@ namespace Threax.DockerBuildConfig
         /// </summary>
         public string Context { get; set; }
 
+        /// <summary>
+        /// A map of arguments to pass as --build-arg params when building.
+        /// </summary>
+        public Dictionary<String, String> Args { get; set; }
+
         public void Validate()
         {
             if (Branch == null)

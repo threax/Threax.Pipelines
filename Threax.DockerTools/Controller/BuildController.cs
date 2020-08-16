@@ -47,8 +47,17 @@ namespace Threax.DockerTools.Controller
                 args += " --pull";
             }
 
+            if(buildConfig.Args != null)
+            {
+                foreach(var arg in buildConfig.Args)
+                {
+                    args += $" --build-arg {arg.Key}={arg.Value}";
+                }
+            }
+
             args += " --progress=plain";
 
+            logger.LogInformation(args);
             var startInfo = new ProcessStartInfo("docker", args);
             startInfo.Environment["DOCKER_BUILDKIT"] = "1";
 
