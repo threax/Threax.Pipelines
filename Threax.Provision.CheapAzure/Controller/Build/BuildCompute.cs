@@ -48,7 +48,12 @@ namespace Threax.Provision.CheapAzure.Controller.Build
                 args += " --pull";
             }
 
-            var exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", args));
+            args += " --progress=plain";
+
+            var startInfo = new ProcessStartInfo("docker", args);
+            startInfo.Environment["DOCKER_BUILDKIT"] = "1";
+
+            var exitCode = processRunner.RunProcessWithOutput(startInfo);
             if (exitCode != 0)
             {
                 throw new InvalidOperationException("An error occured during the docker build.");
