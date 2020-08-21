@@ -28,7 +28,7 @@ namespace Threax.Provision.CheapAzure.Services
             if (creds.User == null)
             {
                 creds.Created = true;
-                creds.User = stringGenerator.CreateBase64String(24);
+                creds.User = stringGenerator.CreateBase64String(rand.Next(8) + 8);
                 creds.User = FixUser(creds.User);
                 await this.keyVaultManager.SetSecret(keyVaultName, creds.UserKey, creds.User);
             }
@@ -36,7 +36,7 @@ namespace Threax.Provision.CheapAzure.Services
             if (creds.Pass == null)
             {
                 creds.Created = true;
-                creds.Pass = stringGenerator.CreateBase64String(32);
+                creds.Pass = stringGenerator.CreateBase64String(rand.Next(24) + 16);
                 creds.Pass = FixPass(creds.Pass);
                 await this.keyVaultManager.SetSecret(keyVaultName, creds.PassKey, creds.Pass);
             }

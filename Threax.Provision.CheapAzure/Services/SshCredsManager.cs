@@ -17,7 +17,7 @@ namespace Threax.Provision.CheapAzure.Services
     class SshCredsManager : IDisposable, ISshCredsManager
     {
         private const string SshRuleName = "SSH";
-
+        private const string LFPlaceholder = "**lf**";
         private readonly Config config;
         private readonly IKeyVaultManager keyVaultManager;
         private readonly ICredentialLookup credentialLookup;
@@ -82,10 +82,66 @@ namespace Threax.Provision.CheapAzure.Services
         public async Task<String> LoadPublicKey()
         {
             var publicKeyName = PublicKeySecretName;
-            var publicKey = await keyVaultManager.GetSecret(config.InfraKeyVaultName, publicKeyName);
+            var publicKey = UnpackKey(await keyVaultManager.GetSecret(config.InfraKeyVaultName, publicKeyName));
             if (publicKey == null)
             {
-                throw new InvalidOperationException($"You must create a key pair with \"ssh-keygen -t rsa -b 2048 -f newazurevm\" and save it as '{publicKeyName}' and '{PrivateKeySecretName}' in the '{config.InfraKeyVaultName}' key vault. Also replace all the newlines with '**lf**'. This is needed to preserve them when they are reloaded. Then run this program again. There is no automation for this step at this time.");
+                logger.LogInformation("Need to create ssh keypair. Please press enter to the prompts below.");
+                var outFile = Path.GetFullPath("newazurevm");
+                var outPubFile = $"{outFile}.pub";
+                try
+                {
+                    var startInfo = new ProcessStartInfo("ssh-keygen", $"-t rsa -b 4096 -o -a 100 -f \"{outFile}\"");
+                    var result = processRunner.RunProcessWithOutput(startInfo);
+                    if (result != 0)
+                    {
+                        throw new InvalidOperationException($"Error creating keys with ssh-keygen. ErrorCode: {result}");
+                    }
+
+                    var privateKey = File.ReadAllText(outFile);
+                    //Clean up newlines in private key, this should work on any os
+                    privateKey = PackKey(privateKey);
+                    await keyVaultManager.SetSecret(config.InfraKeyVaultName, PrivateKeySecretName, privateKey);
+
+                    //Set public key last since this is what satisfies the condition above, don't want to be in a half state.
+                    publicKey = File.ReadAllText(outPubFile);
+                    publicKey = PackKey(publicKey); //Pack the key to store it
+                    if (publicKey.EndsWith(LFPlaceholder))
+                    {
+                        publicKey = publicKey.Substring(0, publicKey.Length - LFPlaceholder.Length);
+                    }
+                    await keyVaultManager.SetSecret(config.InfraKeyVaultName, publicKeyName, publicKey);
+
+                    publicKey = UnpackKey(publicKey); //Unpack the key again to return it
+                }
+                finally
+                {
+                    if (File.Exists(outFile))
+                    {
+                        try
+                        {
+                            File.Delete(outFile);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, $"{ex.GetType().Name} erasing file {outFile}. Please ensure this file is erased manually.");
+                        }
+                    }
+                    if (File.Exists(outPubFile))
+                    {
+                        try
+                        {
+                            File.Delete(outPubFile);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, $"{ex.GetType().Name} erasing file {outFile}. Please ensure this file is erased manually.");
+                        }
+                    }
+
+                    //throw new InvalidOperationException($"You must create a key pair with \"ssh-keygen -t rsa -b 4096 -o -a 100 -f newazurevm\" and save it as '{publicKeyName}' and '{PrivateKeySecretName}' in the '{config.InfraKeyVaultName}' key vault. Also replace all the newlines with '**lf**'. This is needed to preserve them when they are reloaded. Then run this program again. There is no automation for this step at this time.");
+                }
+
+                logger.LogInformation("Finished creating new ssh key. Continuing.");
             }
 
             return publicKey;
@@ -124,19 +180,19 @@ namespace Threax.Provision.CheapAzure.Services
                 logger.LogInformation($"Trying key scan connection to '{sshHost}'. Retry '{retry}'.");
                 key = processRunner.RunProcessWithOutputGetOutput(new ProcessStartInfo("ssh-keyscan", $"-t rsa {sshHost}"));
 
-                if(++retry > 100)
+                if (++retry > 100)
                 {
                     throw new InvalidOperationException($"Retried ssh-keyscan '{retry}' times. Giving up.");
                 }
             } while (String.IsNullOrEmpty(key));
 
             var existing = await keyVaultManager.GetSecret(config.InfraKeyVaultName, config.SshKnownHostKey);
-            if(existing != null && existing != key)
+            if (existing != null && existing != key)
             {
                 logger.LogInformation($"Current saved server key (top) does not match current key on server (bottom). \n'{existing}'\n{key}");
                 logger.LogInformation("If this is because the vm was recreated please enter y below. Otherwise this will be considered an error and the provisioning will stop.");
 
-                if(!"y".Equals(Console.ReadLine(), StringComparison.InvariantCultureIgnoreCase))
+                if (!"y".Equals(Console.ReadLine(), StringComparison.InvariantCultureIgnoreCase))
                 {
                     throw new InvalidOperationException("The ssh keys did not match and were rejected by the user. Key vault not updated.");
                 }
@@ -177,9 +233,8 @@ namespace Threax.Provision.CheapAzure.Services
                     File.AppendAllText(knownHostsFile, key);
                 }
 
-                var publicKey = await keyVaultManager.GetSecret(config.InfraKeyVaultName, PublicKeySecretName);
-                var privateKey = await keyVaultManager.GetSecret(config.InfraKeyVaultName, PrivateKeySecretName);
-                privateKey = privateKey.Replace("**lf**", "\n"); //Replace all placeholder line feeds with real line feeds
+                var publicKey = UnpackKey(await keyVaultManager.GetSecret(config.InfraKeyVaultName, PublicKeySecretName));
+                var privateKey = UnpackKey(await keyVaultManager.GetSecret(config.InfraKeyVaultName, PrivateKeySecretName));
 
                 File.WriteAllText(publicKeyFile, publicKey);
                 File.WriteAllText(privateKeyFile, privateKey);
@@ -196,7 +251,7 @@ namespace Threax.Provision.CheapAzure.Services
                     var startInfo = new ProcessStartInfo("ssh", $"-i \"{privateKeyFile}\" -t \"{vmUser}@{sshHost}\" \"pwd\"");
                     exitCode = processRunner.RunProcessWithOutput(startInfo);
 
-                    if(++retry > 100)
+                    if (++retry > 100)
                     {
                         throw new InvalidOperationException($"Could not establish connection to ssh host '{sshHost}' after '{retry}' retries. Giving up.");
                     }
@@ -212,6 +267,18 @@ namespace Threax.Provision.CheapAzure.Services
             {
                 sshHost = config.VmIpAddress ?? await vmManager.GetPublicIp(config.PublicIpName);
             }
+        }
+
+        private static string PackKey(string key)
+        {
+            key = key?.Replace("\r", "")?.Replace("\n", LFPlaceholder);
+            return key;
+        }
+
+        private static string UnpackKey(string key)
+        {
+            key = key?.Replace(LFPlaceholder, "\n");
+            return key;
         }
     }
 }

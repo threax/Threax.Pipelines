@@ -9,6 +9,11 @@ namespace Threax.Pipelines.Core
     {
         public int RunProcessWithOutput(ProcessStartInfo startInfo)
         {
+            return RunProcessWithOutput(startInfo, null);
+        }
+
+        public int RunProcessWithOutput(ProcessStartInfo startInfo, Action<Process> processCreated)
+        {
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardOutput = true;
             using (var process = Process.Start(startInfo))
@@ -29,6 +34,8 @@ namespace Threax.Pipelines.Core
                 };
                 process.BeginErrorReadLine();
                 process.BeginOutputReadLine();
+
+                processCreated?.Invoke(process);
 
                 process.WaitForExit();
 
