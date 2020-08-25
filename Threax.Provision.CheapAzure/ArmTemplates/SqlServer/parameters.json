@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
   "parameters": {
     "allowAzureIps": {
-      "value": true
+      "value": false
     },
     "administratorLogin": {
       "value": "changethis!"

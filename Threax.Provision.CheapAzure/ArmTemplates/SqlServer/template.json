@@ -27,7 +27,7 @@
     },
     "allowAzureIps": {
       "type": "bool",
-      "defaultValue": true
+      "defaultValue": false
     },
     "enableVA": {
       "type": "bool",
