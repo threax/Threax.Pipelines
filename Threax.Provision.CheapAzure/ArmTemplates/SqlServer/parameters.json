@@ -1,33 +1,42 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "allowAzureIps": {
-            "value": true
-        },
-        "administratorLogin": {
-            "value": "changethis!"
-        },
-        "administratorLoginPassword": {
-            "value": null
-        },
-        "enableADS": {
-            "value": false
-        },
-        "location": {
-            "value": "eastus"
-        },
-        "serverName": {
-            "value": "invalidname!"
-        },
-        "enableVA": {
-            "value": false
-        },
-        "useVAManagedIdentity": {
-            "value": false
-        },
-        "serverTags": {
-            "value": {}
-        }
+  "parameters": {
+    "allowAzureIps": {
+      "value": true
+    },
+    "administratorLogin": {
+      "value": "changethis!"
+    },
+    "administratorLoginPassword": {
+      "value": null
+    },
+    "enableADS": {
+      "value": false
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "serverName": {
+      "value": "invalidname!"
+    },
+    "enableVA": {
+      "value": false
+    },
+    "useVAManagedIdentity": {
+      "value": false
+    },
+    "serverTags": {
+      "value": {}
+    },
+    "vnetRuleName": {
+      "value": "invalidname!"
+    },
+    "vnetName": {
+      "value": "invalidname!"
+    },
+    "vnetSubnetName": {
+      "value": "invalidname!"
     }
+  }
 }

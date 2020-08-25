@@ -83,6 +83,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
             {
                 publicIpAddressName = config.PublicIpName,
                 networkSecurityGroupName = config.NsgName,
+                virtualNetworkName = config.VnetName
             };
             await armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, vm);
 

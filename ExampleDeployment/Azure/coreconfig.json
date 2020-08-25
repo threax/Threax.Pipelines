@@ -8,6 +8,8 @@
   "AppInsightsName": "threax-ai",
   "VmName": "threax-vm",
   "PublicIpName": "threax-vm-ip",
+  "NsgName": "threax-vm-nsg",
+  "VnetName": "threax-vm-vnet",
 
   "TenantId": "",
   "UserId": "",

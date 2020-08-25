@@ -126,5 +126,15 @@ namespace Threax.Provision.CheapAzure
         /// The name of the Network Security Group.
         /// </summary>
         public String NsgName { get; set; }
+
+        /// <summary>
+        /// The name of the vnet.
+        /// </summary>
+        public String VnetName { get; set; }
+
+        /// <summary>
+        /// The name of the vnet subnet. Default: 'default'
+        /// </summary>
+        public String VnetSubnetName { get; set; } = "default";
     }
 }
