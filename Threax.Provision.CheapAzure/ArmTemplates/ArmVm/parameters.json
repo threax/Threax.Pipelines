@@ -1,109 +1,99 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "location": {
-            "value": "eastus"
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "networkInterfaceName": {
+      "value": "invalid!"
+    },
+    "networkSecurityGroupName": {
+      "value": "invalid!"
+    },
+    "networkSecurityGroupRules": {
+      "value": [
+        {
+          "name": "SSH",
+          "properties": {
+            "priority": 300,
+            "protocol": "TCP",
+            "access": "Deny",
+            "direction": "Inbound",
+            "sourceAddressPrefix": "*",
+            "sourcePortRange": "*",
+            "destinationAddressPrefix": "*",
+            "destinationPortRange": "22"
+          }
         },
-        "networkInterfaceName": {
-            "value": "invalid!"
+        {
+          "name": "HTTPS",
+          "properties": {
+            "priority": 320,
+            "protocol": "TCP",
+            "access": "Allow",
+            "direction": "Inbound",
+            "sourceAddressPrefix": "*",
+            "sourcePortRange": "*",
+            "destinationAddressPrefix": "*",
+            "destinationPortRange": "443"
+          }
         },
-        "networkSecurityGroupName": {
-            "value": "invalid!"
-        },
-        "networkSecurityGroupRules": {
-            "value": [
-                {
-                    "name": "SSH",
-                    "properties": {
-                        "priority": 300,
-                        "protocol": "TCP",
-                        "access": "Deny",
-                        "direction": "Inbound",
-                        "sourceAddressPrefix": "*",
-                        "sourcePortRange": "*",
-                        "destinationAddressPrefix": "*",
-                        "destinationPortRange": "22"
-                    }
-                },
-                {
-                    "name": "HTTPS",
-                    "properties": {
-                        "priority": 320,
-                        "protocol": "TCP",
-                        "access": "Allow",
-                        "direction": "Inbound",
-                        "sourceAddressPrefix": "*",
-                        "sourcePortRange": "*",
-                        "destinationAddressPrefix": "*",
-                        "destinationPortRange": "443"
-                    }
-                },
-                {
-                    "name": "HTTP",
-                    "properties": {
-                        "priority": 340,
-                        "protocol": "TCP",
-                        "access": "Allow",
-                        "direction": "Inbound",
-                        "sourceAddressPrefix": "*",
-                        "sourcePortRange": "*",
-                        "destinationAddressPrefix": "*",
-                        "destinationPortRange": "80"
-                    }
-                }
-            ]
-        },
-        "subnetName": {
-            "value": "default"
-        },
-        "virtualNetworkName": {
-            "value": "invalid!"
-        },
-        "addressPrefixes": {
-            "value": [
-                "10.0.0.0/24"
-            ]
-        },
-        "subnets": {
-            "value": [
-                {
-                    "name": "default",
-                    "properties": {
-                        "addressPrefix": "10.0.0.0/24"
-                    }
-                }
-            ]
-        },
-        "publicIpAddressName": {
-            "value": "invalid!"
-        },
-        "publicIpAddressType": {
-            "value": "Static"
-        },
-        "publicIpAddressSku": {
-            "value": "Basic"
-        },
-        "virtualMachineName": {
-            "value": "invalid!"
-        },
-        "virtualMachineComputerName": {
-            "value": "invalid!"
-        },
-        "virtualMachineRG": {
-            "value": "invalid!"
-        },
-        "osDiskType": {
-            "value": "StandardSSD_LRS"
-        },
-        "virtualMachineSize": {
-            "value": "Basic_A1"
-        },
-        "adminUsername": {
-            "value": "azureuser"
-        },
-        "adminPublicKey": {
-            "value": null
+        {
+          "name": "HTTP",
+          "properties": {
+            "priority": 340,
+            "protocol": "TCP",
+            "access": "Allow",
+            "direction": "Inbound",
+            "sourceAddressPrefix": "*",
+            "sourcePortRange": "*",
+            "destinationAddressPrefix": "*",
+            "destinationPortRange": "80"
+          }
         }
+      ]
+    },
+    "subnetName": {
+      "value": "default"
+    },
+    "virtualNetworkName": {
+      "value": "invalid!"
+    },
+    "addressPrefixes": {
+      "value": [
+        "10.0.0.0/24"
+      ]
+    },
+    "publicIpAddressName": {
+      "value": "invalid!"
+    },
+    "publicIpAddressType": {
+      "value": "Static"
+    },
+    "publicIpAddressSku": {
+      "value": "Basic"
+    },
+    "virtualMachineName": {
+      "value": "invalid!"
+    },
+    "virtualMachineComputerName": {
+      "value": "invalid!"
+    },
+    "virtualMachineRG": {
+      "value": "invalid!"
+    },
+    "osDiskType": {
+      "value": "StandardSSD_LRS"
+    },
+    "virtualMachineSize": {
+      "value": "Basic_A1"
+    },
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "adminPublicKey": {
+      "value": null
     }
+  }
 }

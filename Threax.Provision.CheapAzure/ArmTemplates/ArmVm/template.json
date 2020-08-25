@@ -23,9 +23,6 @@
     "addressPrefixes": {
       "type": "array"
     },
-    "subnets": {
-      "type": "array"
-    },
     "publicIpAddressName": {
       "type": "string"
     },
@@ -114,7 +111,22 @@
         "addressSpace": {
           "addressPrefixes": "[parameters('addressPrefixes')]"
         },
-        "subnets": "[parameters('subnets')]"
+        "subnets": [
+          {
+            "name": "default",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql",
+                  "locations": [
+                    "[parameters('location')]"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
       }
     },
     {
