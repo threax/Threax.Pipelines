@@ -5,7 +5,7 @@
     },
     "Create Common": {
       "commandName": "Project",
-      "commandLineArgs": "CreateCommon \"$(ProjectDir)../ExampleDeployment/coreconfig.json\" \"$(ProjectDir)../ExampleDeployment/id/appsettings.json\""
+      "commandLineArgs": "CreateCommon \"$(ProjectDir)../ExampleDeployment/coreconfig.json\""
     },
     "Create Id": {
       "commandName": "Project",
