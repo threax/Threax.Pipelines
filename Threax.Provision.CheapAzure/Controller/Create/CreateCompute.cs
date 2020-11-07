@@ -68,7 +68,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                     await CreateServicePrincipal(spName);
                 }
 
-                var id = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id");
+                var id = (await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id"))?.ToInsecureString();
                 if (id == null)
                 {
                     //If this id is null the service principal id was lost for this app. Recreate it
@@ -82,13 +82,13 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 
                     await CreateServicePrincipal(spName);
 
-                    id = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id");
+                    id = (await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id"))?.ToInsecureString();
                 }
                 await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, Guid.Parse(id));
 
                 //Setup App Connection String Secret
                 logger.LogInformation("Setting app key vault connection string secret.");
-                var vaultCs = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring");
+                var vaultCs = (await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring"))?.ToInsecureString();
 
                 var fileName = Path.GetFileName(configFileProvider.GetConfigPath());
                 var serverConfigFilePath = $"/app/{resource.Name}/{fileName}";

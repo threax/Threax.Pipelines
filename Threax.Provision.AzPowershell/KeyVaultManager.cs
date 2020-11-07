@@ -171,7 +171,7 @@ namespace Threax.Provision.AzPowershell
             }
         }
 
-        public async Task<String> GetSecret(String keyVaultName, String name)
+        public async Task<SecureString> GetSecret(String keyVaultName, String name)
         {
             using (var pwsh = PowerShell.Create())
             {
@@ -189,7 +189,7 @@ namespace Threax.Provision.AzPowershell
 
                 pwsh.ThrowOnErrors($"Error loading '{name}' from Key Vault '{keyVaultName}'.");
                 var info = outputCollection.FirstOrDefault() as dynamic;
-                return info?.SecretValueText;
+                return info?.SecretValue;
             }
         }
 

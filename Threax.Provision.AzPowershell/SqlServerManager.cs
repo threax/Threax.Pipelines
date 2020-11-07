@@ -82,9 +82,9 @@ namespace Threax.Provision.AzPowershell
             pwsh.ThrowOnErrors($"Error removing firewall rule for '{name}' on server {serverName}.");
         }
 
-        public String CreateConnectionString(String serverName, String initialCatalog, String user, String pass)
+        public SecureString CreateConnectionString(String serverName, String initialCatalog, String user, String pass)
         {
-            return $"Server={serverName}.database.windows.net,1433;Initial Catalog={initialCatalog};Persist Security Info=False;User ID={user};Password={pass};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            return $"Server={serverName}.database.windows.net,1433;Initial Catalog={initialCatalog};Persist Security Info=False;User ID={user};Password={pass};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;".ToSecureString();
         }
     }
 }

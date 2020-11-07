@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security;
 using System.Threading.Tasks;
 
 namespace Threax.Provision.AzPowershell
@@ -11,6 +12,6 @@ namespace Threax.Provision.AzPowershell
         
         Task SetFirewallRule(string name, string serverName, string resourceGroupName, string startIp, string endIp);
 
-        String CreateConnectionString(String serverName, String initialCatalog, String user, String pass);
+        SecureString CreateConnectionString(String serverName, String initialCatalog, String user, String pass);
     }
 }

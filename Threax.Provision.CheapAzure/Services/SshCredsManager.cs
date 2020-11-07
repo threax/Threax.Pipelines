@@ -82,7 +82,7 @@ namespace Threax.Provision.CheapAzure.Services
         public async Task<String> LoadPublicKey()
         {
             var publicKeyName = PublicKeySecretName;
-            var publicKey = UnpackKey(await keyVaultManager.GetSecret(config.InfraKeyVaultName, publicKeyName));
+            var publicKey = UnpackKey((await keyVaultManager.GetSecret(config.InfraKeyVaultName, publicKeyName))?.ToInsecureString());
             if (publicKey == null)
             {
                 logger.LogInformation("Need to create ssh keypair. Please press enter to the prompts below.");
@@ -186,7 +186,7 @@ namespace Threax.Provision.CheapAzure.Services
                 }
             } while (String.IsNullOrEmpty(key));
 
-            var existing = await keyVaultManager.GetSecret(config.InfraKeyVaultName, config.SshKnownHostKey);
+            var existing = (await keyVaultManager.GetSecret(config.InfraKeyVaultName, config.SshKnownHostKey))?.ToInsecureString();
             if (existing != null && existing != key)
             {
                 logger.LogInformation($"Current saved server key (top) does not match current key on server (bottom). \n'{existing}'\n{key}");
@@ -226,15 +226,15 @@ namespace Threax.Provision.CheapAzure.Services
                     throw new InvalidOperationException($"Please create an ssh profile at '{knownHostsFile}'.");
                 }
 
-                var key = await keyVaultManager.GetSecret(config.InfraKeyVaultName, config.SshKnownHostKey);
+                var key = (await keyVaultManager.GetSecret(config.InfraKeyVaultName, config.SshKnownHostKey))?.ToInsecureString();
                 var currentKeys = File.ReadAllText(knownHostsFile);
                 if (!currentKeys.Contains(key))
                 {
                     File.AppendAllText(knownHostsFile, key);
                 }
 
-                var publicKey = UnpackKey(await keyVaultManager.GetSecret(config.InfraKeyVaultName, PublicKeySecretName));
-                var privateKey = UnpackKey(await keyVaultManager.GetSecret(config.InfraKeyVaultName, PrivateKeySecretName));
+                var publicKey = UnpackKey((await keyVaultManager.GetSecret(config.InfraKeyVaultName, PublicKeySecretName))?.ToInsecureString());
+                var privateKey = UnpackKey((await keyVaultManager.GetSecret(config.InfraKeyVaultName, PrivateKeySecretName))?.ToInsecureString());
 
                 File.WriteAllText(publicKeyFile, publicKey);
                 File.WriteAllText(privateKeyFile, privateKey);

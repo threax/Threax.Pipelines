@@ -9,7 +9,7 @@ namespace Threax.Provision.AzPowershell
         Task CreateVault(string keyVaultName, string resourceGroupName, string location);
         Task<bool> Exists(string VaultName);
         Task<VaultCertificate> GetCertificate(string VaultName, string Name);
-        Task<string> GetSecret(string keyVaultName, string name);
+        Task<SecureString> GetSecret(string keyVaultName, string name);
         Task ImportCertificate(string VaultName, string Name, byte[] cert, SecureString Password);
         Task ImportCertificate(string VaultName, string Name, string FilePath, SecureString Password);
         Task LockSecrets(string keyVaultName, Guid userId);

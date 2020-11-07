@@ -84,7 +84,7 @@ namespace Threax.Provision.AzPowershell.Tests
         public async Task GetSecret()
         {
             var manager = new KeyVaultManager(mockup.Get<ILogger<KeyVaultManager>>());
-            var result = await manager.GetSecret(TestVault, TestKey);
+            var result = (await manager.GetSecret(TestVault, TestKey))?.ToInsecureString();
             Assert.Equal(result, TestValue);
         }
 
