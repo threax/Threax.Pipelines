@@ -12,3 +12,6 @@ $result = New-AzADServicePrincipal -DisplayName azdo-service-connection -Passwor
 Now in Azure Devops create a new Azure Resource Manager service connection with a manual service principal. Use `$result.ApplicationId` as the Service Principal Id and `ConvertFrom-SecureString $result.Secret -AsPlainText` for the Service principal key. Tenant id and sub id come from azure. This should verify.
 
 When registering permissions on the key vaults use `$result.Id` for the guid. This can be set as the AzDoUser in the core config.
+
+## Troubleshooting
+If you have issues with the az powershell commands running you might need to update / include the libraries it can't load in the main cheapazure executable.
