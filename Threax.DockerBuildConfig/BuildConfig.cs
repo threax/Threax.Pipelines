@@ -52,11 +52,6 @@ namespace Threax.DockerBuildConfig
         public String ClonePath { get; private set; }
 
         /// <summary>
-        /// An array of images to pull when building. These will be pulled with separate docker pull commands.
-        /// </summary>
-        public List<String> PullImages { get; set; }
-
-        /// <summary>
         /// Set this to true to always pull base images when building. This will add 
         /// --pull to build commands. Default: False.
         /// </summary>
