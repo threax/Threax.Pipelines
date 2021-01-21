@@ -342,3 +342,4 @@ healthchecksdb
 /ExampleDeployment/**/data
 /ExampleDeployment/**/secrets
 /ExampleDeployment/**/pod.json
+/ExampleDeployment/Local/**/*tar.gz
