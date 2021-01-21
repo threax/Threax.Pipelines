@@ -19,6 +19,14 @@
       "commandName": "Project",
       "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json"
     },
+    "Backup Id": {
+      "commandName": "Project",
+      "commandLineArgs": "backup $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json"
+    },
+    "Backup Id norestart": {
+      "commandName": "Project",
+      "commandLineArgs": "backup $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json norestart"
+    },
     "Clone AppDashboard": {
       "commandName": "Project",
       "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json"
@@ -31,25 +39,25 @@
       "commandName": "Project",
       "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json"
     },
-    "Clone Notes": {
+    "Clone AppTemplate": {
       "commandName": "Project",
-      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json"
+      "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/Local/apptemplate/appsettings.json"
     },
-    "Build Notes": {
+    "Build AppTemplate": {
       "commandName": "Project",
-      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json"
+      "commandLineArgs": "build $(ProjectDir)../ExampleDeployment/Local/apptemplate/appsettings.json"
     },
-    "Push Notes": {
+    "Push AppTemplate": {
       "commandName": "Project",
-      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json"
+      "commandLineArgs": "push $(ProjectDir)../ExampleDeployment/Local/apptemplate/appsettings.json"
     },
-    "Run Notes": {
+    "Run AppTemplate": {
       "commandName": "Project",
-      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json"
+      "commandLineArgs": "run $(ProjectDir)../ExampleDeployment/Local/apptemplate/appsettings.json"
     },
-    "Exec Notes AddAdmin": {
+    "Exec AppTemplate AddAdmin": {
       "commandName": "Project",
-      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json AddAdmin a5dcd5a3-abef-4814-9f5c-78c3d36b7130"
+      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/apptemplate/appsettings.json AddAdmin a5dcd5a3-abef-4814-9f5c-78c3d36b7130"
     },
     "Build Nginx": {
       "commandName": "Project",
@@ -75,9 +83,9 @@
       "commandName": "Project",
       "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json SetupAppDashboard --exec-load secret appdashboard/JwtAuth__ClientSecret $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json JwtAuth__ClientSecret"
     },
-    "Setup Notes (Run id and notes first)": {
+    "Setup AppTemplate (Run id and apptemplate first)": {
       "commandName": "Project",
-      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json AddFromMetadata \"https://notes.dev.threax.com\" --exec-load secret notes/JwtAuth__ClientSecret $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json JwtAuth__ClientSecret --exec-load secret notes/SharedClientCredentials__ClientSecret $(ProjectDir)../ExampleDeployment/Local/notes/appsettings.json SharedClientCredentials__ClientSecret"
+      "commandLineArgs": "exec $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json AddFromMetadata \"https://apptemplate.dev.threax.com\" --exec-load secret apptemplate/JwtAuth__ClientSecret $(ProjectDir)../ExampleDeployment/Local/apptemplate/appsettings.json JwtAuth__ClientSecret --exec-load secret apptemplate/SharedClientCredentials__ClientSecret $(ProjectDir)../ExampleDeployment/Local/apptemplate/appsettings.json SharedClientCredentials__ClientSecret"
     }
   }
 }

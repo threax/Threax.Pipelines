@@ -61,6 +61,11 @@ namespace Threax.DeployConfig
         public String Group { get; set; } = "10000";
 
         /// <summary>
+        /// The base path to use when backing up data files.
+        /// </summary>
+        public String BackupDataPath { get; set; }
+
+        /// <summary>
         /// If this is set to a string that command will be run inside an InitContainer before the main container is started.
         /// </summary>
         public String InitCommand { get; set; }
