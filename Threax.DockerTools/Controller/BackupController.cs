@@ -64,11 +64,16 @@ namespace Threax.DockerTools.Controller
                 {
                     backupPath = Path.GetFullPath(Path.Combine(backupPath, userProvidedPath));
                 }
+                else
+                {
+                    backupPath = Path.GetFullPath(Path.Combine(backupPath, "backup"));
+                }
+                backupPath = Path.Combine(backupPath, deploymentConfig.Name);
                 if (!Directory.Exists(backupPath))
                 {
                     Directory.CreateDirectory(backupPath);
                 }
-                backupPath = $"{backupPath}/{deploymentConfig.Name}-{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}.tar.gz";
+                backupPath = Path.Combine(backupPath, $"{deploymentConfig.Name}-{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}.tar.gz");
 
                 //Do backup
                 logger.LogInformation($"Backing up data folder '{fullDataPath}' to '{backupPath}'");

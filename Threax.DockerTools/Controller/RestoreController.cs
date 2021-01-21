@@ -54,6 +54,11 @@ namespace Threax.DockerTools.Controller
                 {
                     backupSearchPath = Path.GetFullPath(Path.Combine(backupSearchPath, userProvidedPath));
                 }
+                else
+                {
+                    backupSearchPath = Path.GetFullPath(Path.Combine(backupSearchPath, "backup"));
+                }
+                backupSearchPath = Path.Combine(backupSearchPath, deploymentConfig.Name);
 
                 var backupSearch = $"{deploymentConfig.Name}-*.tar.gz";
                 var backupPath = Directory.EnumerateFiles(backupSearchPath, backupSearch, SearchOption.TopDirectoryOnly)
