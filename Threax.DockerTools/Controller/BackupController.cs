@@ -21,28 +21,29 @@ namespace Threax.DockerTools.Controller
         private IProcessRunner processRunner;
         private readonly IRunTask runTask;
         private readonly IArgsProvider argsProvider;
+        private readonly IStopContainerTask stopContainerTask;
 
         public BackupController(
             DeploymentConfig deploymentConfig,
             ILogger<RunController> logger,
             IProcessRunner processRunner,
             IRunTask runTask,
-            IArgsProvider argsProvider)
+            IArgsProvider argsProvider,
+            IStopContainerTask stopContainerTask)
         {
             this.deploymentConfig = deploymentConfig;
             this.logger = logger;
             this.processRunner = processRunner;
             this.runTask = runTask;
             this.argsProvider = argsProvider;
+            this.stopContainerTask = stopContainerTask;
         }
 
         public Task Run()
         {
             int exitCode;
 
-            //Stop the current running container before backup
-            exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"rm {deploymentConfig.Name} --force"));
-            //It is ok if this fails, probably means it wasn't running
+            stopContainerTask.StopContainer(deploymentConfig.Name);
 
             var args = argsProvider.Args;
             var restart = !args.Contains("norestart");

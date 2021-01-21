@@ -69,6 +69,7 @@ namespace Threax.DockerTools
                 services.AddScoped<ICreateCertificateTask, CreateCertificateTask>();
                 services.AddScoped<ILoadTask, LoadTask>();
                 services.AddScoped<IRunTask, RunTask>();
+                services.AddScoped<IStopContainerTask, StopContainerTask>();
             })
             .Run(c => c.Run());
         }

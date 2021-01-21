@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Threax.DeployConfig;
 using Threax.DockerBuildConfig;
-using Threax.DockerTools.Tasks;
 using Threax.Pipelines.Core;
 using Threax.Pipelines.Docker;
 
@@ -24,6 +23,7 @@ namespace Threax.DockerTools.Tasks
         private readonly IConfigFileProvider configFileProvider;
         private readonly ICreateBase64SecretTask createBase64SecretTask;
         private readonly ICreateCertificateTask createCertificateTask;
+        private readonly IStopContainerTask stopContainerTask;
 
         public RunTask(
             BuildConfig buildConfig,
@@ -34,7 +34,8 @@ namespace Threax.DockerTools.Tasks
             IOSHandler osHandler,
             IConfigFileProvider configFileProvider,
             ICreateBase64SecretTask createBase64SecretTask,
-            ICreateCertificateTask createCertificateTask)
+            ICreateCertificateTask createCertificateTask,
+            IStopContainerTask stopContainerTask)
         {
             this.buildConfig = buildConfig;
             this.deploymentConfig = deploymentConfig;
@@ -45,6 +46,7 @@ namespace Threax.DockerTools.Tasks
             this.configFileProvider = configFileProvider;
             this.createBase64SecretTask = createBase64SecretTask;
             this.createCertificateTask = createCertificateTask;
+            this.stopContainerTask = stopContainerTask;
         }
 
         public Task Run()
@@ -68,8 +70,7 @@ namespace Threax.DockerTools.Tasks
                 taggedImageName = imageManager.FindLatestImage(image, buildConfig.BaseTag, currentTag);
             }
 
-            exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("docker", $"rm {deploymentConfig.Name} --force"));
-            //It is ok if this fails, probably means it wasn't running
+            stopContainerTask.StopContainer(deploymentConfig.Name);
 
             var args = new StringBuilder($"--network appnet --name {deploymentConfig.Name} ");
             if (!String.IsNullOrEmpty(deploymentConfig.User) && !String.IsNullOrEmpty(deploymentConfig.Group))
