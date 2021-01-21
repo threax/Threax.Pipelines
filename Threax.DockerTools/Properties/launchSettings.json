@@ -27,6 +27,14 @@
       "commandName": "Project",
       "commandLineArgs": "backup $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json norestart"
     },
+    "Restore Id": {
+      "commandName": "Project",
+      "commandLineArgs": "restore $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json"
+    },
+    "Restore Id norestart": {
+      "commandName": "Project",
+      "commandLineArgs": "restore $(ProjectDir)../ExampleDeployment/Local/id/appsettings.json norestart"
+    },
     "Clone AppDashboard": {
       "commandName": "Project",
       "commandLineArgs": "clone $(ProjectDir)../ExampleDeployment/Local/appdashboard/appsettings.json"
