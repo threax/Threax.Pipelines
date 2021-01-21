@@ -62,7 +62,7 @@ namespace Threax.DockerTools.Controller
 
                 if(backupPath == null)
                 {
-                    throw new InvalidOperationException($"Cannot find any backup files of the pattern '{backupSearch}'");
+                    throw new InvalidOperationException($"Cannot find any backup files of the pattern '{backupSearch}' in search directory '{backupSearchPath}'.");
                 }
 
                 if (!File.Exists(backupPath))
