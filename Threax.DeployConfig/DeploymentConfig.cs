@@ -18,8 +18,9 @@ namespace Threax.DeployConfig
         public DeploymentConfig(String sourceFile)
         {
             this.SourceFile = sourceFile;
-            this.AppDataBasePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(this.SourceFile), "data"));
-            this.SecretDataBasePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(this.SourceFile), "secrets"));
+            this.DeploymentBasePath = Path.GetFullPath(Path.GetDirectoryName(this.SourceFile));
+            this.AppDataBasePath = Path.GetFullPath(Path.Combine(DeploymentBasePath, "data"));
+            this.SecretDataBasePath = Path.GetFullPath(Path.Combine(DeploymentBasePath, "secrets"));
         }
 
         /// <summary>
@@ -27,6 +28,12 @@ namespace Threax.DeployConfig
         /// </summary>
         [JsonIgnore]
         public String SourceFile { get; private set; }
+
+        /// <summary>
+        /// The parent folder for deployment data.
+        /// </summary>
+        [JsonIgnore]
+        public String DeploymentBasePath { get; set; }
 
         /// <summary>
         /// The path that provides the root volume for relative volume mounts.

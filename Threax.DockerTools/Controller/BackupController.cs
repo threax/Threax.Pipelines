@@ -42,31 +42,32 @@ namespace Threax.DockerTools.Controller
         public Task Run()
         {
             int exitCode;
-
-            stopContainerTask.StopContainer(deploymentConfig.Name);
-
             var args = argsProvider.Args;
             var restart = !args.Contains("norestart");
 
             try
             {
+                //Get source path
                 var fullDataPath = Path.GetFullPath(deploymentConfig.AppDataBasePath);
                 var dataParentPath = Path.GetFullPath(Path.Combine(fullDataPath, ".."));
                 var dataFolder = Path.GetFileName(fullDataPath);
-                var backupPath = deploymentConfig.BackupDataPath;
-                if (String.IsNullOrEmpty(backupPath))
-                {
-                    backupPath = dataParentPath;
-                }
 
+                //Get backup destination path
+                var backupPath = deploymentConfig.DeploymentBasePath;
+                var userProvidedPath = deploymentConfig.BackupDataPath;
+                if (!String.IsNullOrEmpty(userProvidedPath))
+                {
+                    backupPath = Path.GetFullPath(Path.Combine(backupPath, userProvidedPath));
+                }
                 if (!Directory.Exists(backupPath))
                 {
                     Directory.CreateDirectory(backupPath);
                 }
-
                 backupPath = $"{backupPath}/{deploymentConfig.Name}.tar.gz";
 
+                //Do backup
                 logger.LogInformation($"Backing up data folder '{fullDataPath}' to '{backupPath}'");
+                stopContainerTask.StopContainer(deploymentConfig.Name);
 
                 exitCode = processRunner.RunProcessWithOutput(new ProcessStartInfo("tar", $"cvpzf {backupPath} {dataFolder}")
                 {
