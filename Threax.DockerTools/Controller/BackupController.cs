@@ -49,6 +49,11 @@ namespace Threax.DockerTools.Controller
             {
                 //Get source path
                 var fullDataPath = Path.GetFullPath(deploymentConfig.AppDataBasePath);
+                if (!Directory.Exists(fullDataPath))
+                {
+                    throw new InvalidOperationException($"Cannot find source directory '{fullDataPath}'. Skipping backup.");
+                }
+
                 var dataParentPath = Path.GetFullPath(Path.Combine(fullDataPath, ".."));
                 var dataFolder = Path.GetFileName(fullDataPath);
 
