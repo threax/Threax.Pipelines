@@ -3,14 +3,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Threax.ConsoleApp;
 using Threax.DeployConfig;
-using Threax.DockerBuildConfig;
 using Threax.DockerTools.Tasks;
 using Threax.Pipelines.Core;
-using Threax.Pipelines.Docker;
 
 namespace Threax.DockerTools.Controller
 {
@@ -51,13 +48,22 @@ namespace Threax.DockerTools.Controller
                 var destinationPath = Path.GetFullPath(deploymentConfig.AppDataBasePath);
 
                 //Get backup archive source path
-                var backupPath = deploymentConfig.DeploymentBasePath;
+                var backupSearchPath = deploymentConfig.DeploymentBasePath;
                 var userProvidedPath = deploymentConfig.BackupDataPath;
                 if (!String.IsNullOrEmpty(userProvidedPath))
                 {
-                    backupPath = Path.GetFullPath(Path.Combine(backupPath, userProvidedPath));
+                    backupSearchPath = Path.GetFullPath(Path.Combine(backupSearchPath, userProvidedPath));
                 }
-                backupPath = $"{backupPath}/{deploymentConfig.Name}.tar.gz";
+
+                var backupSearch = $"{deploymentConfig.Name}-*.tar.gz";
+                var backupPath = Directory.EnumerateFiles(backupSearchPath, backupSearch, SearchOption.TopDirectoryOnly)
+                    .OrderByDescending(i => i)
+                    .FirstOrDefault();
+
+                if(backupPath == null)
+                {
+                    throw new InvalidOperationException($"Cannot find any backup files of the pattern '{backupSearch}'");
+                }
 
                 if (!File.Exists(backupPath))
                 {

@@ -63,7 +63,7 @@ namespace Threax.DockerTools.Controller
                 {
                     Directory.CreateDirectory(backupPath);
                 }
-                backupPath = $"{backupPath}/{deploymentConfig.Name}.tar.gz";
+                backupPath = $"{backupPath}/{deploymentConfig.Name}-{DateTime.UtcNow.ToString("yyyyMMddHHmmss")}.tar.gz";
 
                 //Do backup
                 logger.LogInformation($"Backing up data folder '{fullDataPath}' to '{backupPath}'");
