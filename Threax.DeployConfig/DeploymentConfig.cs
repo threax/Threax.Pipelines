@@ -68,6 +68,11 @@ namespace Threax.DeployConfig
         public String Group { get; set; } = "10000";
 
         /// <summary>
+        /// Additional groups to put the container user in.
+        /// </summary>
+        public List<String> GroupAdd { get; set; }
+
+        /// <summary>
         /// The base path to use when backing up data files.
         /// </summary>
         public String BackupDataPath { get; set; }

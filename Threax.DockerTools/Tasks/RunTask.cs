@@ -82,6 +82,14 @@ namespace Threax.DockerTools.Tasks
                 logger.LogWarning("No user and group defined. Container will run as root.");
             }
 
+            if (deploymentConfig.GroupAdd != null)
+            {
+                foreach (var group in deploymentConfig.GroupAdd)
+                {
+                    args.Append($"--group-add {group} ");
+                }
+            }
+
             if (deploymentConfig.Environment != null)
             {
                 foreach (var env in deploymentConfig.Environment)
