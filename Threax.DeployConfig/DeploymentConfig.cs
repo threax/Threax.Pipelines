@@ -95,6 +95,11 @@ namespace Threax.DeployConfig
         public Dictionary<String, Secret> Secrets { get; set; }
 
         /// <summary>
+        /// A map of devices.
+        /// </summary>
+        public Dictionary<String, Device> Devices { get; set; }
+
+        /// <summary>
         /// Key value pairs for environment variables.
         /// </summary>
         public Dictionary<String, String> Environment { get; set; }

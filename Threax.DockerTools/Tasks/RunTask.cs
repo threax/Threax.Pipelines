@@ -158,6 +158,19 @@ namespace Threax.DockerTools.Tasks
                 }
             }
 
+            if (deploymentConfig.Devices != null)
+            {
+                foreach (var device in deploymentConfig.Devices)
+                {
+                    args.Append($"--device=\"{device.Value.Source}");
+                    if (!String.IsNullOrEmpty(device.Value.Destination))
+                    {
+                        args.Append($":{device.Value.Destination}");
+                    }
+                    args.Append($"\" ");
+                }
+            }
+
             if (deploymentConfig.AutoMountAppSettings)
             {
                 var path = deploymentConfig.GetSecretDataPath("threax-docker-appsettings-json");
