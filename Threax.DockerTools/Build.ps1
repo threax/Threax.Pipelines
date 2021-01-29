@@ -1,6 +1,6 @@
 param (
     [Parameter(Position=0,mandatory=$true)]$destDir,
-    [Parameter(Position=1)]$unixTarget = "ubuntu.18.04-x64"
+    [Parameter(Position=1)]$unixTarget = "linux-x64"
 )
 
 $scriptPath = Split-Path $script:MyInvocation.MyCommand.Path
@@ -15,7 +15,7 @@ else {
     $target = "win-x64"
 }
 
-Remove-Item -Recurse "$destDir/bin" -ErrorAction 'SilentlyContinue' # Have to call this every time or errors can occur
+Remove-Item -Recurse "$destDir/*" -ErrorAction 'SilentlyContinue' # Have to call this every time or errors can occur
 
 # Build the image then extract the tool from it by running it.
 docker build --build-arg TARGET=$target "$scriptPath/.." -f "$scriptPath/Dockerfile" -t threax-docker-tools-builder --progress=plain
