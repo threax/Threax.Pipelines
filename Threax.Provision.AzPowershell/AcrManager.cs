@@ -5,89 +5,69 @@ using System.Linq;
 using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
+using Threax.ProcessHelper;
 
 namespace Threax.Provision.AzPowershell
 {
     public class AcrManager : IAcrManager
     {
-        private readonly ILogger<AcrManager> logger;
+        private readonly IShellRunner shellRunner;
 
-        public AcrManager(ILogger<AcrManager> logger)
+        public AcrManager(IShellRunner shellRunner)
         {
-            this.logger = logger;
+            this.shellRunner = shellRunner;
         }
 
-        public async Task Create(String Name, String ResourceGroupName, string Location, String Sku)
+        public Task Create(String Name, String ResourceGroupName, string Location, String Sku)
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.ContainerRegistry");
-            var parm = new { Name, ResourceGroupName, Sku, Location };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("New-AzContainerRegistry -EnableAdminUser", parm);
+            pwsh.AddCommand($"Import-Module Az.ContainerRegistry");
+            pwsh.AddResultCommand($"New-AzContainerRegistry -EnableAdminUser -Name {Name} -ResourceGroupName {ResourceGroupName} -Location {Location} -Sku {Sku}");
 
-            var outputCollection = await pwsh.RunAsync();
-
-            pwsh.ThrowOnErrors($"Error creating Azure Container Registry '{Name}' in Resource Group '{ResourceGroupName}' in '{Location}' with sku '{Sku}'.");
+            return shellRunner.RunProcessVoidAsync(pwsh,
+                invalidExitCodeMessage: $"Error creating Azure Container Registry '{Name}' in Resource Group '{ResourceGroupName}' in '{Location}' with sku '{Sku}'.");
         }
 
         public async Task<bool> IsNameAvailable(String Name)
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.ContainerRegistry");
-            var parm = new { Name };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("Test-AzContainerRegistryNameAvailability", parm);
+            pwsh.AddCommand($"Import-Module Az.ContainerRegistry");
+            pwsh.AddResultCommand($"Test-AzContainerRegistryNameAvailability -Name {Name}");
 
-            var outputCollection = await pwsh.RunAsync();
+            dynamic result = await shellRunner.RunProcessAsync(pwsh,
+                invalidExitCodeMessage: $"Error testing Azure Container Registry name availability for '{Name}'.");
 
-            pwsh.ThrowOnErrors($"Error testing Azure Container Registry name availability for '{Name}'.");
-
-            dynamic result = outputCollection.First();
             return result.NameAvailable;
         }
 
         public async Task GetAcr(String Name, String ResourceGroupName)
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.ContainerRegistry");
-            var parm = new { Name, ResourceGroupName, };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("Get-AzContainerRegistry", parm);
+            pwsh.AddCommand($"Import-Module Az.ContainerRegistry");
+            pwsh.AddResultCommand($"Get-AzContainerRegistry -Name {Name} -ResourceGroupName {ResourceGroupName}");
 
-            var outputCollection = await pwsh.RunAsync();
+            dynamic result = await shellRunner.RunProcessAsync(pwsh,
+                invalidExitCodeMessage: $"Error getting Azure Container Registry '{Name}' in Resource Group '{ResourceGroupName}'.");
 
-            pwsh.ThrowOnErrors($"Error getting Azure Container Registry '{Name}' in Resource Group '{ResourceGroupName}'.");
         }
 
         public async Task<AcrCredential> GetAcrCredential(String Name, String ResourceGroupName)
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.ContainerRegistry");
-            var parm = new { Name, ResourceGroupName, };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("Get-AzContainerRegistryCredential", parm);
+            pwsh.AddCommand($"Import-Module Az.ContainerRegistry");
+            pwsh.AddResultCommand($"Get-AzContainerRegistryCredential -Name {Name} -ResourceGroupName {ResourceGroupName}");
 
-            var outputCollection = await pwsh.RunAsync();
+            dynamic result = await shellRunner.RunProcessAsync(pwsh,
+                invalidExitCodeMessage: $"Error getting Azure Container Registry '{Name}' in Resource Group '{ResourceGroupName}'.");
 
-            pwsh.ThrowOnErrors($"Error getting Azure Container Registry '{Name}' in Resource Group '{ResourceGroupName}'.");
-
-            dynamic result = outputCollection.First();
             return new AcrCredential
             {
                 Username = result.Username,

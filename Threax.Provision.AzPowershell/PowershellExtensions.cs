@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Threax.ProcessHelper;
 
 namespace Threax.Provision.AzPowershell
 {
@@ -101,6 +102,15 @@ namespace Threax.Provision.AzPowershell
             {
                 //Only do this on Windows
                 pwsh.AddScript("Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
+            }
+        }
+
+        public static void SetUnrestrictedExecution(this IShellCommandBuilder pwsh)
+        {
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                //Only do this on Windows
+                //pwsh.AddCommand($"Set-ExecutionPolicy -ExecutionPolicy Unrestricted");
             }
         }
 

@@ -11,6 +11,8 @@
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.3" />
     <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="7.0.3" />
     <PackageReference Include="Microsoft.WSMan.Management" Version="7.0.3" />
+    <PackageReference Include="Threax.ProcessHelper" Version="1.0.0-pre19" />
+    <PackageReference Include="Threax.ProcessHelper.Pwsh" Version="1.0.0-pre19" />
   </ItemGroup>
 
 </Project>
