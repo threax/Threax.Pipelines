@@ -5,35 +5,30 @@ using System.Linq;
 using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
+using Threax.ProcessHelper;
 
 namespace Threax.Provision.AzPowershell
 {
     public class AppInsightsManager : IAppInsightsManager
     {
-        private readonly ILogger<AppInsightsManager> logger;
+        private readonly IShellRunner shellRunner;
 
-        public AppInsightsManager(ILogger<AppInsightsManager> logger)
+        public AppInsightsManager(IShellRunner shellRunner)
         {
-            this.logger = logger;
+            this.shellRunner = shellRunner;
         }
 
         public async Task<String> GetAppInsightsInstrumentationKey(String Name, String ResourceGroupName)
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.ApplicationInsights");
-            var parm = new { Name, ResourceGroupName, };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("Get-AzApplicationInsights", parm);
+            pwsh.AddCommand($"Import-Module Az.ApplicationInsights");
+            pwsh.AddResultCommand($"Get-AzApplicationInsights -Name {Name} -ResourceGroupName {ResourceGroupName}");
 
-            var outputCollection = await pwsh.RunAsync();
+            dynamic result = await shellRunner.RunProcessAsync(pwsh,
+               invalidExitCodeMessage: $"Error getting App Insights instrumentation key for '{Name}' in Resource Group '{ResourceGroupName}'.");
 
-            pwsh.ThrowOnErrors($"Error getting Azure Container Registry '{Name}' in Resource Group '{ResourceGroupName}'.");
-
-            dynamic result = outputCollection.First();
             return result.InstrumentationKey;
         }
     }

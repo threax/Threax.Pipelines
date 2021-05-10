@@ -1,4 +1,4 @@
-//#define ENABLE_ARM_TESTS
+#define ENABLE_ARM_TESTS
 
 using System;
 using Xunit;
@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Threax.AspNetCore.Tests;
 using Castle.Core.Logging;
 using Microsoft.Extensions.Logging;
+using Xunit.Abstractions;
+using Threax.ProcessHelper;
 
 namespace Threax.Provision.AzPowershell.Tests
 {
@@ -18,6 +20,11 @@ namespace Threax.Provision.AzPowershell.Tests
 
         Mockup mockup = new Mockup();
 
+        public ArmTemplateManagerTests(ITestOutputHelper output)
+        {
+            mockup.AddCommonMockups(output);
+        }
+
         [Fact
 #if !ENABLE_ARM_TESTS
          (Skip = "Arm Tests Disabled")
@@ -25,7 +32,7 @@ namespace Threax.Provision.AzPowershell.Tests
         ]
         public async Task DeployRg()
         {
-            var manager = new ArmTemplateManager(mockup.Get<ILogger<ArmTemplateManager>>());
+            var manager = new ArmTemplateManager(mockup.Get<IShellRunner>());
             await manager.SubscriptionDeployment(TestLoc, "ResourceGroupTemplate/template.json", "ResourceGroupTemplate/parameters.json");
         }
 
@@ -36,7 +43,7 @@ namespace Threax.Provision.AzPowershell.Tests
         ]
         public async Task DeployRgOverride()
         {
-            var manager = new ArmTemplateManager(mockup.Get<ILogger<ArmTemplateManager>>());
+            var manager = new ArmTemplateManager(mockup.Get<IShellRunner>());
             await manager.SubscriptionDeployment(TestLoc, "ResourceGroupTemplate/template.json", "ResourceGroupTemplate/parameters.json", new { rgName = TestOverrideRg });
             }
 
@@ -47,8 +54,8 @@ namespace Threax.Provision.AzPowershell.Tests
         ]
         public async Task DeployKeyVault()
         {
-            var manager = new ArmTemplateManager(mockup.Get<ILogger<ArmTemplateManager>>());
-            await manager.ResourceGroupDeployment(TestRg, "KeyVaultTemplate/template.json", "KeyVaultTemplate/parameters.json");
+            var manager = new ArmTemplateManager(mockup.Get<IShellRunner>());
+            await manager.ResourceGroupDeployment(TestRg, "KeyVaultTemplate/template.json", "KeyVaultTemplate/parameters.json", new { tenant = "" });
         }
 
         [Fact
@@ -59,8 +66,8 @@ namespace Threax.Provision.AzPowershell.Tests
         public async Task DeployKeyVaultOverride()
         {
             //Note that this test also shows how to use nameFromTemplate to pass any parameters that are name in the arm template.
-            var manager = new ArmTemplateManager(mockup.Get<ILogger<ArmTemplateManager>>());
-            await manager.ResourceGroupDeployment(TestOverrideRg, "KeyVaultTemplate/template.json", "KeyVaultTemplate/parameters.json", new { nameFromTemplate = "threax-prov-override-kv" } /*In the template this is just name. Have to use nameFromTemplate to pass that value. This does not seem to be documented anywhere.*/ );
+            var manager = new ArmTemplateManager(mockup.Get<IShellRunner>());
+            await manager.ResourceGroupDeployment(TestOverrideRg, "KeyVaultTemplate/template.json", "KeyVaultTemplate/parameters.json", new { tenant = "", nameFromTemplate = "threax-prov-override-kv" } /*In the template this is just name. Have to use nameFromTemplate to pass that value. This does not seem to be documented anywhere.*/ );
         }
     }
 }

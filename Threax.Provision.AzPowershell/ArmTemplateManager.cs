@@ -7,37 +7,30 @@ using System.Linq;
 using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
+using Threax.ProcessHelper;
 
 namespace Threax.Provision.AzPowershell
 {
     public class ArmTemplateManager : IArmTemplateManager
     {
-        private readonly ILogger<ArmTemplateManager> logger;
+        private readonly IShellRunner shellRunner;
 
-        public ArmTemplateManager(ILogger<ArmTemplateManager> logger)
+        public ArmTemplateManager(IShellRunner shellRunner)
         {
-            this.logger = logger;
+            this.shellRunner = shellRunner;
         }
 
-        public async Task ResourceGroupDeployment(String resourceGroupName, String templateFile, String templateParameterFile, Object args)
+        public Task ResourceGroupDeployment(String resourceGroupName, String templateFile, String templateParameterFile, Object args)
         {
-            //Setup Args
-            var pwshArgs = new List<KeyValuePair<String, Object>>()
-                { new KeyValuePair<string, object>("ResourceGroupName", resourceGroupName) }
-                .Concat(SetupArgs(ref templateFile, ref templateParameterFile, args));
-
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Resources");
-            pwsh.AddParamLine(pwshArgs);
-            pwsh.AddCommandWithParams("New-AzResourceGroupDeployment", pwshArgs);
+            pwsh.AddCommand($"Import-Module Az.Resources");
+            var commands = new FormattableString[] { $"New-AzResourceGroupDeployment -Name {Guid.NewGuid()} -ResourceGroupName {resourceGroupName}" }.Concat(SetupArgs(ref templateFile, ref templateParameterFile, args));
+            pwsh.AddResultCommand(commands);
 
-            var outputCollection = await pwsh.RunAsync();
-
-            pwsh.ThrowOnErrors($"Error creating Arm Template '{templateFile}' in Resource Group '{resourceGroupName}'.");
+            return shellRunner.RunProcessVoidAsync(pwsh,
+                invalidExitCodeMessage: $"Error creating Arm Template '{templateFile}' in Resource Group '{resourceGroupName}'.");
         }
 
         public Task ResourceGroupDeployment(String resourceGroupName, String templateFile, Object args)
@@ -60,26 +53,17 @@ namespace Threax.Provision.AzPowershell
             return ResourceGroupDeployment(resourceGroupName, armTemplate.GetTemplatePath(), armTemplate.GetParametersPath(), armTemplate);
         }
 
-        public async Task SubscriptionDeployment(String location, String templateFile, String templateParameterFile, Object args)
+        public Task SubscriptionDeployment(String location, String templateFile, String templateParameterFile, Object args)
         {
-            var objectArgs = SetupArgs(ref templateFile, ref templateParameterFile, args);
-            var pwshArgs = new List<KeyValuePair<String, Object>>()
-                { new KeyValuePair<string, object>("Location", location) }
-                .Concat(objectArgs);
-
-            //This should work, but library load error
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Resources");
-            pwsh.AddParamLine(pwshArgs);
-            pwsh.AddCommandWithParams("New-AzDeployment", pwshArgs);
+            pwsh.AddCommand($"Import-Module Az.Resources");
+            var commands = new FormattableString[] { $"New-AzDeployment -Name {Guid.NewGuid()} -Location {location}" }.Concat(SetupArgs(ref templateFile, ref templateParameterFile, args));
+            pwsh.AddResultCommand(commands);
 
-            var outputCollection = await pwsh.RunAsync();
-
-            pwsh.ThrowOnErrors($"Error creating Arm Template Deployment '{templateFile}' in Location '{location}'.");
+            return shellRunner.RunProcessVoidAsync(pwsh,
+                invalidExitCodeMessage: $"Error creating Arm Template Deployment '{templateFile}' in Location '{location}'.");
         }
 
         public Task SubscriptionDeployment(String location, String templateFile, Object args)
@@ -102,21 +86,27 @@ namespace Threax.Provision.AzPowershell
             return SubscriptionDeployment(resourceGroupName, armTemplate.GetTemplatePath(), armTemplate.GetParametersPath(), armTemplate);
         }
 
-        private static IEnumerable<KeyValuePair<string, object>> SetupArgs(ref string templateFile, ref string templateParameterFile, Object args)
+        private static IEnumerable<FormattableString> SetupArgs(ref string templateFile, ref string templateParameterFile, Object args)
         {
-            var mainArgs = new List<KeyValuePair<String, Object>>()
+            templateFile = Path.GetFullPath(templateFile);
+
+            var mainArgs = new List<FormattableString>()
             {
-                new KeyValuePair<string, object>("TemplateFile", templateFile = Path.GetFullPath(templateFile))
+                $" -TemplateFile {templateFile}"
             };
 
             if (templateParameterFile != null)
             {
                 templateParameterFile = Path.GetFullPath(templateParameterFile);
-                mainArgs.Add(new KeyValuePair<string, object>("TemplateParameterFile", templateParameterFile));
+                mainArgs.Add($" -TemplateParameterFile {templateParameterFile}");
             }
 
-            var pwshArgs = mainArgs.Concat(TypeHelper.GetPropertiesAndValues(args).Where(i => i.Value != null)); //Only values that aren't null
-            return pwshArgs;
+            foreach (var prop in TypeHelper.GetPropertiesAndValues(args).Where(i => i.Value != null))
+            {
+                mainArgs.Add($" -{new RawProcessString(prop.Key)} {prop.Value}");
+            }
+
+            return mainArgs;
         }
     }
 }
