@@ -111,5 +111,58 @@ namespace Threax.Provision.AzPowershell
 
             return info != null;
         }
+
+        public Task ImportCertificate(String VaultName, String Name, String FilePath, String Password)
+        {
+            var pwsh = shellRunner.CreateCommandBuilder();
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddCommand($"Import-Module Az.KeyVault");
+            pwsh.AddCommand($"$securePass = ConvertTo-SecureString {Password} -AsPlainText -Force");
+            pwsh.AddResultCommand($"Import-AzKeyVaultCertificate -VaultName {VaultName} -Name {Name} -FilePath {FilePath} -Password $securePass");
+
+            return shellRunner.RunProcessVoidAsync(pwsh,
+               invalidExitCodeMessage: $"Error Importing Certificate '{Name}' to Key Vault '{VaultName}'.");
+        }
+
+        public async Task ImportCertificate(String VaultName, String Name, byte[] cert, String Password)
+        {
+            var outFile = Path.GetTempFileName();
+            try
+            {
+                using (var stream = File.Open(outFile, FileMode.Create))
+                {
+                    stream.Write(cert);
+                }
+                await ImportCertificate(VaultName, Name, outFile, Password);
+            }
+            finally
+            {
+                if (File.Exists(outFile))
+                {
+                    File.Delete(outFile);
+                }
+            }
+        }
+
+        public async Task<VaultCertificate> GetCertificate(String VaultName, String Name)
+        {
+            var pwsh = shellRunner.CreateCommandBuilder();
+
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddCommand($"Import-Module Az.KeyVault");
+            pwsh.AddResultCommand($"Get-AzKeyVaultCertificate -VaultName {VaultName} -Name {Name}");
+
+            dynamic info = await shellRunner.RunProcessAsync(pwsh,
+                invalidExitCodeMessage: $"Error getting certificate '{Name}' from Key Vault '{VaultName}'.");
+
+            return info != null ?
+                new VaultCertificate()
+                {
+                    KeyId = info.KeyId,
+                    SecretId = info.SecretId,
+                    Thumbprint = info.Thumbprint
+                } : null;
+        }
     }
 }
