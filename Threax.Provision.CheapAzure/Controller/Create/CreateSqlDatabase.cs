@@ -58,7 +58,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             await sqlServerFirewallRuleManager.Unlock(config.SqlServerName, config.ResourceGroup, machineIp, machineIp);
 
             var saCreds = await credentialLookup.GetOrCreateCredentials(config.InfraKeyVaultName, config.SqlSaBaseKey);
-            var saConnectionString = (sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, saCreds.User, saCreds.Pass))?.ToInsecureString();
+            var saConnectionString = sqlServerManager.CreateConnectionString(config.SqlServerName, config.SqlDbName, saCreds.User, saCreds.Pass);
 
             //Setup user in new db
             logger.LogInformation($"Setting up users for {resource.Name} in Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");

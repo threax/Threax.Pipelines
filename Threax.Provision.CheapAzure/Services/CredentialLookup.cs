@@ -50,8 +50,8 @@ namespace Threax.Provision.CheapAzure.Services
             var userKey = $"{credBaseName}-user";
             var passKey = $"{credBaseName}-pass";
 
-            var user = (await this.keyVaultManager.GetSecret(keyVaultName, userKey))?.ToInsecureString();
-            var pass = (await this.keyVaultManager.GetSecret(keyVaultName, passKey))?.ToInsecureString();
+            var user = await this.keyVaultManager.GetSecret(keyVaultName, userKey);
+            var pass = await this.keyVaultManager.GetSecret(keyVaultName, passKey);
 
             return new Credential()
             {

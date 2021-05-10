@@ -12,6 +12,6 @@ namespace Threax.Provision.AzPowershell
         
         Task SetFirewallRule(string name, string serverName, string resourceGroupName, string startIp, string endIp);
 
-        SecureString CreateConnectionString(String serverName, String initialCatalog, String user, String pass);
+        String CreateConnectionString(String serverName, String initialCatalog, String user, String pass);
     }
 }

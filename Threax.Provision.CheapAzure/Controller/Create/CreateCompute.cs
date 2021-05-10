@@ -68,7 +68,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                     await CreateServicePrincipal(spName);
                 }
 
-                var id = (await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id"))?.ToInsecureString();
+                var id = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id");
                 if (id == null)
                 {
                     //If this id is null the service principal id was lost for this app. Recreate it
@@ -82,13 +82,13 @@ namespace Threax.Provision.CheapAzure.Controller.Create
 
                     await CreateServicePrincipal(spName);
 
-                    id = (await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id"))?.ToInsecureString();
+                    id = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-id");
                 }
                 await keyVaultManager.UnlockSecretsRead(azureKeyVaultConfig.VaultName, Guid.Parse(id));
 
                 //Setup App Connection String Secret
                 logger.LogInformation("Setting app key vault connection string secret.");
-                var vaultCs = (await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring"))?.ToInsecureString();
+                var vaultCs = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring");
 
                 var fileName = Path.GetFileName(configFileProvider.GetConfigPath());
                 var serverConfigFilePath = $"/app/{resource.Name}/{fileName}";
@@ -114,7 +114,7 @@ namespace Threax.Provision.CheapAzure.Controller.Create
             var sp = await servicePrincipalManager.CreateServicePrincipal(spName, config.SubscriptionId, config.ResourceGroup);
             await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, "sp-id", sp.Id);
             await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, "sp-appkey", sp.Secret);
-            var appKey = (await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-appkey"))?.ToInsecureString();
+            var appKey = await keyVaultManager.GetSecret(azureKeyVaultConfig.VaultName, "sp-appkey");
             var spConnectionString = $"RunAs=App;AppId={sp.ApplicationId};TenantId={config.TenantId};AppKey={appKey}";
             await keyVaultManager.SetSecret(azureKeyVaultConfig.VaultName, "sp-connectionstring", spConnectionString);
         }

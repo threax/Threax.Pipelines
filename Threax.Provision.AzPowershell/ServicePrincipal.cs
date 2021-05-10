@@ -15,7 +15,7 @@ namespace Threax.Provision.AzPowershell
         /// <summary>
         /// The secret to use to connect to the service principal. This is only returned when the service principal is newly created.
         /// </summary>
-        public SecureString Secret { get; set; }
+        public String Secret { get; set; }
 
         /// <summary>
         /// The application id for the service principal.
