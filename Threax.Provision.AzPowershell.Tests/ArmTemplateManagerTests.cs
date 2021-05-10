@@ -1,4 +1,4 @@
-#define ENABLE_ARM_TESTS
+//#define ENABLE_ARM_TESTS
 
 using System;
 using Xunit;

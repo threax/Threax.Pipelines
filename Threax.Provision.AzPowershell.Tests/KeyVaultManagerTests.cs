@@ -1,4 +1,4 @@
-#define ENABLE_KEY_VAULT_TESTS
+//#define ENABLE_KEY_VAULT_TESTS
 
 using System;
 using Xunit;
