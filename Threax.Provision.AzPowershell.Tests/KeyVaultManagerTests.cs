@@ -1,4 +1,4 @@
-//#define ENABLE_KEY_VAULT_TESTS
+#define ENABLE_KEY_VAULT_TESTS
 
 using System;
 using Xunit;
@@ -17,15 +17,16 @@ namespace Threax.Provision.AzPowershell.Tests
         const string TestVault = "threax-prov-kv";
         const string TestRg = "threax-prov-rg";
         const string TestRegion = "East US";
-        static readonly Guid TestGuid = Guid.Parse("e172b235-4b92-4a6f-96e9-c7097bb973db"); //Set this to a real guid.
         const string TestKey = "TestSecret";
         const string TestValue = "A Test Value";
 
         Mockup mockup = new Mockup();
+        Config config;
 
         public KeyVaultManagerTests(ITestOutputHelper output)
         {
             mockup.AddCommonMockups(output);
+            config = mockup.Get<Config>();
         }
 
         [Fact
@@ -36,7 +37,7 @@ namespace Threax.Provision.AzPowershell.Tests
         public async Task UnlockSecrets()
         {
             var manager = new KeyVaultManager(mockup.Get<IShellRunner>());
-            await manager.UnlockSecrets(TestVault, TestGuid);
+            await manager.UnlockSecrets(TestVault, config.UserGuid);
         }
 
         [Fact
@@ -47,7 +48,7 @@ namespace Threax.Provision.AzPowershell.Tests
         public async Task LockSecrets()
         {
             var manager = new KeyVaultManager(mockup.Get<IShellRunner>());
-            await manager.LockSecrets(TestVault, TestGuid);
+            await manager.LockSecrets(TestVault, config.UserGuid);
         }
 
         [Fact
@@ -94,8 +95,8 @@ namespace Threax.Provision.AzPowershell.Tests
         {
             using var keyVaultAccess = new KeyVaultAccessManager(new KeyVaultManager(mockup.Get<IShellRunner>()));
 
-            await keyVaultAccess.Unlock(TestVault, TestGuid);
-            await keyVaultAccess.Unlock(TestVault, TestGuid);
+            await keyVaultAccess.Unlock(TestVault, config.UserGuid);
+            await keyVaultAccess.Unlock(TestVault, config.UserGuid);
         }
 
         [Fact

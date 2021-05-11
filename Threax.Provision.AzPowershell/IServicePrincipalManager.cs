@@ -9,8 +9,6 @@ namespace Threax.Provision.AzPowershell
 
         Task Remove(String DisplayName);
 
-        Task RemoveApplication(String DisplayName);
-
         Task<ServicePrincipal> CreateServicePrincipal(string name, string subscription, string resourceGroup, string role = "Reader");
     }
 }

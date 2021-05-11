@@ -77,7 +77,6 @@ namespace Threax.Provision.CheapAzure.Controller.Create
                     if (await servicePrincipalManager.Exists(spName))
                     {
                         await servicePrincipalManager.Remove(spName);
-                        await servicePrincipalManager.RemoveApplication(spName);
                     }
 
                     await CreateServicePrincipal(spName);

@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Text.Json;
 using Threax.AspNetCore.Tests;
 using Threax.ProcessHelper;
 using Xunit.Abstractions;
@@ -23,6 +25,12 @@ namespace Threax.Provision.AzPowershell.Tests
                         OutputDataReceived = (o, e) => { if (e.Data != null) output.WriteLine(e.Data); },
                     }
                 };
+            });
+
+            mockup.MockServiceCollection.AddSingleton<Config>(s =>
+            {
+                var json = File.ReadAllText("config.json");
+                return JsonSerializer.Deserialize<Config>(json);
             });
 
             return mockup;

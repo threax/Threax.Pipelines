@@ -5,88 +5,61 @@ using System.Linq;
 using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
+using Threax.ProcessHelper;
 
 namespace Threax.Provision.AzPowershell
 {
     public class ServicePrincipalManager : IServicePrincipalManager
     {
-        private readonly ILogger<ServicePrincipalManager> logger;
+        private readonly IShellRunner shellRunner;
 
-        public ServicePrincipalManager(ILogger<ServicePrincipalManager> logger)
+        public ServicePrincipalManager(IShellRunner shellRunner)
         {
-            this.logger = logger;
+            this.shellRunner = shellRunner;
         }
 
         public async Task<bool> Exists(String DisplayName)
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Resources");
-            var parm = new { DisplayName };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("Get-AzADServicePrincipal", parm);
+            pwsh.AddCommand($"Import-Module Az.Resources");
+            pwsh.AddResultCommand($"Get-AzADServicePrincipal -DisplayName {DisplayName}");
 
-            var outputCollection = await pwsh.RunAsync();
+            var result = await shellRunner.RunProcessAsync(pwsh,
+                invalidExitCodeMessage: $"Error getting service principal '{DisplayName}'.");
 
-            pwsh.ThrowOnErrors($"Error getting service principal '{DisplayName}'.");
-
-            return outputCollection.Any();
+            return result.Type != Newtonsoft.Json.Linq.JTokenType.Null;
         }
 
-        public async Task Remove(String DisplayName)
+        public Task Remove(String DisplayName)
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Resources");
-            var parm = new { DisplayName };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("Remove-AzADServicePrincipal -Force", parm);
+            pwsh.AddCommand($"Import-Module Az.Resources");
+            pwsh.AddCommand($"Remove-AzADServicePrincipal -Force -DisplayName {DisplayName}");
+            pwsh.AddResultCommand($"Remove-AzADApplication -Force -DisplayName {DisplayName}");
 
-            var outputCollection = await pwsh.RunAsync();
-
-            pwsh.ThrowOnErrors($"Error getting service principal '{DisplayName}'.");
-        }
-
-        public async Task RemoveApplication(String DisplayName)
-        {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
-
-            pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Resources");
-            var parm = new { DisplayName };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("Remove-AzADApplication -Force", parm);
-
-            var outputCollection = await pwsh.RunAsync();
-
-            pwsh.ThrowOnErrors($"Error getting service principal '{DisplayName}'.");
+            return shellRunner.RunProcessVoidAsync(pwsh,
+                invalidExitCodeMessage: $"Error getting service principal '{DisplayName}'.");
         }
 
         public async Task<ServicePrincipal> CreateServicePrincipal(String displayName, String subscription, String resourceGroup, String role = "Reader")
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Resources");
-            var parm = new { DisplayName = displayName, Role = role, Scope = $"/subscriptions/{subscription}/resourceGroups/{resourceGroup}" };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("New-AzADServicePrincipal", parm);
+            pwsh.AddCommand($"Import-Module Az.Resources");
+            var scope = $"/subscriptions/{subscription}/resourceGroups/{resourceGroup}";
+            pwsh.AddCommand($"$info = New-AzADServicePrincipal -DisplayName {displayName} -Role {role} -Scope {scope}");
+            pwsh.AddCommand($"if($info -eq $null){{ throw }}");
+            pwsh.AddCommand($"$secret = ConvertFrom-SecureString -SecureString $info.Secret -AsPlainText");
+            pwsh.AddResultCommand($"@{{Secret = $secret;Id = $info.Id;ApplicationId = $info.ApplicationId;DisplayName = $info.DisplayName;}}");
 
-            var outputCollection = await pwsh.RunAsync();
+            dynamic result = await shellRunner.RunProcessAsync(pwsh,
+                invalidExitCodeMessage: $"Error creating service principal '{displayName}' in Scope '{scope}' with role '{role}'.");
 
-            pwsh.ThrowOnErrors($"Error creating service principal '{displayName}' in Scope '{parm.Scope}' with role '{role}'.");
-
-            dynamic result = outputCollection.First();
             return new ServicePrincipal
             {
                 Id = result.Id,

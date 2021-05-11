@@ -10,7 +10,7 @@ namespace Threax.Provision.AzPowershell.Tests
 {
     public class SubscriptionManagerTests
     {
-        static readonly Guid TestGuid = Guid.Empty; //Set to a real subscription guid
+        static readonly Guid Subscription = Guid.Empty; //Set to a real subscription guid
 
         Mockup mockup = new Mockup();
 
@@ -22,7 +22,7 @@ namespace Threax.Provision.AzPowershell.Tests
         public async Task SetContext()
         {
             var manager = new SubscriptionManager(mockup.Get<ILogger<SubscriptionManager>>());
-            await manager.SetContext(TestGuid);
+            await manager.SetContext(Subscription);
         }
 
         [Fact]
