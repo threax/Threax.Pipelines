@@ -5,35 +5,29 @@ using System.Linq;
 using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
+using Threax.ProcessHelper;
 
 namespace Threax.Provision.AzPowershell
 {
     public class StorageManager : IStorageManager
     {
-        private readonly ILogger<StorageManager> logger;
+        private readonly IShellRunner shellRunner;
 
-        public StorageManager(ILogger<StorageManager> logger)
+        public StorageManager(IShellRunner shellRunner)
         {
-            this.logger = logger;
+            this.shellRunner = shellRunner;
         }
 
         public async Task<String> GetAccessKey(String AccountName, String ResourceGroupName)
         {
-            var pwshArgs = new { AccountName, ResourceGroupName };
-
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Storage");
-            pwsh.AddParamLine(pwshArgs);
-            pwsh.AddCommandWithParams("Get-AzStorageAccountKey", pwshArgs);
+            pwsh.AddCommand($"Import-Module Az.Storage");
+            pwsh.AddResultCommand($"Get-AzStorageAccountKey -AccountName {AccountName} -ResourceGroupName {ResourceGroupName}");
 
-            var outputCollection = await pwsh.RunAsync();
-            pwsh.ThrowOnErrors($"Error getting storage account key for '{AccountName}' in Resource Group '{ResourceGroupName}'.");
-
-            dynamic result = outputCollection.First();
+            dynamic result = await shellRunner.RunProcessAsync(pwsh,
+                invalidExitCodeMessage: $"Error getting storage account key for '{AccountName}' in Resource Group '{ResourceGroupName}'.");
 
             return result.Value;
         }

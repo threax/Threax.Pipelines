@@ -2,34 +2,29 @@
 using System;
 using System.Management.Automation;
 using System.Threading.Tasks;
+using Threax.ProcessHelper;
 
 namespace Threax.Provision.AzPowershell
 {
     public class SubscriptionManager : ISubscriptionManager
     {
-        private ILogger<SubscriptionManager> logger;
+        private readonly IShellRunner shellRunner;
 
-        public SubscriptionManager(ILogger<SubscriptionManager> logger)
+        public SubscriptionManager(IShellRunner shellRunner)
         {
-            this.logger = logger;
+            this.shellRunner = shellRunner;
         }
 
-        public async Task SetContext(Guid subscriptionId)
+        public Task SetContext(Guid subscriptionId)
         {
-            using (var pwsh = PowerShell.Create())
-            {
-                pwsh.PrintInformationStream(logger);
-                pwsh.PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
-                pwsh.SetUnrestrictedExecution();
-                pwsh.AddScript("Import-Module Az.Accounts");
-                pwsh.AddScript("param($sub) Set-AzContext -SubscriptionId $sub");
-                pwsh.AddParameter("sub", subscriptionId.ToString());
+            pwsh.SetUnrestrictedExecution();
+            pwsh.AddCommand($"Import-Module Az.Accounts");
+            pwsh.AddResultCommand($"Set-AzContext -SubscriptionId {subscriptionId}");
 
-                var outputCollection = await pwsh.RunAsync();
-
-                pwsh.ThrowOnErrors($"Error setting context to '{subscriptionId}'.");
-            }
+            return shellRunner.RunProcessVoidAsync(pwsh,
+                invalidExitCodeMessage: $"Error setting context to '{subscriptionId}'.");
         }
     }
 }

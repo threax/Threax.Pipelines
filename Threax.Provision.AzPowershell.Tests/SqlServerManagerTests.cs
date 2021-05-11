@@ -1,4 +1,4 @@
-#define ENABLE_SQL_SERVER_TESTS
+//#define ENABLE_SQL_SERVER_TESTS
 
 using System;
 using Xunit;
