@@ -1,4 +1,4 @@
-//#define ENABLE_SQL_SERVER_TESTS
+#define ENABLE_SQL_SERVER_TESTS
 
 using System;
 using Xunit;
@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
+using Threax.ProcessHelper;
+using Xunit.Abstractions;
 
 namespace Threax.Provision.AzPowershell.Tests
 {
@@ -22,6 +24,11 @@ namespace Threax.Provision.AzPowershell.Tests
         const string Ip = "192.168.1.1";
 
         Mockup mockup = new Mockup();
+
+        public SqlServerManagerTests(ITestOutputHelper output)
+        {
+            mockup.AddCommonMockups(output);
+        }
 
         public void Dispose()
         {
@@ -45,7 +52,7 @@ namespace Threax.Provision.AzPowershell.Tests
             var user = secretString.Substring(0, secretString.Length / 2);
             var pass = secretString.Substring(secretString.Length / 2) + "!2Ab"; //Last bit ensures complexity
 
-            var manager = new SqlServerManager(mockup.Get<ILogger<SqlServerManager>>());
+            var manager = new SqlServerManager(mockup.Get<IShellRunner>());
             await manager.Create(TestSqlServer, TestRg, TestRegion, user, pass);
         }
 
@@ -56,7 +63,7 @@ namespace Threax.Provision.AzPowershell.Tests
         ]
         public async Task SetServerFirewallRule()
         {
-            var manager = new SqlServerManager(mockup.Get<ILogger<SqlServerManager>>());
+            var manager = new SqlServerManager(mockup.Get<IShellRunner>());
             await manager.SetFirewallRule(TestFirewallRule, TestSqlServer, TestRg, Ip, Ip);
         }
 
@@ -67,7 +74,7 @@ namespace Threax.Provision.AzPowershell.Tests
         ]
         public async Task RemoveServerFirewallRule()
         {
-            var manager = new SqlServerManager(mockup.Get<ILogger<SqlServerManager>>());
+            var manager = new SqlServerManager(mockup.Get<IShellRunner>());
             await manager.RemoveFirewallRule(TestFirewallRule, TestSqlServer, TestRg);
         }
 
@@ -78,7 +85,7 @@ namespace Threax.Provision.AzPowershell.Tests
         ]
         public async Task FirewallRuleManagerTests()
         {
-            using var firewallRuleManager = new SqlServerFirewallRuleManager(new SqlServerManager(mockup.Get<ILogger<SqlServerManager>>()));
+            using var firewallRuleManager = new SqlServerFirewallRuleManager(new SqlServerManager(mockup.Get<IShellRunner>()));
 
             await firewallRuleManager.Unlock(TestSqlServer, TestRg, Ip, Ip);
             await firewallRuleManager.Unlock(TestSqlServer, TestRg, Ip, Ip);

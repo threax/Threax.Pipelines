@@ -6,80 +6,55 @@ using System.Management.Automation;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using Threax.ProcessHelper;
 
 namespace Threax.Provision.AzPowershell
 {
     public class SqlServerManager : ISqlServerManager
     {
-        private readonly ILogger<SqlServerManager> logger;
+        private readonly IShellRunner shellRunner;
 
-        public SqlServerManager(ILogger<SqlServerManager> logger)
+        public SqlServerManager(IShellRunner shellRunner)
         {
-            this.logger = logger;
+            this.shellRunner = shellRunner;
         }
 
-        public async Task Create(String name, String resourceGroupName, String location, String adminUser, String adminPass)
+        public Task Create(String name, String resourceGroupName, String location, String adminUser, String adminPass)
         {
-            var creds = new PSCredential(adminUser, adminPass.ToSecureString());
-
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Sql");
-            pwsh.AddParamLine(new { name, location, resourceGroupName, creds });
-            pwsh.AddScript($"New-AzSqlServer -ServerName ${nameof(name)} -SqlAdministratorCredentials ${nameof(creds)} -Location ${nameof(location)} -ResourceGroupName ${nameof(resourceGroupName)}");
+            pwsh.AddCommand($"Import-Module Az.Sql");
+            pwsh.AddCommand($"$secStringPassword = ConvertTo-SecureString {adminPass} -AsPlainText");
+            pwsh.AddCommand($"$credObject = New-Object System.Management.Automation.PSCredential ({adminUser}, $secStringPassword)");
+            pwsh.AddResultCommand($"New-AzSqlServer -ServerName {name} -SqlAdministratorCredentials $credObject -Location {location} -ResourceGroupName {resourceGroupName}");
 
-            var outputCollection = await pwsh.RunAsync();
-
-            pwsh.ThrowOnErrors($"Error creating Sql Server '{name}' in Resource Group '{resourceGroupName}' at '{location}'.");
+            return shellRunner.RunProcessVoidAsync(pwsh,
+                invalidExitCodeMessage: $"Error creating Sql Server '{name}' in Resource Group '{resourceGroupName}' at '{location}'.");
         }
 
-        public async Task SetFirewallRule(String name, String serverName, String resourceGroupName, String startIp, String endIp)
+        public Task SetFirewallRule(String name, String serverName, String resourceGroupName, String startIp, String endIp)
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Sql");
-            var parm = new
-            {
-                FirewallRuleName = name,
-                StartIpAddress = startIp,
-                EndIpAddress = endIp,
-                ServerName = serverName,
-                ResourceGroupName = resourceGroupName
-            };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("New-AzSqlServerFirewallRule", parm);
+            pwsh.AddCommand($"Import-Module Az.Sql");
+            pwsh.AddResultCommand($"New-AzSqlServerFirewallRule -FirewallRuleName {name} -StartIpAddress {startIp} -EndIpAddress {endIp} -ServerName {serverName} -ResourceGroupName {resourceGroupName}");
 
-            var outputCollection = await pwsh.RunAsync();
-
-            pwsh.ThrowOnErrors($"Error setting firewall rule for '{name}' on server {serverName}.");
+            return shellRunner.RunProcessVoidAsync(pwsh,
+                invalidExitCodeMessage: $"Error setting firewall rule for '{name}' on server {serverName}.");
         }
 
-        public async Task RemoveFirewallRule(String name, String serverName, String resourceGroupName)
+        public Task RemoveFirewallRule(String name, String serverName, String resourceGroupName)
         {
-            using var pwsh = PowerShell.Create()
-                .PrintInformationStream(logger)
-                .PrintErrorStream(logger);
+            var pwsh = shellRunner.CreateCommandBuilder();
 
             pwsh.SetUnrestrictedExecution();
-            pwsh.AddScript("Import-Module Az.Sql");
-            var parm = new
-            {
-                FirewallRuleName = name,
-                ServerName = serverName,
-                ResourceGroupName = resourceGroupName
-            };
-            pwsh.AddParamLine(parm);
-            pwsh.AddCommandWithParams("Remove-AzSqlServerFirewallRule", parm);
+            pwsh.AddCommand($"Import-Module Az.Sql");
+            pwsh.AddResultCommand($"Remove-AzSqlServerFirewallRule -FirewallRuleName {name} -ServerName {serverName} -ResourceGroupName {resourceGroupName}");
 
-            var outputCollection = await pwsh.RunAsync();
-
-            pwsh.ThrowOnErrors($"Error removing firewall rule for '{name}' on server {serverName}.");
+            return shellRunner.RunProcessVoidAsync(pwsh,
+                invalidExitCodeMessage: $"Error removing firewall rule for '{name}' on server {serverName}.");
         }
 
         public String CreateConnectionString(String serverName, String initialCatalog, String user, String pass)
