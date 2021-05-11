@@ -9,7 +9,7 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.SqlServer
 {
     class ArmSqlServer : ArmTemplate
     {
-        public ArmSqlServer(String serverName, String administratorLogin, SecureString password, String vnetName, String vnetSubnetName)
+        public ArmSqlServer(String serverName, String administratorLogin, String password, String vnetName, String vnetSubnetName)
         {
             this.serverName = serverName;
             this.administratorLogin = administratorLogin;
@@ -22,7 +22,7 @@ namespace Threax.Provision.CheapAzure.ArmTemplates.SqlServer
 
         public string administratorLogin { get; set; }
 
-        public SecureString administratorLoginPassword { get; set; }
+        public String administratorLoginPassword { get; set; }
 
         public string vnetSubnetName { get; }
         

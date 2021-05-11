@@ -46,7 +46,7 @@ namespace Threax.Provision.CheapAzure.Controller.CreateCommon
 
             //Setup logical server
             logger.LogInformation($"Setting up SQL Logical Server '{config.SqlServerName}' in Resource Group '{config.ResourceGroup}'.");
-            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlServer(config.SqlServerName, saCreds.User, saCreds.Pass.ToSecureString(), config.VnetName, config.VnetSubnetName));
+            await this.armTemplateManager.ResourceGroupDeployment(config.ResourceGroup, new ArmSqlServer(config.SqlServerName, saCreds.User, saCreds.Pass, config.VnetName, config.VnetSubnetName));
 
             //Setup shared sql db
             logger.LogInformation($"Setting up Shared SQL Database '{config.SqlDbName}' on SQL Logical Server '{config.SqlServerName}'.");

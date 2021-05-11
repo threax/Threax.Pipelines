@@ -6,7 +6,7 @@
       "type": "string"
     },
     "administratorLoginPassword": {
-      "type": "securestring"
+      "type": "string"
     },
     "location": {
       "type": "string"

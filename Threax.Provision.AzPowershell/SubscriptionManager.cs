@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Management.Automation;
+﻿using System;
 using System.Threading.Tasks;
 using Threax.ProcessHelper;
 
