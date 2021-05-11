@@ -26,14 +26,7 @@ namespace Threax.Provision.AzPowershell
 
             var ruleName = Guid.NewGuid().ToString();
             await sqlServerManager.SetFirewallRule(ruleName, serverName, resourceGroupName, startIp, endIp);
-            this.createdRules.Add(new FirewallRuleInfo()
-            {
-                ResourceGroupName = resourceGroupName,
-                RuleName = ruleName,
-                ServerName = serverName,
-                StartIp = startIp,
-                EndIp = endIp
-            });
+            this.createdRules.Add(new FirewallRuleInfo(serverName, resourceGroupName, ruleName, startIp, endIp));
         }
 
         public void Dispose()
@@ -47,6 +40,15 @@ namespace Threax.Provision.AzPowershell
 
         class FirewallRuleInfo
         {
+            public FirewallRuleInfo(string serverName, string resourceGroupName, string ruleName, string startIp, string endIp)
+            {
+                ServerName = serverName;
+                ResourceGroupName = resourceGroupName;
+                RuleName = ruleName;
+                StartIp = startIp;
+                EndIp = endIp;
+            }
+
             public String ServerName { get; set; }
 
             public String ResourceGroupName { get; set; }

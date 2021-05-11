@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DiExtensions
     {
-        public static void AddThreaxProvisionAzPowershell(this IServiceCollection services, Action<AzPowershellOptions> configure = null)
+        public static void AddThreaxProvisionAzPowershell(this IServiceCollection services, Action<AzPowershellOptions>? configure = null)
         {
             var options = new AzPowershellOptions();
             configure?.Invoke(options);
@@ -30,8 +30,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddScoped<ISqlServerFirewallRuleManager, SqlServerFirewallRuleManager>();
             services.TryAddScoped<ISqlServerManager, SqlServerManager>();
             services.TryAddScoped<IAcrManager, AcrManager>();
-            services.TryAddScoped<IWebAppManager, WebAppManager>();
-            services.TryAddScoped<IWebAppIdentityManager, WebAppIdentityManager>();
             services.TryAddScoped<IStorageManager, StorageManager>();
         }
     }

@@ -81,7 +81,7 @@ namespace Threax.Provision.AzPowershell
                invalidExitCodeMessage: $"Error setting secret '{name}' in Key Vault '{keyVaultName}'.");
         }
 
-        public async Task<String> GetSecret(String keyVaultName, String name)
+        public async Task<String?> GetSecret(String keyVaultName, String name)
         {
             var pwsh = shellRunner.CreateCommandBuilder();
 
@@ -145,7 +145,7 @@ namespace Threax.Provision.AzPowershell
             }
         }
 
-        public async Task<VaultCertificate> GetCertificate(String VaultName, String Name)
+        public async Task<VaultCertificate?> GetCertificate(String VaultName, String Name)
         {
             var pwsh = shellRunner.CreateCommandBuilder();
 
@@ -157,12 +157,7 @@ namespace Threax.Provision.AzPowershell
                 invalidExitCodeMessage: $"Error getting certificate '{Name}' from Key Vault '{VaultName}'.");
 
             return info != null ?
-                new VaultCertificate()
-                {
-                    KeyId = info.KeyId,
-                    SecretId = info.SecretId,
-                    Thumbprint = info.Thumbprint
-                } : null;
+                new VaultCertificate(info.KeyId, info.SecretId, info.Thumbprint) : null;
         }
     }
 }
