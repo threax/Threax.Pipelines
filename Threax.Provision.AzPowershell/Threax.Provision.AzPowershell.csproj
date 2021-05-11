@@ -10,8 +10,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.6" />
-    <PackageReference Include="Threax.ProcessHelper" Version="1.0.0-pre22" />
-    <PackageReference Include="Threax.ProcessHelper.Pwsh" Version="1.0.0-pre22" />
+    <PackageReference Include="Threax.ProcessHelper" Version="1.0.0-pre23" />
+    <PackageReference Include="Threax.ProcessHelper.Pwsh" Version="1.0.0-pre23" />
   </ItemGroup>
 
 </Project>

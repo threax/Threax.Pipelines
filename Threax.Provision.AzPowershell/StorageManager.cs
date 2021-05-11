@@ -21,10 +21,12 @@ namespace Threax.Provision.AzPowershell
             pwsh.AddCommand($"Import-Module Az.Storage");
             pwsh.AddResultCommand($"Get-AzStorageAccountKey -AccountName {AccountName} -ResourceGroupName {ResourceGroupName}");
 
-            dynamic result = await shellRunner.RunProcessAsync(pwsh,
-                invalidExitCodeMessage: $"Error getting storage account key for '{AccountName}' in Resource Group '{ResourceGroupName}'.");
+            var error = $"Error getting storage account key for '{AccountName}' in Resource Group '{ResourceGroupName}'.";
 
-            return result.Value;
+            var result = await shellRunner.RunProcessAsync(pwsh,
+                invalidExitCodeMessage: error);
+
+            return result?.ToString() ?? throw new InvalidOperationException(error);
         }
     }
 }
