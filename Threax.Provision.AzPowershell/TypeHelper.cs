@@ -8,11 +8,11 @@ namespace Threax.Provision.AzPowershell
 {
     class TypeHelper
     {
-        public static IEnumerable<KeyValuePair<String, Object>> GetPropertiesAndValues(Object instance)
+        public static IEnumerable<KeyValuePair<String, Object?>> GetPropertiesAndValues(Object instance)
         {
             foreach (var prop in instance.GetType().GetTypeInfo().DeclaredProperties.Where(i => i.CanRead))
             {
-                yield return KeyValuePair.Create(prop.Name, prop.GetGetMethod().Invoke(instance, new object[0]));
+                yield return KeyValuePair.Create(prop.Name, prop.GetGetMethod()?.Invoke(instance, new object[0]));
             }
         }
     }

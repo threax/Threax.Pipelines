@@ -27,7 +27,7 @@ namespace Threax.Provision.AzPowershell
             return result.IpAddress;
         }
 
-        public  Task SetSecurityRuleAccess(String NetworkSecurityGroup, String ResourceGroup, String Name, String Access)
+        public Task SetSecurityRuleAccess(String NetworkSecurityGroup, String ResourceGroup, String Name, String Access)
         {
             {
                 var pwsh = shellRunner.CreateCommandBuilder();

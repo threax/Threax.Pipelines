@@ -16,7 +16,7 @@ namespace Threax.Provision.AzPowershell
             this.shellRunner = shellRunner;
         }
 
-        public Task ResourceGroupDeployment(String resourceGroupName, String templateFile, String templateParameterFile, Object args)
+        public Task ResourceGroupDeployment(String resourceGroupName, String templateFile, String? templateParameterFile, Object args)
         {
             var pwsh = shellRunner.CreateCommandBuilder();
 
@@ -34,7 +34,7 @@ namespace Threax.Provision.AzPowershell
             return ResourceGroupDeployment(resourceGroupName, templateFile, null, args);
         }
 
-        public Task ResourceGroupDeployment(String resourceGroupName, String templateFile, String templateParametersFile)
+        public Task ResourceGroupDeployment(String resourceGroupName, String templateFile, String? templateParametersFile)
         {
             return ResourceGroupDeployment(resourceGroupName, templateFile, templateParametersFile, new Object());
         }
@@ -49,7 +49,7 @@ namespace Threax.Provision.AzPowershell
             return ResourceGroupDeployment(resourceGroupName, armTemplate.GetTemplatePath(), armTemplate.GetParametersPath(), armTemplate);
         }
 
-        public Task SubscriptionDeployment(String location, String templateFile, String templateParameterFile, Object args)
+        public Task SubscriptionDeployment(String location, String templateFile, String? templateParameterFile, Object args)
         {
             var pwsh = shellRunner.CreateCommandBuilder();
 
@@ -67,7 +67,7 @@ namespace Threax.Provision.AzPowershell
             return SubscriptionDeployment(location, templateFile, null, args);
         }
 
-        public Task SubscriptionDeployment(String location, String templateFile, String templateParametersFile)
+        public Task SubscriptionDeployment(String location, String templateFile, String? templateParametersFile)
         {
             return SubscriptionDeployment(location, templateFile, templateParametersFile, new Object());
         }
@@ -82,7 +82,7 @@ namespace Threax.Provision.AzPowershell
             return SubscriptionDeployment(resourceGroupName, armTemplate.GetTemplatePath(), armTemplate.GetParametersPath(), armTemplate);
         }
 
-        private static IEnumerable<FormattableString> SetupArgs(ref string templateFile, ref string templateParameterFile, Object args)
+        private static IEnumerable<FormattableString> SetupArgs(ref string templateFile, ref string? templateParameterFile, Object args)
         {
             templateFile = Path.GetFullPath(templateFile);
 

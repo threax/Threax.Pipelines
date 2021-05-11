@@ -1,13 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using System.Management.Automation;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Threax.Pipelines.Core;
 using Threax.Provision.AzPowershell;
@@ -74,7 +68,7 @@ namespace Threax.Provision.CheapAzure.Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"An {ex.GetType().Name} occured cleaning up private key file '{privateKeyFile}'. Message: {ex.Message}\n{ex.StackTrace}");
+                    Console.WriteLine($"An {ex.GetType().Name} occured disabling access to ssh in '{config.NsgName}' rg: '{config.ResourceGroup}' Rule Name: '{SshRuleName}'. Message: {ex.Message}\n{ex.StackTrace}");
                 }
             }
         }

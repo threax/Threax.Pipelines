@@ -107,6 +107,8 @@ namespace Threax.Provision.CheapAzure
                     o.AddConsole();
                 });
 
+                services.AddThreaxPwshShellRunner();
+
                 services.AddScoped<IStringGenerator, StringGenerator>();
                 services.AddScoped<ICredentialLookup, CredentialLookup>();
                 services.AddScoped<IVmCommands, VmCommands>();

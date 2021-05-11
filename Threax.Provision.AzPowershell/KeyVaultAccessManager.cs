@@ -25,11 +25,7 @@ namespace Threax.Provision.AzPowershell
             }
 
             await keyVaultManager.UnlockSecrets(keyVaultName, userId);
-            this.createdRules.Add(new KeyVaultRuleInfo()
-            {
-                KeyVaultName = keyVaultName,
-                UserId = userId
-            });
+            this.createdRules.Add(new KeyVaultRuleInfo(keyVaultName, userId));
         }
 
         public void Dispose()
@@ -44,6 +40,12 @@ namespace Threax.Provision.AzPowershell
 
         class KeyVaultRuleInfo
         {
+            public KeyVaultRuleInfo(string keyVaultName, Guid userId)
+            {
+                KeyVaultName = keyVaultName;
+                UserId = userId;
+            }
+
             public string KeyVaultName { get; set; }
             public Guid UserId { get; set; }
         }

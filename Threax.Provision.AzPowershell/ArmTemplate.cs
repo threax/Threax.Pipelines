@@ -12,7 +12,7 @@ namespace Threax.Provision.AzPowershell
             var type = this.GetType();
             string templateFolder = GetTemplateFolder(type);
 
-            var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location), "ArmTemplates", templateFolder, "parameters.json");
+            var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location) ?? "", "ArmTemplates", templateFolder, "parameters.json");
             return path;
         }
 
@@ -21,13 +21,13 @@ namespace Threax.Provision.AzPowershell
             var type = this.GetType();
             string templateFolder = GetTemplateFolder(type);
 
-            var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location), "ArmTemplates", templateFolder, "template.json");
+            var path = Path.Combine(Path.GetDirectoryName(type.Assembly.Location) ?? "", "ArmTemplates", templateFolder, "template.json");
             return path;
         }
 
         protected static string GetTemplateFolder(Type type)
         {
-            var templateFolder = type.Namespace;
+            var templateFolder = type.Namespace ?? "";
             var lastDot = templateFolder.LastIndexOf('.');
             var startIndex = lastDot + 1;
             if (lastDot != -1 && startIndex < templateFolder.Length)
